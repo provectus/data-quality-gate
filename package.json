@@ -1,0 +1,10 @@
+{
+  "name": "ipa",
+  "description": "",
+  "version": "0.1.0",
+  "devDependencies": {
+    "serverless": "^2.56.0",
+    "serverless-deployment-bucket": "^1.5.1",
+    "serverless-step-functions": "^3.0.0"
+  }
+}
