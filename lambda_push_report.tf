@@ -11,7 +11,7 @@ resource "random_uuid" "push_report" {
 module "docker_image_push_report" {
   source          = "terraform-aws-modules/lambda/aws//modules/docker-build"
   version         = "3.2.1"
-  create_ecr_repo = false
+  create_ecr_repo = true
   ecr_repo        = aws_ecr_repository.push_report.name
   image_tag       = random_uuid.push_report.result
   source_path     = "${path.module}/functions/report_push/"

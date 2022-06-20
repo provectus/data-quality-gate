@@ -11,7 +11,7 @@ resource "random_uuid" "fast_data" {
 module "docker_image_fast_data" {
   source          = "terraform-aws-modules/lambda/aws//modules/docker-build"
   version         = "3.2.1"
-  create_ecr_repo = false
+  create_ecr_repo = true
   ecr_repo        = aws_ecr_repository.fast_data_qa.name
   image_tag       = random_uuid.fast_data.result
   source_path     = "${path.module}/functions/data_test/"
