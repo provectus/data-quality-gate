@@ -12,7 +12,7 @@ module "docker_image_push_report" {
   source          = "terraform-aws-modules/lambda/aws//modules/docker-build"
   version         = "3.2.1"
   create_ecr_repo = true
-  ecr_repo        = aws_ecr_repository.push_report.name
+  ecr_repo        = "${local.resource_name_prefix}-push-report"
   image_tag       = random_uuid.push_report.result
   source_path     = "${path.module}/functions/report_push/"
 }
