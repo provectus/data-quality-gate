@@ -1,0 +1,4 @@
+bucket         = "tf-state-dev-deployments-data-quality-gate"
+key            = "tf_state/dev"
+region         = "eu-central-1"
+dynamodb_table = "TerraformStateLocks"
