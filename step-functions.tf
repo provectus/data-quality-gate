@@ -5,7 +5,7 @@ resource "aws_sfn_state_machine" "fast_data_qa" {
   definition = <<DEFINITION
 {
   "Comment": "This is your state machine",
-  "StartAt": "Read new files",
+  "StartAt": "Process Tests",
   "States": {
     "Process Tests": {
       "Type": "Map",
