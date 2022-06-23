@@ -89,28 +89,28 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
   }
 
-  # Cache behavior with precedence 2
-  ordered_cache_behavior {
-    path_pattern     = "/parseauth"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["OPTIONS", "HEAD"]
-    target_origin_id = local.resource_name_prefix
-    forwarded_values {
-      query_string = true
-      cookies {
-        forward = "none"
-      }
-    }
-    lambda_function_association {
-      event_type   = "viewer-request"
-      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.ParseAuthHandler
-    }
-    min_ttl                = 0
-    default_ttl            = 3600
-    max_ttl                = 86400
-    compress               = true
-    viewer_protocol_policy = "redirect-to-https"
-  }
+#  # Cache behavior with precedence 2
+#  ordered_cache_behavior {
+#    path_pattern     = "/parseauth"
+#    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+#    cached_methods   = ["OPTIONS", "HEAD"]
+#    target_origin_id = local.resource_name_prefix
+#    forwarded_values {
+#      query_string = true
+#      cookies {
+#        forward = "none"
+#      }
+#    }
+#    lambda_function_association {
+#      event_type   = "viewer-request"
+#      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.ParseAuthHandler
+#    }
+#    min_ttl                = 0
+#    default_ttl            = 3600
+#    max_ttl                = 86400
+#    compress               = true
+#    viewer_protocol_policy = "redirect-to-https"
+#  }
   price_class = "PriceClass_200"
 
   restrictions {
