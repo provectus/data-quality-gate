@@ -13,6 +13,15 @@ locals {
   }
 }
 
+provider "aws" {
+  region = var.aws_region
+
+  default_tags {
+    tags = {
+      "Project"               = local.resource_name_prefix
+    }
+  }
+}
 
 resource "aws_cloudwatch_log_group" "state-machine-log-group" {
   name              = "/aws/${local.resource_name_prefix}/states/fast-data-qa-logs"

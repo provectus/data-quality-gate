@@ -17,3 +17,13 @@ variable "slack_webhook_url" {
   type = string
   default = null
 }
+
+variable "cognito_user_pool_id" {
+  type = string
+  default = null
+}
+
+variable "tags" {
+  type = map(string)
+  default = null
+}

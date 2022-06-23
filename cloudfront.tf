@@ -5,7 +5,7 @@ resource "aws_cloudfront_origin_access_identity" "data_qa_oai" {
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name = aws_s3_bucket.fast_data_qa.bucket_regional_domain_name
-    origin_id   = local.resource_name_prefix
+    origin_id   = aws_cloudfront_origin_access_identity.data_qa_oai.id
 
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.data_qa_oai.cloudfront_access_identity_path
@@ -20,7 +20,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.resource_name_prefix
+    target_origin_id = aws_cloudfront_origin_access_identity.data_qa_oai.id
 
     forwarded_values {
       query_string = false
@@ -41,7 +41,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     path_pattern     = "/content/immutable/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = local.resource_name_prefix
+    target_origin_id = aws_cloudfront_origin_access_identity.data_qa_oai.id
 
     forwarded_values {
       query_string = false
@@ -79,8 +79,38 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     max_ttl                = 86400
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
+    lambda_function_association {
+      event_type   = "viewer-request"
+      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.CheckAuthHandler
+    }
+    lambda_function_association {
+      event_type   = "origin-response"
+      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.HttpHeadersHandler
+    }
   }
 
+  # Cache behavior with precedence 2
+  ordered_cache_behavior {
+    path_pattern     = "/parseauth"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["OPTIONS", "HEAD"]
+    target_origin_id = local.resource_name_prefix
+    forwarded_values {
+      query_string = true
+      cookies {
+        forward = "none"
+      }
+    }
+    lambda_function_association {
+      event_type   = "viewer-request"
+      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.ParseAuthHandler
+    }
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
   price_class = "PriceClass_200"
 
   restrictions {
@@ -90,9 +120,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     }
   }
 
-  tags = {
-    Environment = "production"
-  }
+  tags = var.tags
 
   viewer_certificate {
     cloudfront_default_certificate = true
