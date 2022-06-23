@@ -20,7 +20,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = aws_cloudfront_origin_access_identity.data_qa_oai.id
+    target_origin_id = "${local.resource_name_prefix}-s3-origin"
 
     forwarded_values {
       query_string = false
@@ -41,7 +41,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     path_pattern     = "/content/immutable/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = aws_cloudfront_origin_access_identity.data_qa_oai.id
+    target_origin_id = "${local.resource_name_prefix}-s3-origin"
 
     forwarded_values {
       query_string = false
@@ -64,7 +64,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     path_pattern     = "/content/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.resource_name_prefix
+    target_origin_id = "${local.resource_name_prefix}-s3-origin"
 
     forwarded_values {
       query_string = false
