@@ -5,7 +5,7 @@ resource "aws_cloudfront_origin_access_identity" "data_qa_oai" {
 resource "aws_cloudfront_distribution" "s3_distribution" {
   origin {
     domain_name = aws_s3_bucket.fast_data_qa.bucket_regional_domain_name
-    origin_id   = aws_cloudfront_origin_access_identity.data_qa_oai.id
+    origin_id   = "${local.resource_name_prefix}-s3-origin"
 
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.data_qa_oai.cloudfront_access_identity_path
