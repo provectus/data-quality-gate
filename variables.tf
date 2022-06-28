@@ -27,3 +27,8 @@ variable "tags" {
   type = map(string)
   default = null
 }
+
+variable "s3_source_data_bucket" {
+  type = string
+  description = "bucket name, with the data on which test will be executed"
+}

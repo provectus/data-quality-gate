@@ -15,6 +15,17 @@ resource "aws_iam_policy" "allow_s3_bucket_read" {
         {
           "Effect" : "Allow",
           "Action" : [
+            "s3:ListBucket",
+            "s3:GetObject*"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::${var.s3_source_data_bucket}",
+            "arn:aws:s3:::${var.s3_source_data_bucket}/*"
+          ]
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
             "s3:*"
           ],
           "Resource" : [

@@ -2,7 +2,7 @@
    "fileLocations":[
       {
          "URIPrefixes":[
-            "s3://${bucket_name}-${env_name}-fast-data-qa/test_configs/test_coverage.json"
+               "s3://${bucket_name}/test_configs/test_coverage.json"
          ]
       }
    ],

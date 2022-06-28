@@ -42,7 +42,7 @@ resource "aws_sns_topic" "data_qa_alerts_notifications" {
 module "notify_slack" {
   count = var.slack_webhook_url == null ? 0 : 1
   source  = "terraform-aws-modules/notify-slack/aws"
-  version = "~> 4.0"
+  version = "~> 5.3"
 
   lambda_function_name = "${local.resource_name_prefix}-notify-slack-data-qa"
 
