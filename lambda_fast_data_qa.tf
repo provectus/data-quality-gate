@@ -3,7 +3,7 @@ resource "random_uuid" "fast_data" {
     for filename in setunion(
       fileset("${path.module}/functions/data_test/", "*.py"),
       fileset("${path.module}/functions/data_test/", "requirements.txt"),
-      fileset("${path.module}/functions/data_test/", "Dockerfile")
+      fileset("${path.module}/functions/data_test/", "Dockerfile"),
       fileset("${path.module}/functions/data_test/", ".dockerignore")
     ) :
     filename => filemd5("${path.module}/functions/data_test/${filename}")
