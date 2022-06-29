@@ -68,77 +68,76 @@ def change_ge_config(datasource_root, datasource_folder,engine):
     configfile_raw = context_ge.get_config().to_yaml_str()
     configfile = yaml.safe_load(configfile_raw)
 
-    match engine:
-        case 's3':
-            datasources = {
-                "pandas_s3": {
-                    "class_name": "PandasDatasource",
-                    "batch_kwargs_generators": {
-                        "pandas_s3_generator": {
-                            "class_name": "S3GlobReaderBatchKwargsGenerator",
-                            "bucket": datasource_root,
-                            "assets": {
-                                "your_first_data_asset_name": {
-                                    "prefix": "/",
-                                    "regex_filter": ".*"
-                                }
+
+    if engine=='s3':
+        datasources = {
+            "pandas_s3": {
+                "class_name": "PandasDatasource",
+                "batch_kwargs_generators": {
+                    "pandas_s3_generator": {
+                        "class_name": "S3GlobReaderBatchKwargsGenerator",
+                        "bucket": datasource_root,
+                        "assets": {
+                            "your_first_data_asset_name": {
+                                "prefix": "/",
+                                "regex_filter": ".*"
                             }
                         }
-                    },
-                    "module_name": "great_expectations.datasource",
-                    "data_asset_type": {
-                        "class_name": "PandasDataset",
-                        "module_name": "great_expectations.dataset"
                     }
+                },
+                "module_name": "great_expectations.datasource",
+                "data_asset_type": {
+                    "class_name": "PandasDataset",
+                    "module_name": "great_expectations.dataset"
                 }
             }
+        }
 
-            config = DataContextConfig(config_version=configfile['config_version'], datasources=datasources,
-                                       expectations_store_name=configfile['expectations_store_name'],
-                                       validations_store_name=configfile['validations_store_name'],
-                                       evaluation_parameter_store_name=configfile['evaluation_parameter_store_name'],
-                                       plugins_directory='/great_expectations/plugins',
-                                       validation_operators=configfile['validation_operators'],
-                                       config_variables_file_path=configfile['config_variables_file_path'],
-                                       anonymous_usage_statistics=configfile['anonymous_usage_statistics'],
-                                       store_backend_defaults=S3StoreBackendDefaults(
-                                           default_bucket_name=qa_bucket_name,
-                                           expectations_store_prefix=qa_bucket_name + '/great_expectations/expectations/',
-                                           validations_store_prefix=qa_bucket_name + '/great_expectations/uncommitted/validations/'))
-            return config
-        case 'athena':
-            return 2
-        case 'redshift':
-            return 2
-        case 'hudi':
-            return 3
-        case 'postgresql':
-            return 4
-        case 'snowflake':
-            return 4
-        case _:
-            return s3.Bucket(datasource_root)
+        config = DataContextConfig(config_version=configfile['config_version'], datasources=datasources,
+                                   expectations_store_name=configfile['expectations_store_name'],
+                                   validations_store_name=configfile['validations_store_name'],
+                                   evaluation_parameter_store_name=configfile['evaluation_parameter_store_name'],
+                                   plugins_directory='/great_expectations/plugins',
+                                   validation_operators=configfile['validation_operators'],
+                                   config_variables_file_path=configfile['config_variables_file_path'],
+                                   anonymous_usage_statistics=configfile['anonymous_usage_statistics'],
+                                   store_backend_defaults=S3StoreBackendDefaults(
+                                       default_bucket_name=qa_bucket_name,
+                                       expectations_store_prefix=qa_bucket_name + '/great_expectations/expectations/',
+                                       validations_store_prefix=qa_bucket_name + '/great_expectations/uncommitted/validations/'))
+        return config
+    elif engine=='athena':
+        return 2
+    elif engine=='redshift':
+        return 3
+    elif engine=='hudi':
+        return 4
+    elif engine=='postgresql':
+        return 5
+    elif engine=='snowflake':
+        return 6
+    else:
+        return s3.Bucket(datasource_root)
 
 
 
 
 
 def select_engine_source(datasource_root,engine):
-    match engine:
-        case 's3':
-            return s3.Bucket(datasource_root)
-        case 'athena':
-            return 2
-        case 'redshift':
-            return 2
-        case 'hudi':
-            return 3
-        case 'postgresql':
-            return 4
-        case 'snowflake':
-            return 4
-        case _:
-            return s3.Bucket(datasource_root)
+    if engine=='s3':
+        return s3.Bucket(datasource_root)
+    elif engine=='athena':
+        return 2
+    elif engine=='redshift':
+        return 3
+    elif engine=='hudi':
+        return 4
+    elif engine=='postgresql':
+        return 5
+    elif engine=='snowflake':
+        return 6
+    else:
+        return s3.Bucket(datasource_root)
 
 def profile_data(file, file_name, cloudfront, datasource_root, datasource_folder, source_covered,engine):
     qa_bucket = s3.Bucket(qa_bucket_name)
