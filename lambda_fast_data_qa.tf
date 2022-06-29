@@ -3,8 +3,7 @@ resource "random_uuid" "fast_data" {
     for filename in setunion(
       fileset("${path.module}/functions/data_test/", "*.py"),
       fileset("${path.module}/functions/data_test/", "requirements.txt"),
-      fileset("${path.module}/functions/data_test/", "Dockerfile"),
-      fileset("${path.module}/functions/data_test/", ".dockerignore")
+      fileset("${path.module}/functions/data_test/", "Dockerfile")
     ) :
     filename => filemd5("${path.module}/functions/data_test/${filename}")
   }
@@ -12,11 +11,11 @@ resource "random_uuid" "fast_data" {
 
 module "docker_image_fast_data" {
   source          = "terraform-aws-modules/lambda/aws//modules/docker-build"
-  version         = "3.2.1"
+  version         = "3.3.1"
   create_ecr_repo = true
   ecr_repo        = "${local.resource_name_prefix}-fast-data"
   image_tag       = random_uuid.fast_data.result
-  source_path     = "${path.module}/functions/data_test/"
+  source_path     = "../functions/data_test/"
 }
 
 module "lambda_function_fast_data" {
