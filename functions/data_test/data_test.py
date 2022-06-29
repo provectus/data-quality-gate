@@ -8,7 +8,6 @@ import awswrangler as wr
 from datasource import prepare_final_ds
 def handler(event,context):
     cloudfront = os.environ['QA_CLOUDFRONT']
-    file = event['file']
     engine = event['engine']
     source_root = event['source_root']
     source = event['source_data']
