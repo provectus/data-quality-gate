@@ -77,19 +77,19 @@ def get_source_name(source,engine):
         return 6
     else:
         if type(source) == list:
-            source_name = re.search('.*/(.+?)\\.parquet', source[0]).group(1)
+            source_name = re.search('.*/(.+?)(\_(\d.*)|).parquet', source[0]).group(1)
         else:
-            source_name = re.search('.*/(.+?)\\.parquet', source).group(1)
+            source_name = re.search('.*/(.+?)(\_(\d.*)|).parquet', source).group(1)
         return source_name
 
 def prepare_final_ds(source,engine,source_engine):
 
     if type(source) == list:
+        source_name = get_source_name(source, engine)
         source = concat_source_list(source,engine,source_engine)
-        source_name = get_source_name(source,engine)
     else:
+        source_name = get_source_name(source, engine)
         source = prepare_source(source,engine,source_engine)
-        source_name = get_source_name(source,engine)
     df = read_source(source,engine)
 
     return df,source_name
