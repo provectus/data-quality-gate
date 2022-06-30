@@ -61,9 +61,9 @@ def read_source(source,engine):
 def get_source_name(source,engine):
     if engine == 's3':
         if type(source) == list:
-            source_name = re.search('.*/(.+?)\\.parquet', source[0]).group(1)
+            source_name = re.search('.*/(.+?)(\_(\d.*)|).parquet', source[0]).group(1)
         else:
-            source_name = re.search('.*/(.+?)\\.parquet', source).group(1)
+            source_name = re.search('.*/(.+?)(\_(\d.*)|).parquet', source).group(1)
         return source_name
     elif engine == 'athena':
         return 2
