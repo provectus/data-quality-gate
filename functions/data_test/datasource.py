@@ -9,7 +9,7 @@ def concat_source_list(engine,source,source_engine):
     final_source_files = []
     if engine == 's3':
         for sc in source:
-            final_source_files.append(source_engine + '/' + sc.split('/')[0] + sc.replace(sc.split('/')[0], ''))
+            final_source_files.append('s3://' + source_engine + '/' + sc)
         return final_source_files
     elif engine == 'athena':
         return 2
@@ -23,12 +23,12 @@ def concat_source_list(engine,source,source_engine):
         return 6
     else:
         for sc in source:
-            final_source_files.append(source_engine + '/' + sc.split('/')[0] + sc.replace(sc.split('/')[0], ''))
+            final_source_files.append('s3://'+source_engine + '/' + sc)
         return final_source_files
 
 def prepare_source(engine,source,source_engine):
     if engine == 's3':
-        return source_engine + '/' + source.split('/')[0] + source.replace(source.split('/')[0],'')
+        return 's3://'+source_engine + '/' + source
     elif engine == 'athena':
         return 2
     elif engine == 'redshift':
@@ -40,7 +40,7 @@ def prepare_source(engine,source,source_engine):
     elif engine == 'snowflake':
         return 6
     else:
-        return source_engine + '/' + source.split('/')[0] + source.replace(source.split('/')[0],'')
+        return 's3://'+source_engine + '/' + source
 
 def read_source(source,engine):
     if engine == 's3':
@@ -84,13 +84,12 @@ def get_source_name(source,engine):
 
 def prepare_final_ds(source,engine,source_engine):
 
-    # if type(source) == list:
-    #     source_name = get_source_name(source, engine)
-    #     # source = concat_source_list(source,engine,source_engine)
-    # else:
-    #     source_name = get_source_name(source, engine)
-    #     # source = prepare_source(source,engine,source_engine)
-    source_name = get_source_name(source, engine)
+    if type(source) == list:
+        source_name = get_source_name(source, engine)
+        source = concat_source_list(source,engine,source_engine)
+    else:
+        source_name = get_source_name(source, engine)
+        source = prepare_source(source,engine,source_engine)
     df = read_source(source,engine)
 
     return df,source_name
