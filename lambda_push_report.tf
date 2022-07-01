@@ -2,7 +2,8 @@ resource "random_uuid" "push_report" {
   keepers = {
     for filename in setunion(
       fileset("${path.module}/..functions/report_push/", "*.py"),
-      fileset("${path.module}/../functions/report_push/", "requirements.txt")
+      fileset("${path.module}/../functions/report_push/", "requirements.txt"),
+      fileset("${path.module}/../functions/report_push/", "Dockerfile")
     ) :
     filename => filemd5("${path.module}/../functions/report_push/${filename}")
   }
