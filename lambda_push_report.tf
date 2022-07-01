@@ -15,7 +15,7 @@ module "docker_image_push_report" {
   create_ecr_repo = true
   ecr_repo        = "${local.resource_name_prefix}-push-report"
   image_tag       = random_uuid.push_report.result
-  source_path     = "${path.root}/functions/report_push"
+  source_path     = abspath("${path.cwd}/functions/report_push")
 }
 
 module "lambda_function_push_report" {
