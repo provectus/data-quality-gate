@@ -9,13 +9,17 @@ resource "random_uuid" "push_report" {
   }
 }
 
+locals {
+  report_push_path = "${path.module}/function/report_push"
+}
+
 module "docker_image_push_report" {
   source          = "terraform-aws-modules/lambda/aws//modules/docker-build"
   version         = "3.3.1"
   create_ecr_repo = true
   ecr_repo        = "${local.resource_name_prefix}-push-report"
   image_tag       = random_uuid.push_report.result
-  source_path     = abspath("${path.cwd}/functions/report_push")
+  source_path     = local.report_push_path
 }
 
 module "lambda_function_push_report" {
