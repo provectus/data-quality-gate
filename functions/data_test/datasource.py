@@ -86,10 +86,10 @@ def prepare_final_ds(source,engine,source_engine):
 
     if type(source) == list:
         source_name = get_source_name(source, engine)
-        source = concat_source_list(source,engine,source_engine)
+        source = concat_source_list(engine,source,source_engine)
     else:
         source_name = get_source_name(source, engine)
-        source = prepare_source(source,engine,source_engine)
+        source = prepare_source(engine,source,source_engine)
     df = read_source(source,engine)
 
     return df,source_name
