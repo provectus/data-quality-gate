@@ -10,7 +10,7 @@ resource "random_uuid" "push_report" {
 }
 
 locals {
-  report_push_path = abspath("${path.module}/function/report_push")
+  report_push_path = abspath("${path.module}/functions/report_push")
 }
 
 module "docker_image_push_report" {
