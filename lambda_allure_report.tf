@@ -15,7 +15,7 @@ module "docker_image_allure_report" {
   create_ecr_repo = true
   ecr_repo        = "${local.resource_name_prefix}-allure-report"
   image_tag       = random_uuid.allure_report.result
-  source_path     = "${path.module}/../functions/allure_report"
+  source_path     = "${path.module}/functions/allure_report"
 }
 
 module "lambda_function_allure_report" {
