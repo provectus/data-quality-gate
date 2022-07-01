@@ -20,7 +20,7 @@ module "docker_image_fast_data" {
 
 module "lambda_function_fast_data" {
   source         = "terraform-aws-modules/lambda/aws"
-  version        = "3.2.1"
+  version        = "3.3.1"
   function_name  = "${local.resource_name_prefix}-fast-data"
   description    = "Fast data QA"
   create_package = false

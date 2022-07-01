@@ -11,16 +11,16 @@ resource "random_uuid" "push_report" {
 
 module "docker_image_push_report" {
   source          = "terraform-aws-modules/lambda/aws//modules/docker-build"
-  version         = "3.2.1"
+  version         = "3.3.1"
   create_ecr_repo = true
   ecr_repo        = "${local.resource_name_prefix}-push-report"
   image_tag       = random_uuid.push_report.result
-  source_path     = "${path.module}/functions/report_push/"
+  source_path     = "${path.module}/functions/report_push"
 }
 
 module "lambda_function_push_report" {
   source         = "terraform-aws-modules/lambda/aws"
-  version        = "3.2.1"
+  version        = "3.3.1"
   function_name  = "${local.resource_name_prefix}-push-report"
   description    = "Allure report"
   create_package = false
