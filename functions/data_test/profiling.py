@@ -145,10 +145,10 @@ def profile_data(file, file_name, cloudfront, datasource_root, source_covered,en
     context_ge = BaseDataContext(project_config=config)
     df = file
     try:
-        profile = ProfileReport(df, title=file + " Profiling Report", minimal=True)
+        profile = ProfileReport(df, title=file_name + " Profiling Report", minimal=True)
         report = profile.to_html()
     except TypeError:
-        profile = ProfileReport(df, title=file + " Profiling Report")
+        profile = ProfileReport(df, title=file_name + " Profiling Report")
         report = profile.to_html()
 
 
