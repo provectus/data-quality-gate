@@ -2,7 +2,7 @@ FROM python:3.7-slim-bullseye
 RUN apt-get update && apt-get install -y --no-install-recommends \
 debconf
 COPY ./*.py /
-COPY ./great_expectations /
+COPY great_expectations /great_expectations
 COPY ./requirements.txt /
 RUN pip3 install -r requirements.txt --no-cache-dir
 RUN rm -f  /etc/timezone
