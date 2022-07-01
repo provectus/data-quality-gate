@@ -141,7 +141,7 @@ def select_engine_source(datasource_root,engine):
 
 def profile_data(file, file_name, cloudfront, datasource_root, source_covered,engine):
     qa_bucket = s3.Bucket(qa_bucket_name)
-    config = change_ge_config(datasource_root)
+    config = change_ge_config(datasource_root,engine)
     context_ge = BaseDataContext(project_config=config)
     df = file
     try:
