@@ -62,7 +62,7 @@ class MyExpectationHandler(Handler):
         super().__init__(mapping, typeset, *args, **kwargs)
 
 
-def change_ge_config(datasource_root, datasource_folder,engine):
+def change_ge_config(datasource_root,engine):
     context_ge = DataContext()
 
     configfile_raw = context_ge.get_config().to_yaml_str()
@@ -139,7 +139,7 @@ def select_engine_source(datasource_root,engine):
     else:
         return s3.Bucket(datasource_root)
 
-def profile_data(file, file_name, cloudfront, datasource_root, datasource_folder, source_covered,engine):
+def profile_data(file, file_name, cloudfront, datasource_root, source_covered,engine):
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)
     context_ge = BaseDataContext(project_config=config)
