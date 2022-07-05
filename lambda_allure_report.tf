@@ -3,7 +3,8 @@ resource "random_uuid" "allure_report" {
     for filename in setunion(
       fileset("${path.module}/functions/allure_report/", "*.py"),
       fileset("${path.module}/functions/allure_report/", "requirements.txt"),
-      fileset("${path.module}/functions/allure_report/", "Dockerfile")
+      fileset("${path.module}/functions/allure_report/", "Dockerfile"),
+      fileset("${path.module}/functions/allure_report/", "generate_report.sh")
     ) :
     filename => filemd5("${path.module}/functions/allure_report/${filename}")
   }
