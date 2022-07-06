@@ -31,5 +31,6 @@ COPY --from=build ${FUNCTION_DIR} ${FUNCTION_DIR}
 COPY --from=build allure ${FUNCTION_DIR}/allure
 COPY --from=build aws ${FUNCTION_DIR}/aws
 RUN ./aws/install
+RUN find . -type f -exec chmod 755 {} \;
 ENTRYPOINT ["/usr/local/bin/python", "-m", "awslambdaric"]
 CMD ["make_allure_report.handler"]

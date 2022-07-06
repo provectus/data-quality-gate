@@ -112,7 +112,7 @@ resource "aws_sfn_state_machine" "fast_data_qa" {
           }
         }
       },
-      "ItemsPath": "$.Payload.files",
+      "ItemsPath": "$.files",
       "Next": "Success"
     },
     "Success": {
