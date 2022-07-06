@@ -18,7 +18,7 @@ def handler(event,context):
         source_name = event['table']
     except KeyError:
         source_name = ''
-    final_ds, source_name = prepare_final_ds(source, engine, source_root)
+    final_ds, source_name = prepare_final_ds(source, engine, source_root,source_name)
     try:
         source_covered = coverage_config[coverage_config['table'] == source_name]['complexSuite'].values[0]
     except (IndexError,KeyError) as e:
