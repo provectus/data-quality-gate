@@ -14,11 +14,14 @@ def handler(event,context):
     run_name = event['run_name']
     qa_bucket_name = os.environ['QA_BUCKET']
     coverage_config = wr.s3.read_json(path='s3://' + qa_bucket_name + '/test_configs/test_coverage.json')
-    final_ds,source_name = prepare_final_ds(source,engine,source_root)
-
+    try:
+        source_name = event['table']
+    except KeyError:
+        source_name = ''
+    final_ds, source_name = prepare_final_ds(source, engine, source_root)
     try:
         source_covered = coverage_config[coverage_config['table'] == source_name]['complexSuite'].values[0]
-    except IndexError:
+    except (IndexError,KeyError) as e:
         source_covered = False
 
     profile_link,folder_key,config = profile_data(final_ds,source_name,cloudfront,source_root,source_covered, engine)

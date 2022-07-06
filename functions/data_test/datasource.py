@@ -82,13 +82,12 @@ def get_source_name(source,engine):
             source_name = re.search('.*/(.+?)(\_(\d.*)|).parquet', source).group(1)
         return source_name
 
-def prepare_final_ds(source,engine,source_engine):
-
-    if type(source) == list:
+def prepare_final_ds(source,engine,source_engine,source_name):
+    if (source_name == ''):
         source_name = get_source_name(source, engine)
+    if type(source) == list:
         source = concat_source_list(engine,source,source_engine)
     else:
-        source_name = get_source_name(source, engine)
         source = prepare_source(engine,source,source_engine)
     df = read_source(source,engine)
 
