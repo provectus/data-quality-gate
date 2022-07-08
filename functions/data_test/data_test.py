@@ -1,8 +1,5 @@
 from profiling import profile_data
 from suite_run import validate_data
-import os
-import s3fs
-import re
 import boto3
 import awswrangler as wr
 from datasource import prepare_final_ds
