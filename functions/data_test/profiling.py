@@ -1,20 +1,13 @@
-import numpy as np
-import pandas as pd
 from pandas_profiling import ProfileReport
-import os
-import s3fs
 import boto3
 import awswrangler as wr
-import re
 from pandas_profiling.model import expectation_algorithms
 from pandas_profiling.model.handler import Handler
-import great_expectations as ge
 from Expectation_report_new import ExpectationsReportNew
 from pandas_profiling.expectations_report import ExpectationsReport
 from datetime import datetime
 from great_expectations import DataContext
 from great_expectations.data_context import BaseDataContext
-from great_expectations.data_context.store import TupleFilesystemStoreBackend
 from great_expectations.data_context.types.base import DataContextConfig, S3StoreBackendDefaults
 import yaml
 from great_expectations.data_context import BaseDataContext
@@ -140,7 +133,6 @@ def select_engine_source(datasource_root,engine):
         return s3.Bucket(datasource_root)
 
 def profile_data(file, file_name, cloudfront, datasource_root, source_covered,engine):
-    qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root,engine)
     context_ge = BaseDataContext(project_config=config)
     df = file

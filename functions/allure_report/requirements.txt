@@ -5,9 +5,8 @@ s3fs==2021.6.0
 python-dateutil==2.8.1
 botocore==1.20.49
 boto3==1.17.1
-boto
+boto==2.49.0
 pyarrow==2
-fastparquet
-awslambdaric
-awswrangler
-# awscliv2==1.5.2
+fastparquet==0.8.0
+awslambdaric==2.0.4
+awswrangler==2.12.1

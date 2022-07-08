@@ -4,11 +4,7 @@
 # In[ ]:
 
 
-from great_expectations import DataContext
-import great_expectations as ge
-import os
 from pathlib import Path
-import s3fs
 import boto3
 BASE_DIR = Path(__file__).resolve().parent
 from great_expectations.data_context import BaseDataContext
