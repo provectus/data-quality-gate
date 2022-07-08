@@ -3,12 +3,15 @@ from datetime import date
 import json
 import awswrangler as wr
 import random
+import os
+cloudWatch = boto3.client('cloudwatch')
 s3 = boto3.resource('s3')
-ssm = boto3.client('ssm')
 dynamodb = boto3.resource('dynamodb')
-dynamo_table_name = ssm.get_parameter(Name='/data-qa/dynamo-table', WithDecryption=True)['Parameter']['Value']
+dynamo_table_name = os.environ['QA_DYNAMODB_TABLE']
 table = dynamodb.Table(dynamo_table_name)
-qa_bucket = ssm.get_parameter(Name='/data-qa/qa-bucket', WithDecryption=True)['Parameter']['Value']
+qa_bucket = os.environ['QA_BUCKET']
+environment = os.environ['ENVIRONMENT']
+
 def handler(event, context):
 
     replaced_allure_links = event['links'].get('Payload')
@@ -20,6 +23,7 @@ def handler(event, context):
     path = report.get('path')
     file = report.get('suite_name')
     key = report.get('folder_key')
+    run_name = report.get('run_name')
     items = []
 
     df = wr.s3.read_json(path=['s3://'+qa_bucket+'/allure/' + suite + '/' + key + '/allure-report/history/history-trend.json'])
@@ -27,8 +31,6 @@ def handler(event, context):
     total = history['data']['0']['total']
     failed = history['data']['0']['failed']
     passed = history['data']['0']['passed']
-    skipped = history['data']['0']['skipped']
-    broken = history['data']['0']['broken']
     if failed != 0:
         status = 'failed'
     else:
@@ -39,16 +41,15 @@ def handler(event, context):
             'file_name': file,
             'all': total,
             'allure_link': replaced_allure_links,
-            'broken': broken,
             'date': today,
             'failed': failed,
             'ge_link': ge_links,
             'passed': passed,
             'profiling_link': profiling_link,
-            'skipped': skipped,
             'status': status,
             'suite': suite,
-            'path': path
+            'path': str(path),
+            'run_name': run_name
         }
     items.append(local_item)
 
@@ -58,4 +59,25 @@ def handler(event, context):
             batch.put_item(
                 Item=item
             )
+
+    cloudWatch.put_metric_data(
+        Namespace='Data-QA',
+        MetricData=[
+            {
+                'MetricName': 'suite_failed_count',
+                'Dimensions': [
+                    {
+                        'Name': 'table_name',
+                        'Value': suite
+                    },
+                    {
+                        'Name': 'Environment',
+                        'Value': environment
+                    }
+                ],
+                'Value': failed,
+                'Unit': 'Count'
+            },
+        ]
+    )
     return "Dashboard is ready!"
