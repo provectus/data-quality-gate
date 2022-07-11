@@ -2,6 +2,7 @@ from profiling import profile_data
 from suite_run import validate_data
 import boto3
 import awswrangler as wr
+import os
 from datasource import prepare_final_ds
 def handler(event,context):
     cloudfront = os.environ['QA_CLOUDFRONT']
