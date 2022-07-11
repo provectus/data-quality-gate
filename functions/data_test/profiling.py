@@ -11,6 +11,7 @@ from great_expectations.data_context import BaseDataContext
 from great_expectations.data_context.types.base import DataContextConfig, S3StoreBackendDefaults
 import yaml
 from great_expectations.data_context import BaseDataContext
+import os
 
 s3 = boto3.resource("s3")
 qa_bucket_name = os.environ['QA_BUCKET']
@@ -133,6 +134,7 @@ def select_engine_source(datasource_root,engine):
         return s3.Bucket(datasource_root)
 
 def profile_data(file, file_name, cloudfront, datasource_root, source_covered,engine):
+    qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root,engine)
     context_ge = BaseDataContext(project_config=config)
     df = file
