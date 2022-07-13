@@ -26,7 +26,7 @@ terraform {
     }
     docker = {
       source  = "kreuzwerker/docker"
-      version = "2.12.0"
+      version = "2.18.0"
     }
   }
   required_version = "1.1.7"
