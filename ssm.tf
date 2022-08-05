@@ -4,7 +4,7 @@ resource "aws_ssm_parameter" "data_qa_cloudfront" {
   description = "domain for cloudfront"
   name        = "/${local.resource_name_prefix}/data-qa/cloudfront"
   type        = "String"
-  value       = aws_cloudfront_distribution.s3_distribution.domain_name
+  value       = local.aws_cloudfront_distribution
 }
 
 resource "aws_ssm_parameter" "data_qa_datasource_bucket" {

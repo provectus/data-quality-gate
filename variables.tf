@@ -44,3 +44,9 @@ variable "expectations_store" {
   description = "Path to the expectations_store directory, relative to the root TF"
   default     = "../expectations_store"
 }
+
+variable "cloudfront_allowed_subnets" {
+  type        = list(string)
+  default     = null
+  description = "list of allowed subnets, suitable if you wan't use Cognito and allow users to get reports from specific IP address spaces"
+}
