@@ -362,7 +362,7 @@ resource "aws_waf_ipset" "ipset" {
   name  = "tfIPSet"
 
   dynamic "ip_set_descriptors" {
-    for_each = set(var.cloudfront_allowed_subnets)
+    for_each = toset(var.cloudfront_allowed_subnets)
     content {
       type  = "IPV4"
       value = ip_set_descriptors.value
