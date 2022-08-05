@@ -9,7 +9,7 @@ resource "aws_s3_bucket" "source_data_bucket" {
 
 module "data_qa_gate" {
   source                     = "../"
-  cloudfront_allowed_subnets = ["195.155.100.203/32"]
+  cloudfront_allowed_subnets = ["176.232.57.191/32", "195.155.100.203/32"]
   s3_source_data_bucket      = aws_s3_bucket.source_data_bucket.bucket
   environment                = "test-ip"
 }
