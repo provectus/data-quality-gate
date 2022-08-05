@@ -93,11 +93,11 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
 
     lambda_function_association {
       event_type = "viewer-request"
-      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.CheckAuthHandler
+      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.CheckAuthHandler
     }
     lambda_function_association {
       event_type = "origin-response"
-      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.HttpHeadersHandler
+      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.HttpHeadersHandler
     }
   }
 
@@ -123,11 +123,11 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     viewer_protocol_policy = "redirect-to-https"
     lambda_function_association {
       event_type = "viewer-request"
-      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.CheckAuthHandler
+      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.CheckAuthHandler
     }
     lambda_function_association {
       event_type = "origin-response"
-      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.HttpHeadersHandler
+      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.HttpHeadersHandler
     }
   }
 
@@ -146,7 +146,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     }
     lambda_function_association {
       event_type = "viewer-request"
-      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.ParseAuthHandler
+      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.ParseAuthHandler
     }
     min_ttl                = 0
     default_ttl            = 3600
@@ -169,7 +169,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     }
     lambda_function_association {
       event_type = "viewer-request"
-      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.RefreshAuthHandler
+      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.RefreshAuthHandler
     }
     min_ttl                = 0
     default_ttl            = 3600
@@ -192,7 +192,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     }
     lambda_function_association {
       event_type = "viewer-request"
-      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge.outputs.SignOutHandler
+      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack[0].edge.outputs.SignOutHandler
     }
     min_ttl                = 0
     default_ttl            = 3600
