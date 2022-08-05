@@ -360,8 +360,9 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
 resource "aws_waf_ipset" "ipset" {
   count = var.cloudfront_allowed_subnets != null ? 1 : 0
   name  = "tfIPSet"
+
   dynamic "ip_set_descriptors" {
-    for_each = var.cloudfront_allowed_subnets
+    for_each = set(var.cloudfront_allowed_subnets)
     content {
       type  = "IPV4"
       value = ip_set_descriptors.value
