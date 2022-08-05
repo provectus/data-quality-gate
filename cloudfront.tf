@@ -361,7 +361,7 @@ resource "aws_waf_ipset" "ipset" {
   count = var.cloudfront_allowed_subnets != null ? 1 : 0
   name  = "tfIPSet"
   dynamic "ip_set_descriptors" {
-    for_each = var.cloudfront_allowed_subnets != 0 ? var.cloudfront_allowed_subnets : null
+    for_each = var.cloudfront_allowed_subnets
     content {
       type  = "IPV4"
       value = ip_set_descriptors.value
@@ -383,7 +383,6 @@ resource "aws_waf_rule" "wafrule" {
 }
 
 resource "aws_waf_web_acl" "waf_acl" {
-
   name        = "tfWebACL"
   metric_name = "tfWebACL"
 
