@@ -7,18 +7,17 @@ data "aws_availability_zones" "available" {
 locals {
   resource_name_prefix = "${var.project}-${var.environment}"
   tags = {
-    Module     = "data-qa-gate"
+    Module      = "data-qa-gate"
     Environment = var.environment
     Terraform   = "true"
   }
 }
 
 provider "aws" {
-  region = var.aws_region
 
   default_tags {
     tags = {
-      "Project"               = local.resource_name_prefix
+      "Project" = local.resource_name_prefix
     }
   }
 }
