@@ -192,7 +192,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     }
     lambda_function_association {
       event_type = "viewer-request"
-      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack[0].edge.outputs.SignOutHandler
+      lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.SignOutHandler
     }
     min_ttl                = 0
     default_ttl            = 3600
