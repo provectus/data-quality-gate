@@ -50,3 +50,8 @@ variable "cloudfront_allowed_subnets" {
   default     = null
   description = "list of allowed subnets, suitable if you wan't use Cognito and allow users to get reports from specific IP address spaces"
 }
+
+variable "cloudfront_location_restrictions" {
+  default     = var.cloudfront_location_restrictions
+  description = "List of regions allowed for CloudFront distribution"
+}
