@@ -99,12 +99,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
       event_type = "origin-response"
       lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.HttpHeadersHandler
     }
-    restrictions {
-      geo_restriction {
-        restriction_type = "whitelist"
-        locations        = var.cloudfront_location_restrictions
-      }
-    }
   }
 
   # Cache behavior with precedence 1
@@ -135,12 +129,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
       event_type = "origin-response"
       lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.HttpHeadersHandler
     }
-    restrictions {
-      geo_restriction {
-        restriction_type = "whitelist"
-        locations        = var.cloudfront_location_restrictions
-      }
-    }
   }
   # Cache behavior with precedence 2
   ordered_cache_behavior {
@@ -170,12 +158,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
       event_type = "origin-response"
       lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.HttpHeadersHandler
     }
-    restrictions {
-      geo_restriction {
-        restriction_type = "whitelist"
-        locations        = var.cloudfront_location_restrictions
-      }
-    }
   }
   # Cache behavior with precedence 3
   ordered_cache_behavior {
@@ -199,12 +181,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     max_ttl                = 86400
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
-    restrictions {
-      geo_restriction {
-        restriction_type = "whitelist"
-        locations        = var.cloudfront_location_restrictions
-      }
-    }
   }
   # Cache behavior with precedence 4
   ordered_cache_behavior {
@@ -228,12 +204,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     max_ttl                = 86400
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
-    restrictions {
-      geo_restriction {
-        restriction_type = "whitelist"
-        locations        = var.cloudfront_location_restrictions
-      }
-    }
   }
   # Cache behavior with precedence 5
   ordered_cache_behavior {
@@ -257,12 +227,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     max_ttl                = 86400
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
-    restrictions {
-      geo_restriction {
-        restriction_type = "whitelist"
-        locations        = var.cloudfront_location_restrictions
-      }
-    }
   }
   price_class = "PriceClass_200"
 
@@ -278,8 +242,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
   viewer_certificate {
     cloudfront_default_certificate = true
   }
-
-  #web_acl_id = aws_waf_web_acl.waf_acl.id
 }
 
 data "aws_iam_policy_document" "s3_policy_for_cloudfront" {
