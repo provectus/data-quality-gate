@@ -52,6 +52,6 @@ variable "cloudfront_allowed_subnets" {
 }
 
 variable "cloudfront_location_restrictions" {
-  default     = var.cloudfront_location_restrictions
+  default     = ["US", "CA", "GB", "DE", "TR"]
   description = "List of regions allowed for CloudFront distribution"
 }
