@@ -26,7 +26,7 @@ module "lambda_function_push_report" {
   create_package = false
   environment_variables = {
     QA_BUCKET         = aws_s3_bucket.fast_data_qa.bucket
-    QA_CLOUDFRONT     = aws_cloudfront_distribution.s3_distribution.domain_name
+    QA_CLOUDFRONT     = local.aws_cloudfront_distribution
     QA_DYNAMODB_TABLE = aws_dynamodb_table.data_qa_report.name
     ENVIRONMENT       = var.environment
   }

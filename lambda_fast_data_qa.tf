@@ -26,12 +26,12 @@ module "lambda_function_fast_data" {
   create_package = false
   environment_variables = {
     QA_BUCKET         = aws_s3_bucket.fast_data_qa.bucket
-    QA_CLOUDFRONT     = aws_cloudfront_distribution.s3_distribution.domain_name
+    QA_CLOUDFRONT     = local.aws_cloudfront_distribution
     QA_DYNAMODB_TABLE = aws_dynamodb_table.data_qa_report.name
     #CDC_BUCKET        = var.source_s3_bucket_name
     #HOODIE_CONFIG     = "${data.terraform_remote_state.common_infra.outputs.etl_task_settings}/configs/${var.environment}/hudi_config.json"
     #HUDI_DB           = data.terraform_remote_state.env-specific.outputs.processed_glue_database
-    ENVIRONMENT       = var.environment
+    ENVIRONMENT = var.environment
   }
   image_uri                      = module.docker_image_fast_data.image_uri
   package_type                   = "Image"
