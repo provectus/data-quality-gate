@@ -34,6 +34,6 @@ module "lambda_function_push_report" {
   package_type                   = "Image"
   reserved_concurrent_executions = -1
   timeout                        = 900
-  memory_size                    = 1024
+  memory_size                    = var.lambda_push_report_memory
   tracing_mode                   = "PassThrough"
 }

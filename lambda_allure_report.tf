@@ -37,6 +37,6 @@ module "lambda_function_allure_report" {
   package_type                   = "Image"
   reserved_concurrent_executions = -1
   timeout                        = 900
-  memory_size                    = 1024
+  memory_size                    = var.lambda_allure_report_memory
   tracing_mode                   = "PassThrough"
 }

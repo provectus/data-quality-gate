@@ -55,3 +55,18 @@ variable "cloudfront_location_restrictions" {
   default     = ["US", "CA", "GB", "DE", "TR"]
   description = "List of regions allowed for CloudFront distribution"
 }
+
+variable "lambda_allure_report_memory" {
+  description = "Amount of memory allocated to the lambda function lambda_allure_report"
+  default     = 1024
+}
+
+variable "lambda_fast_data_qa_memory" {
+  description = "Amount of memory allocated to the lambda function lambda_fast_data_qa"
+  default     = 5048
+}
+
+variable "lambda_push_report_memory" {
+  description = "Amount of memory allocated to the lambda function lambda_push_report"
+  default     = 1024
+}
