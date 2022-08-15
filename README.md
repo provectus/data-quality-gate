@@ -3,6 +3,9 @@
 ## Description
 Terrafrom module which setup Data-QA solution(bucket,Stepfunctions Pipeline with AWS Lambda, Metadata Storage. Data-QA Reports) in your infrastructure in 'one-click'. AWS Based. Built on top of Great_expectations, Pandas_profiling, Allure
 
+## Solution Architecture
+![alt text](https://github.com/provectus/data-quality-gate/blob/master/architecture.png?raw=true)
+
 ## Usage
 Could be used as standard Terraform module, the examples of deployments under `deployment-example` directory.
 
