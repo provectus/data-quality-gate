@@ -1,7 +1,7 @@
 # Data Quality Gate 
 
 ## Description
-Terrafrom module which setup Data-QA solution(bucket,Stepfunctions Pipeline with AWS Lambda, Metadata Storage. Data-QA Reports) in your infructure in 'one-click'. AWS Based. Built on top of Great_expectations and Pandas_profiling
+Terrafrom module which setup Data-QA solution(bucket,Stepfunctions Pipeline with AWS Lambda, Metadata Storage. Data-QA Reports) in your infrastructure in 'one-click'. AWS Based. Built on top of Great_expectations and Pandas_profiling
 
 ## Usage
 Could be used as standard Terraform module, the examples of deployments under `deployment-example` directory.
