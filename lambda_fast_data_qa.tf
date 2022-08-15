@@ -37,7 +37,7 @@ module "lambda_function_fast_data" {
   package_type                   = "Image"
   reserved_concurrent_executions = -1
   timeout                        = 900
-  memory_size                    = 5048
+  memory_size                    = var.lambda_fast_data_qa_memory
   tracing_mode                   = "PassThrough"
 }
 
