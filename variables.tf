@@ -1,36 +1,36 @@
 variable "project" {
-  type    = string
-  default = "demo"
+  type        = string
+  default     = "demo"
+  description = "Name of your project, will be used as a prefix for AWS resources names"
 }
 
 variable "environment" {
-  type    = string
-  default = "data-qa-dev"
-}
-
-variable "aws_region" {
-  type    = string
-  default = "us-west-2"
+  type        = string
+  default     = "data-qa-dev"
+  description = "Additional AWS Resource prefix for all resource name, e.g. project-environment"
 }
 
 variable "slack_webhook_url" {
-  type    = string
-  default = null
+  type        = string
+  default     = null
+  description = "The Slack webhook url, which will be used to send notification if some errors will be found it datasets"
 }
 
 variable "cognito_user_pool_id" {
-  type    = string
-  default = null
+  type        = string
+  default     = null
+  description = "If you already has Cognito user pool which will be used for authentication, you could provide Cognito user pool id here. If it not provided, new Cognito user pool will be created"
 }
 
 variable "tags" {
-  type    = map(string)
-  default = null
+  type        = map(string)
+  default     = null
+  description = "Map of AWS Resource TAG's which will be added to each resource"
 }
 
 variable "s3_source_data_bucket" {
   type        = string
-  description = "bucket name, with the data on which test will be executed"
+  description = "Bucket name, with the data on which test will be executed"
 }
 
 variable "test_coverage_path" {
