@@ -120,6 +120,9 @@ Could be used as standard Terraform module, the examples of deployments under `d
 | <a name="input_slack_webhook_url"></a> [slack\_webhook\_url](#input\_slack\_webhook\_url) | The Slack webhook url, which will be used to send notification if some errors will be found it datasets | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Map of AWS Resource TAG's which will be added to each resource | `map(string)` | `null` | no |
 | <a name="input_test_coverage_path"></a> [test\_coverage\_path](#input\_test\_coverage\_path) | Path to the tests description path, relative to the root TF | `string` | `"../configs/test_coverage.json"` | no |
+| <a name="input_lambda_allure_report_memory"></a> [lambda\_allure\_report\_memory](#input\_lambda\_allure\_report\_memory) | Amount of memory allocated to the lambda function allure report | `int` | `1024` | no |
+| <a name="input_lambda_fast_data_qa_memory"></a> [lambda\_fast\_data\_qa\_memory](#input\_lambda\_fast\_data\_qa\_memory) | Amount of memory allocated to the lambda function fast data qa | `int` | `5048` | no |
+| <a name="input_lambda_push_report_memory"></a> [lambda\_push\_report\_memory](#input\_lambda\_push\_report\_memory) | Amount of memory allocated to the lambda function push report | `int` | `1024` | no |
 
 ## Outputs
 
