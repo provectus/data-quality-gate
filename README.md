@@ -63,6 +63,7 @@ resource "aws_sfn_state_machine" "data_state_machine" {
   - AthenaCatalogName - The name you will give to this catalog in Athena. It will also be used as the function name.
 
 *Cannot be created automatically by terraform because [terraform-provider-aws/issues/16485](https://github.com/hashicorp/terraform-provider-aws/issues/16485)
+
 4. Create AWS Athena Data Source:
 - Data source type -> Amazon DynamoDB
 - Connection details -> lambda function -> name of `AthenaCatalogName` from pt.3 
