@@ -31,17 +31,17 @@ resource "aws_s3_object" "great_expectations_yml" {
 
 resource "aws_s3_object" "test_configs" {
   bucket = aws_s3_bucket.fast_data_qa.bucket
-  source = "${path.root}/${var.test_coverage_path}"
+  source = "${path.module}/${var.test_coverage_path}"
   key    = "test_configs/test_coverage.json"
-  etag   = filemd5("${path.root}/${var.test_coverage_path}")
+  etag   = filemd5("${path.module}/${var.test_coverage_path}")
 }
 
 resource "aws_s3_object" "expectations_store" {
-  for_each = fileset("${path.root}/${var.expectations_store}", "**")
+  for_each = fileset("${path.module}/${var.expectations_store}", "**")
   bucket   = aws_s3_bucket.fast_data_qa.bucket
-  source   = "${path.root}/${var.expectations_store}/${each.value}"
+  source   = "${path.module}/${var.expectations_store}/${each.value}"
   key      = "${aws_s3_bucket.fast_data_qa.bucket}/great_expectations/expectations/${each.value}"
-  etag     = filemd5("${path.root}/${var.expectations_store}/${each.value}")
+  etag     = filemd5("${path.module}/${var.expectations_store}/${each.value}")
 }
 
 resource "aws_s3_object" "test_config_manifest" {

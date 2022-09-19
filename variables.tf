@@ -36,13 +36,13 @@ variable "s3_source_data_bucket" {
 variable "test_coverage_path" {
   type        = string
   description = "Path to the tests description path, relative to the root TF"
-  default     = "../configs/test_coverage.json"
+  default     = "configs/test_coverage.json"
 }
 
 variable "expectations_store" {
   type        = string
   description = "Path to the expectations_store directory, relative to the root TF"
-  default     = "../expectations_store"
+  default     = "expectations_store"
 }
 
 variable "cloudfront_allowed_subnets" {
