@@ -36,7 +36,7 @@ resource "aws_s3_object" "great_expectations_yml" {
   bucket       = aws_s3_bucket.fast_data_qa.bucket
   etag         = filemd5("${path.module}/templates/great_expectations.yml")
   content_type = "application/x-yaml"
-  content      = templatefile(file("${path.module}/templates/great_expectations.yml"), { bucket = aws_s3_bucket.fast_data_qa.bucket })
+  content      = templatefile("${path.module}/templates/great_expectations.yml", { bucket = aws_s3_bucket.fast_data_qa.bucket })
   key          = "${aws_s3_bucket.fast_data_qa.bucket}/great_expectations/great_expectations.yml"
 }
 
