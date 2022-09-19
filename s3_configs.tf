@@ -19,12 +19,14 @@ resource "aws_s3_bucket_versioning" "fast-data-qa-bucket" {
 
 resource "aws_s3_object" "great_expectations_yml" {
   bucket       = aws_s3_bucket.fast_data_qa.bucket
-  etag         = filemd5("${path.module}/templates/great_expectations.yml")
   content_type = "application/x-yaml"
   content = templatefile("${path.module}/templates/great_expectations.yml", {
     bucket = aws_s3_bucket.fast_data_qa.bucket
   })
   key = "${aws_s3_bucket.fast_data_qa.bucket}/great_expectations/great_expectations.yml"
+  etag = md5(templatefile("${path.module}/templates/great_expectations.yml", {
+    bucket = aws_s3_bucket.fast_data_qa.bucket
+  }))
 }
 
 resource "aws_s3_object" "test_configs" {
@@ -43,8 +45,11 @@ resource "aws_s3_object" "expectations_store" {
 }
 
 resource "aws_s3_object" "test_config_manifest" {
-  bucket       = aws_s3_bucket.fast_data_qa.bucket
-  etag         = filemd5("${path.module}/configs/manifest.json")
+  bucket = aws_s3_bucket.fast_data_qa.bucket
+  etag = md5(templatefile("${path.module}/configs/manifest.json", {
+    env_name    = var.environment,
+    bucket_name = aws_s3_bucket.fast_data_qa.bucket
+  }))
   content_type = "application/json"
   content = templatefile("${path.module}/configs/manifest.json",
     {
