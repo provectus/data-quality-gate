@@ -9,7 +9,7 @@ on:
       Branch:
         description: 'Branch name on which jobs will be executed'
         required: true
-        default: 'main'
+        default: 'master'
       TerraformTarget:
         description: 'Terraform Target, please provide resource target name'
         required: true
