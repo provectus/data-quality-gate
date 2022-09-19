@@ -17,14 +17,6 @@ resource "aws_s3_bucket_versioning" "fast-data-qa-bucket" {
   }
 }
 
-#resource "aws_s3_bucket_object" "great_expectations_s3_configs" {
-#  for_each = fileset("${path.module}/configs/great_expectations", "**")
-#  bucket   = aws_s3_bucket.fast_data_qa.bucket
-#  key      = "${aws_s3_bucket.fast_data_qa.bucket}/great_expectations/${each.value}"
-#  source   = "${path.module}/configs/great_expectations/${each.value}"
-#  etag     = filemd5("${path.module}/configs/great_expectations/${each.value}")
-#}
-
 resource "aws_s3_object" "great_expectations_yml" {
   bucket       = aws_s3_bucket.fast_data_qa.bucket
   etag         = filemd5("${path.module}/templates/great_expectations.yml")
@@ -49,14 +41,6 @@ resource "aws_s3_object" "expectations_store" {
   key      = "${aws_s3_bucket.fast_data_qa.bucket}/great_expectations/expectations/${each.value}"
   etag     = filemd5("${path.root}/${var.expectations_store}/${each.value}")
 }
-
-#data "template_file" "test_config_manifest" {
-#  template = file("${path.module}/configs/manifest.json")
-#  vars = {
-#    env_name    = var.environment
-#    bucket_name = aws_s3_bucket.fast_data_qa.bucket
-#  }
-#}
 
 resource "aws_s3_object" "test_config_manifest" {
   bucket       = aws_s3_bucket.fast_data_qa.bucket
