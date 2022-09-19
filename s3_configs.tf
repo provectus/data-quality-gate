@@ -17,27 +17,16 @@ resource "aws_s3_bucket_versioning" "fast-data-qa-bucket" {
   }
 }
 
-#resource "aws_s3_bucket_object" "great_expectations_s3_configs" {
-#  for_each = fileset("${path.module}/configs/great_expectations", "**")
-#  bucket   = aws_s3_bucket.fast_data_qa.bucket
-#  key      = "${aws_s3_bucket.fast_data_qa.bucket}/great_expectations/${each.value}"
-#  source   = "${path.module}/configs/great_expectations/${each.value}"
-#  etag     = filemd5("${path.module}/configs/great_expectations/${each.value}")
-#}
-
-data "template_file" "great_expectations_yml" {
-  template = file("${path.module}/templates/great_expectations.yml")
-  vars = {
-    bucket = aws_s3_bucket.fast_data_qa.bucket
-  }
-}
-
 resource "aws_s3_object" "great_expectations_yml" {
   bucket       = aws_s3_bucket.fast_data_qa.bucket
-  etag         = filemd5("${path.module}/templates/great_expectations.yml")
   content_type = "application/x-yaml"
-  content      = data.template_file.great_expectations_yml.rendered
-  key          = "${aws_s3_bucket.fast_data_qa.bucket}/great_expectations/great_expectations.yml"
+  content = templatefile("${path.module}/templates/great_expectations.yml", {
+    bucket = aws_s3_bucket.fast_data_qa.bucket
+  })
+  key = "${aws_s3_bucket.fast_data_qa.bucket}/great_expectations/great_expectations.yml"
+  etag = md5(templatefile("${path.module}/templates/great_expectations.yml", {
+    bucket = aws_s3_bucket.fast_data_qa.bucket
+  }))
 }
 
 resource "aws_s3_object" "test_configs" {
@@ -55,20 +44,19 @@ resource "aws_s3_object" "expectations_store" {
   etag     = filemd5("${path.root}/${var.expectations_store}/${each.value}")
 }
 
-data "template_file" "test_config_manifest" {
-  template = file("${path.module}/configs/manifest.json")
-  vars = {
-    env_name = var.environment
-    bucket_name = aws_s3_bucket.fast_data_qa.bucket
-  }
-}
-
 resource "aws_s3_object" "test_config_manifest" {
-  bucket       = aws_s3_bucket.fast_data_qa.bucket
-  etag         = filemd5("${path.module}/configs/manifest.json")
+  bucket = aws_s3_bucket.fast_data_qa.bucket
+  etag = md5(templatefile("${path.module}/configs/manifest.json", {
+    env_name    = var.environment,
+    bucket_name = aws_s3_bucket.fast_data_qa.bucket
+  }))
   content_type = "application/json"
-  content      = data.template_file.test_config_manifest.rendered
-  key          = "test_configs/manifest.json"
+  content = templatefile("${path.module}/configs/manifest.json",
+    {
+      env_name    = var.environment,
+      bucket_name = aws_s3_bucket.fast_data_qa.bucket
+  })
+  key = "test_configs/manifest.json"
 }
 
 ##Lifecycle policy to delete reports older than 2 weeks
