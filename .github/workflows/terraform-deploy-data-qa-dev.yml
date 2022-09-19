@@ -29,7 +29,7 @@ jobs:
         run: |
           ls -la
           pwd
-          cd deployment-example
+          cd ./deployment-example
           echo "TF_DIR=$(pwd)" >> $GITHUB_ENV
           echo "TF_BACKEND_CONFIG=terraform-backend.tfbackend" >> $GITHUB_ENV
 
@@ -48,18 +48,15 @@ jobs:
       - name: Terraform init
         id: init
         run: |
+          cd $TF_DIR
           echo "TF_BACKEND_CONFIG: $TF_BACKEND_CONFIG"
           terraform init --backend-config ./$TF_BACKEND_CONFIG
-
-      - name: Terraform validate
-        id: validate
-        run: |
-          terraform validate -no-color
 
       - name: Terraform plan
         id: plan
         if: ${{ github.event.inputs.applyTerraform == 'plan' }}
         run: |
+          cd $TF_DIR
           if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
           then
           terraform plan -input=false
@@ -71,6 +68,7 @@ jobs:
         id: apply
         if: ${{ github.event.inputs.applyTerraform == 'apply' }}
         run: |
+          cd $TF_DIR
           if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
           then
           terraform apply -auto-approve
