@@ -62,8 +62,9 @@ jobs:
         run: |
           if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
           then
-          terraform plan --var-file="$TF_DEPLOY_ENV/$TF_ENV_VARIABLES" -input=false
-          else terraform plan --var-file="$TF_DEPLOY_ENV/$TF_ENV_VARIABLES" -target=${{ github.event.inputs.TerraformTarget }} -input=false
+          terraform plan -input=false
+          else 
+          terraform plan -target=${{ github.event.inputs.TerraformTarget }} -input=false
           fi
 
       - name: Terraform apply
@@ -72,7 +73,8 @@ jobs:
         run: |
           if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
           then
-          terraform apply -auto-approve --var-file="$TF_DEPLOY_ENV/$TF_ENV_VARIABLES"
-          else terraform apply -auto-approve --var-file="$TF_DEPLOY_ENV/$TF_ENV_VARIABLES" -target=${{ github.event.inputs.TerraformTarget }}
+          terraform apply -auto-approve
+          else 
+          terraform apply -auto-approve -target=${{ github.event.inputs.TerraformTarget }}
           fi
           #We should add param to use tfvars for specific env
