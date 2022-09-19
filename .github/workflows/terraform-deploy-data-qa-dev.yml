@@ -29,7 +29,7 @@ jobs:
         run: |
           ls -la
           pwd
-          cd ./data-quality-gate/deployment-example
+          cd deployment-example
           echo "TF_DIR=$(pwd)" >> $GITHUB_ENV
           echo "TF_BACKEND_CONFIG=terraform-backend.tfbackend" >> $GITHUB_ENV
 
@@ -38,7 +38,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-central-1
+          aws-region: eu-west-2
 
       - name: Terraform Install
         uses: hashicorp/setup-terraform@v1
@@ -48,23 +48,18 @@ jobs:
       - name: Terraform init
         id: init
         run: |
-          cd $TF_DIR
-          echo $TF_DEPLOY_ENV
-          echo $TF_BACKEND_CONFIG
-          echo $TF_DEPLOY_ENV/$TF_BACKEND_CONFIG
-          terraform init --backend-config=$TF_DEPLOY_ENV/$TF_BACKEND_CONFIG
+          echo TF_BACKEND_CONFIG=$TF_BACKEND_CONFIG
+          terraform init --backend-config=$TF_BACKEND_CONFIG
 
       - name: Terraform validate
         id: validate
         run: |
-          cd $TF_DIR
           terraform validate -no-color
 
       - name: Terraform plan
         id: plan
         if: ${{ github.event.inputs.applyTerraform == 'plan' }}
         run: |
-          cd $TF_DIR
           if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
           then
           terraform plan --var-file="$TF_DEPLOY_ENV/$TF_ENV_VARIABLES" -input=false
@@ -75,7 +70,6 @@ jobs:
         id: apply
         if: ${{ github.event.inputs.applyTerraform == 'apply' }}
         run: |
-          cd $TF_DIR
           if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
           then
           terraform apply -auto-approve --var-file="$TF_DEPLOY_ENV/$TF_ENV_VARIABLES"
