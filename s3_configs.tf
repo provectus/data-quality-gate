@@ -36,7 +36,7 @@ resource "aws_s3_object" "great_expectations_yml" {
   bucket       = aws_s3_bucket.fast_data_qa.bucket
   etag         = filemd5("${path.module}/templates/great_expectations.yml")
   content_type = "application/x-yaml"
-  content      = data.template_file.great_expectations_yml.rendered
+  content      = templatefile(file("${path.module}/templates/great_expectations.yml"), { bucket = aws_s3_bucket.fast_data_qa.bucket })
   key          = "${aws_s3_bucket.fast_data_qa.bucket}/great_expectations/great_expectations.yml"
 }
 
@@ -58,7 +58,7 @@ resource "aws_s3_object" "expectations_store" {
 data "template_file" "test_config_manifest" {
   template = file("${path.module}/configs/manifest.json")
   vars = {
-    env_name = var.environment
+    env_name    = var.environment
     bucket_name = aws_s3_bucket.fast_data_qa.bucket
   }
 }
