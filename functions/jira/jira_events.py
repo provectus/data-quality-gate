@@ -24,8 +24,8 @@ def get_all_bugs(project: str):
         total += got
 
 
-def create_bug(project_key: str, table_name: str, column_name: str):
-    summary = "[DataQA]: Auto generated bug for data test for table " + table_name + " for column: " + column_name
+def create_bug(project_key: str, table_name: str, fail_step: str, description: str):
+    summary = "[DataQA][BUG][" + table_name + "] " + fail_step
     print(summary)
     got = 50
     total = 0
@@ -56,10 +56,6 @@ def create_bug(project_key: str, table_name: str, column_name: str):
                 "project": {"key": project_key},
                 "issuetype": {"name": "Bug"},
                 "summary": summary,
-                "description": "Auto generated bug for data test for table " + table_name,
+                "description": description,
             }
         )
-
-
-if __name__ == '__main__':
-    create_bug("IPA", "TableName", "ColumnName")
