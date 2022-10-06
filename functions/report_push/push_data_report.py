@@ -5,10 +5,14 @@ import boto3
 import boto
 import boto.s3
 import re
+import fnmatch
 from datetime import date
 import json
 import awswrangler as wr
 import random
+
+from functions.jira.jira_events import create_bug
+
 cloudWatch = boto3.client('cloudwatch')
 s3 = boto3.resource('s3')
 dynamodb = boto3.resource('dynamodb')
@@ -30,8 +34,21 @@ def handler(event, context):
     key = report.get('folder_key')
     run_name = report.get('run_name')
     items = []
-
     df = wr.s3.read_json(path=['s3://'+qa_bucket+'/allure/' + suite + '/' + key + '/allure-report/history/history-trend.json'])
+    result_df = wr.s3.read_json(path=['s3://'+qa_bucket+'/allure/' + suite + '/' + key + '/allure-report/results/'])
+    pattern = "*-result.json"
+    for entry in os.listdir(result_df):
+        if fnmatch.fnmatch(entry, pattern):
+            result_file = open("results/" + entry)
+            result = json.load(result_file)
+            status = result['status']
+            if status == "passed":
+                print("Result is passed, try next")
+            if status == "failed":
+                table_name = result['labels'][1]['value']
+                fail_step = result['steps'][0]['name']
+                description = result['description']
+                create_bug("IPA", table_name[:table_name.find('.')], fail_step[:fail_step.find('.')], description)
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
     failed = history['data']['0']['failed']
@@ -40,7 +57,6 @@ def handler(event, context):
         status = 'failed'
     else:
         status = 'passed'
-
     local_item = {
             'file':str(random.random()),
             'file_name': file,
