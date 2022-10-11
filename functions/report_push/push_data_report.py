@@ -11,7 +11,7 @@ import json
 import awswrangler as wr
 import random
 
-from functions.jira.jira_events import create_bug
+from functions.report_push.jira_events import create_bug
 
 cloudWatch = boto3.client('cloudwatch')
 s3 = boto3.resource('s3')
@@ -34,21 +34,23 @@ def handler(event, context):
     key = report.get('folder_key')
     run_name = report.get('run_name')
     items = []
+    failed_test = 0
     df = wr.s3.read_json(path=['s3://'+qa_bucket+'/allure/' + suite + '/' + key + '/allure-report/history/history-trend.json'])
     result_df = wr.s3.read_json(path=['s3://'+qa_bucket+'/allure/' + suite + '/' + key + '/allure-report/results/'])
-    pattern = "*-result.json"
-    for entry in os.listdir(result_df):
-        if fnmatch.fnmatch(entry, pattern):
-            result_file = open("results/" + entry)
-            result = json.load(result_file)
-            status = result['status']
+    for file_name in [file for file in os.listdir(result_df) if file.endswith('-result.json')]:
+        with open("result_df" + file_name) as json_file:
+            data = json.load(json_file)
+            status = data['status']
             if status == "passed":
                 print("Result is passed, try next")
             if status == "failed":
-                table_name = result['labels'][1]['value']
-                fail_step = result['steps'][0]['name']
-                description = result['description']
-                create_bug("IPA", table_name[:table_name.find('.')], fail_step[:fail_step.find('.')], description)
+                failed_test += 1
+                print("Result is failed, try to get info")
+                tableName = data['labels'][1]['value']
+                failStep = data['steps'][0]['name']
+                description = data['description']
+                create_bug("IPA", tableName[:tableName.find('.')], failStep[:failStep.find('.')], description +
+                           "https://" + replaced_allure_links)
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
     failed = history['data']['0']['failed']
@@ -85,7 +87,7 @@ def handler(event, context):
         Namespace='Data-QA',
         MetricData=[
             {
-                'MetricName': 'suite_failed_count',
+                'MetricName': 'bug_created_count',
                 'Dimensions': [
                     {
                         'Name': 'table_name',
@@ -96,7 +98,7 @@ def handler(event, context):
                         'Value': environment
                     }
                 ],
-                'Value': failed,
+                'Value': failed_test,
                 'Unit': 'Count'
             },
         ]

@@ -7,6 +7,9 @@ secrets = get_secrets(REGION_NAME, secret_name)
 API_USERNAME = secrets.get("JIRA_API_USERNAME")
 API_PASSWORD = secrets.get("JIRA_API_PASSWORD")
 
+environment = os.environ['ENVIRONMENT']
+
+
 options = {'server': API_URL}
 jira = JIRA(options, basic_auth=(API_USERNAME, API_PASSWORD))
 
@@ -24,7 +27,7 @@ def get_all_bugs(project: str):
         total += got
 
 
-def create_bug(project_key: str, table_name: str, fail_step: str, description: str):
+def create_bug(project_key: str, table_name: str, fail_step: str, description: str, replaced_allure_links):
     summary = "[DataQA][BUG][" + table_name + "] " + fail_step
     print(summary)
     got = 50
@@ -56,6 +59,6 @@ def create_bug(project_key: str, table_name: str, fail_step: str, description: s
                 "project": {"key": project_key},
                 "issuetype": {"name": "Bug"},
                 "summary": summary,
-                "description": description,
+                "description": description + replaced_allure_links,
             }
         )
