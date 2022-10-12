@@ -11,7 +11,7 @@ import json
 import awswrangler as wr
 import random
 
-from functions.report_push.jira_events import create_bug
+from functions.report_push.jira_events import open_bug
 
 cloudWatch = boto3.client('cloudwatch')
 s3 = boto3.resource('s3')
@@ -41,15 +41,12 @@ def handler(event, context):
         with open("result_df" + file_name) as json_file:
             data = json.load(json_file)
             status = data['status']
-            if status == "passed":
-                print("Result is passed, try next")
             if status == "failed":
                 failed_test += 1
-                print("Result is failed, try to get info")
                 tableName = data['labels'][1]['value']
                 failStep = data['steps'][0]['name']
                 description = data['description']
-                create_bug("IPA", tableName[:tableName.find('.')], failStep[:failStep.find('.')], description +
+                open_bug("IPA", tableName[:tableName.find('.')], failStep[:failStep.find('.')], description +
                            "https://" + replaced_allure_links)
     history = json.loads(df.to_json())
     total = history['data']['0']['total']

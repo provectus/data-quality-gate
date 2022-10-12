@@ -9,56 +9,37 @@ API_PASSWORD = secrets.get("JIRA_API_PASSWORD")
 
 environment = os.environ['ENVIRONMENT']
 
-
 options = {'server': API_URL}
 jira = JIRA(options, basic_auth=(API_USERNAME, API_PASSWORD))
 
 
-def get_all_bugs(project: str):
-    got = 50
-    total = 0
-    while got == 50:
-        issues = jira.search_issues('project=' + project, startAt=total)
-        for singleIssue in issues:
-            if str(singleIssue.fields.issuetype) == "Bug":
-                print('{}: {}:{}'.format(singleIssue.key, singleIssue.fields.summary,
-                                         singleIssue.fields.reporter.displayName))
-        got = len(issues)
-        total += got
-
-
-def create_bug(project_key: str, table_name: str, fail_step: str, description: str, replaced_allure_links):
+def open_bug(project_key: str, table_name: str, fail_step: str, description: str, replaced_allure_links):
     summary = "[DataQA][BUG][" + table_name + "] " + fail_step
-    print(summary)
-    got = 50
-    total = 0
     ticketExist = False
-    while got == 50:
-        issues = jira.search_issues('project=' + project_key, startAt=total)
-        for singleIssue in issues:
-            if str(singleIssue.fields.issuetype) == "Bug":
-                if summary == str(singleIssue.fields.summary):
-                    if str(singleIssue.fields.status) == 'Open':
-                        print("Issue already exist and open")
-                        ticketExist = True
-                        break
-                    if str(singleIssue.fields.status) == 'Done' or str(
-                            singleIssue.fields.status) == 'Closed' or str(
-                        singleIssue.fields.status) == 'Cancelled':
-                        print("Issue closed, try to reopen")
-                        print(singleIssue.key)
-                        jira.transition_issue(singleIssue.key, transition='19')
-                        ticketExist = True
-                        break
-        got = len(issues)
-        total += got
+    issues = jira.search_issues('project=' + project_key, maxResults=None)
+    for singleIssue in issues:
+        if summary == str(singleIssue.fields.summary) and str(
+                singleIssue.fields.status) == 'Open':
+            print("Status is Open")
+            ticketExist = True
+            break
+        if summary == str(singleIssue.fields.summary) and str(
+                singleIssue.fields.status) != 'Open':
+            print("Status is not open")
+            ticketExist = True
+            jira.transition_issue(singleIssue.key, transition='19')
+            break
     if not ticketExist:
-        print("Issue not found, try to create new")
-        jira.create_issue(
-            fields={
-                "project": {"key": project_key},
-                "issuetype": {"name": "Bug"},
-                "summary": summary,
-                "description": description + replaced_allure_links,
-            }
-        )
+        create_new_bug(description, project_key, replaced_allure_links, summary)
+
+
+def create_new_bug(description, project_key, replaced_allure_links, summary):
+    print("Issue will be created soon")
+    jira.create_issue(
+        fields={
+            "project": {"key": project_key},
+            "issuetype": {"name": "Bug"},
+            "summary": summary,
+            "description": description + replaced_allure_links,
+        }
+    )
