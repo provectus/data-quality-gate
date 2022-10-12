@@ -18,12 +18,10 @@ def open_bug(project_key: str, table_name: str, fail_step: str, description: str
     for singleIssue in issues:
         if summary == str(singleIssue.fields.summary) and str(
                 singleIssue.fields.status) == 'Open':
-            print("Status is Open")
             ticketExist = True
             break
         if summary == str(singleIssue.fields.summary) and str(
                 singleIssue.fields.status) != 'Open':
-            print("Status is not open")
             ticketExist = True
             jira.transition_issue(singleIssue.key, transition='19')
             break
@@ -32,7 +30,6 @@ def open_bug(project_key: str, table_name: str, fail_step: str, description: str
 
 
 def create_new_bug(description, project_key, replaced_allure_links, summary):
-    print("Issue will be created soon")
     jira.create_issue(
         fields={
             "project": {"key": project_key},
