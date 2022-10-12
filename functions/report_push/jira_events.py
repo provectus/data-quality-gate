@@ -1,13 +1,11 @@
 from jira import JIRA
 
 API_URL = os.getenv("JIRA_URL")
-secret_name = os.getenv("SECRET_NAME", "ipa-develop-api-keys")
-REGION_NAME = "us-west-2"
-secrets = get_secrets(REGION_NAME, secret_name)
-API_USERNAME = secrets.get("JIRA_API_USERNAME")
-API_PASSWORD = secrets.get("JIRA_API_PASSWORD")
-
-environment = os.environ['ENVIRONMENT']
+SECRET_NAME = os.getenv("SECRET_NAME", "ipa-develop-api-keys")
+REGION_NAME = os.getenv("REGION_NAME")
+SECRETS = get_secrets(REGION_NAME, SECRET_NAME)
+API_USERNAME = SECRETS.get("JIRA_API_USERNAME")
+API_PASSWORD = SECRETS.get("JIRA_API_PASSWORD")
 
 options = {'server': API_URL}
 jira = JIRA(options, basic_auth=(API_USERNAME, API_PASSWORD))
