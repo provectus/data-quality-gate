@@ -20,6 +20,7 @@ dynamo_table_name = os.environ['QA_DYNAMODB_TABLE']
 table = dynamodb.Table(dynamo_table_name)
 qa_bucket = os.environ['QA_BUCKET']
 environment = os.environ['ENVIRONMENT']
+project_key = os.environ['JIRA_PROJECT_KEY']
 
 def handler(event, context):
 
@@ -35,10 +36,10 @@ def handler(event, context):
     run_name = report.get('run_name')
     items = []
     failed_test = 0
-    df = wr.s3.read_json(path=['s3://'+qa_bucket+'/allure/' + suite + '/' + key + '/allure-report/history/history-trend.json'])
-    result_df = wr.s3.read_json(path=['s3://'+qa_bucket+'/allure/' + suite + '/' + key + '/allure-report/results/'])
-    for file_name in [file for file in os.listdir(result_df) if file.endswith('-result.json')]:
-        with open("result_df" + file_name) as json_file:
+    df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
+    result_df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/results/'], path_suffix = "-result.json")
+    for file_name in [file for file in os.listdir(result_df)]:
+        with open(f'result_df{file_name}') as json_file:
             data = json.load(json_file)
             status = data['status']
             if status == "failed":
@@ -46,8 +47,8 @@ def handler(event, context):
                 tableName = data['labels'][1]['value']
                 failStep = data['steps'][0]['name']
                 description = data['description']
-                open_bug("IPA", tableName[:tableName.find('.')], failStep[:failStep.find('.')], description +
-                           "https://" + replaced_allure_links)
+                open_bug(project_key, tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
+                         f'https://{replaced_allure_links}')
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
     failed = history['data']['0']['failed']

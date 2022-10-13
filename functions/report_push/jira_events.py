@@ -12,7 +12,7 @@ jira = JIRA(options, basic_auth=(API_USERNAME, API_PASSWORD))
 
 
 def open_bug(project_key: str, table_name: str, fail_step: str, description: str, replaced_allure_links):
-    summary = "[DataQA][BUG][" + table_name + "] " + fail_step
+    summary = '[DataQA][BUG][{0}]{1}'.format(table_name, fail_step)
     ticketExist = False
     issues = jira.search_issues('project=' + project_key, maxResults=None)
     for singleIssue in issues:
@@ -20,7 +20,7 @@ def open_bug(project_key: str, table_name: str, fail_step: str, description: str
                 singleIssue.fields.status) == 'Open':
             ticketExist = True
             break
-        if summary == str(singleIssue.fields.summary) and str(
+        elif summary == str(singleIssue.fields.summary) and str(
                 singleIssue.fields.status) != 'Open':
             ticketExist = True
             jira.transition_issue(singleIssue.key, transition='19')
