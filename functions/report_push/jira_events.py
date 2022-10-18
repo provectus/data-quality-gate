@@ -23,18 +23,20 @@ def open_bug(project_key: str, table_name: str, fail_step: str, description: str
         elif summary == str(singleIssue.fields.summary) and str(
                 singleIssue.fields.status) != 'Open':
             ticketExist = True
-            jira.transition_issue(singleIssue.key, transition='19')
+            print("Will be reopen bug with name [{0}]".format(summary))
+            # jira.transition_issue(singleIssue.key, transition='19')
             break
     if not ticketExist:
         create_new_bug(description, project_key, replaced_allure_links, summary)
 
 
 def create_new_bug(description, project_key, replaced_allure_links, summary):
-    jira.create_issue(
-        fields={
-            "project": {"key": project_key},
-            "issuetype": {"name": "Bug"},
-            "summary": summary,
-            "description": description + replaced_allure_links,
-        }
-    )
+    print("Will be created bug with name [{0}]".format(summary))
+    # jira.create_issue(
+    #     fields={
+    #         "project": {"key": project_key},
+    #         "issuetype": {"name": "Bug"},
+    #         "summary": summary,
+    #         "description": description + replaced_allure_links,
+    #     }
+    # )
