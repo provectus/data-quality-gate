@@ -70,3 +70,15 @@ variable "lambda_push_report_memory" {
   description = "Amount of memory allocated to the lambda function lambda_push_report"
   default     = 1024
 }
+
+variable "lambda_push_jira_url" {
+  type        = string
+  default     = null
+  description = "Lambda function push report env variable JIRA_URL"
+}
+
+variable "lambda_push_secret_name" {
+  type        = string
+  default     = null
+  description = "Lambda function push report env variable JIRA_URL"
+}
