@@ -2,8 +2,8 @@ from jira import JIRA
 import os
 
 API_URL = os.getenv("JIRA_URL")
-API_USERNAME = os.getenv("SECRET_NAME_JIRA_USERNAME")
-API_PASSWORD = os.getenv("SECRET_NAME_JIRA_PASSWORD")
+API_USERNAME = os.getenv("DATAQA_JIRA_USERNAME")
+API_PASSWORD = os.getenv("DATAQA_JIRA_PASSWORD")
 
 options = {'server': API_URL}
 jira = JIRA(options, basic_auth=(API_USERNAME, API_PASSWORD))
