@@ -11,7 +11,7 @@ import json
 import awswrangler as wr
 import random
 
-from functions.report_push.jira_events import open_bug
+from jira_events import open_bug
 
 cloudWatch = boto3.client('cloudwatch')
 s3 = boto3.resource('s3')
