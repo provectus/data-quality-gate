@@ -37,8 +37,8 @@ def handler(event, context):
     items = []
     failed_test = 0
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
-    result_df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/result/'], path_suffix=['result.json'])
-    for file_name in [file for file in os.listdir(result_df)]:
+    result_df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/result/'])
+    for file_name in [file for file in os.listdir(result_df) if file.endswith('-result.json')]:
         with open(f'result_df{file_name}') as json_file:
             data = json.load(json_file)
             status = data['status']
