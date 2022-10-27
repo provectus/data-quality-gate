@@ -37,7 +37,7 @@ def handler(event, context):
     items = []
     failed_test = 0
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
-    result_df = wr.s3.read_parquet(
+    result_df = wr.s3.read_json(
         path=f's3://{qa_bucket}/allure/{suite}/{key}/result/',
         path_suffix="result.json"
     )
