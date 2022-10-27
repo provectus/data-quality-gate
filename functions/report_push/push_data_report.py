@@ -34,24 +34,24 @@ def handler(event, context):
     file = report.get('suite_name')
     key = report.get('folder_key')
     run_name = report.get('run_name')
+    bucket = s3.Bucket(qa_bucket)
     items = []
     failed_test = 0
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
-    result_df = wr.s3.read_json(
-        path=f's3://{qa_bucket}/allure/{suite}/{key}/result/',
-        path_suffix="result.json"
-    )
-    for file_name in [file for file in os.listdir(result_df)]:
-        with open(f'result_df{file_name}') as json_file:
-            data = json.load(json_file)
-            status = data['status']
-            if status == "failed":
-                failed_test += 1
-                tableName = data['labels'][1]['value']
-                failStep = data['steps'][0]['name']
-                description = data['description']
-                open_bug(project_key, tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
-                         f'https://{replaced_allure_links}')
+    result_folder_path = f'allure/{suite}/{key}/result/'
+    all_result_files = bucket.objects.filter(Prefix=result_folder_path)
+    for result_file_name in all_result_files:
+        if result_file_name.key.endswith('result.json'):
+            with open(f'{result_folder_path}/{result_file_name.key}') as json_file:
+                dataInFile = json.load(json_file)
+                status = dataInFile['status']
+                if status == "failed":
+                    failed_test += 1
+                    tableName = dataInFile['labels'][1]['value']
+                    failStep = dataInFile['steps'][0]['name']
+                    description = dataInFile['description']
+                    open_bug(project_key, tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
+                             f'https://{replaced_allure_links}')
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
     failed = history['data']['0']['failed']
