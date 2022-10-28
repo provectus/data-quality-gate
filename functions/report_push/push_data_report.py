@@ -39,11 +39,10 @@ def handler(event, context):
     failed_test = 0
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
     relative_path_to_results = f'allure/{suite}/{key}/result/'
-    full_path_to_results = f's3://{qa_bucket}/{relative_path_to_results}/'
     all_result_files = bucket.objects.filter(Prefix=relative_path_to_results)
     for result_file_name in all_result_files:
         if result_file_name.key.endswith('result.json'):
-            with open(f'{full_path_to_results}/{result_file_name.key}') as json_file:
+            with open(f's3://{qa_bucket}{result_file_name.key}') as json_file:
                 dataInFile = json.load(json_file)
                 status = dataInFile['status']
                 if status == "failed":
