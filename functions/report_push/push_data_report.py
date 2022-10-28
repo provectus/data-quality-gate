@@ -36,8 +36,7 @@ def handler(event, context):
     run_name = report.get('run_name')
     bucket = s3.Bucket(qa_bucket)
     items = []
-    failed_test_from_results = 0
-    df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
+    failed_test_count_from_results = 0
     all_result_files = bucket.objects.filter(Prefix=f'allure/{suite}/{key}/result/')
     issues = get_all_issues(project_key)
     for result_file_name in all_result_files:
@@ -46,12 +45,13 @@ def handler(event, context):
             dataInFile = json.load(content_object.get()['Body'])
             status = dataInFile['status']
             if status == "failed":
-                failed_test_from_results += 1
+                failed_test_count_from_results += 1
                 tableName = dataInFile['labels'][1]['value']
                 failStep = dataInFile['steps'][0]['name']
                 description = dataInFile['description']
                 open_bug(tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
                          f'https://{replaced_allure_links}', issues)
+    df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
     failed = history['data']['0']['failed']
@@ -74,7 +74,7 @@ def handler(event, context):
         'suite': suite,
         'path': str(path),
         'run_name': run_name,
-        'failed_test_from_result': failed_test_from_results
+        'failed_test_count_from_results': failed_test_count_from_results
     }
     items.append(local_item)
 
@@ -100,7 +100,7 @@ def handler(event, context):
                         'Value': environment
                     }
                 ],
-                'Value': failed_test_from_results,
+                'Value': failed_test_count_from_results,
                 'Unit': 'Count'
             },
         ]
