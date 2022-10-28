@@ -11,7 +11,7 @@ import json
 import awswrangler as wr
 import random
 
-from jira_events import open_bug
+from jira_events import *
 
 cloudWatch = boto3.client('cloudwatch')
 s3 = boto3.resource('s3')
@@ -22,8 +22,8 @@ qa_bucket = os.environ['QA_BUCKET']
 environment = os.environ['ENVIRONMENT']
 project_key = os.environ['JIRA_PROJECT_KEY']
 
-def handler(event, context):
 
+def handler(event, context):
     replaced_allure_links = event['links'].get('Payload')
     report = event['report'].get('Payload')
     profiling_link = (report.get('profiling'))
@@ -40,6 +40,7 @@ def handler(event, context):
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
     relative_path_to_results = f'allure/{suite}/{key}/result/'
     all_result_files = bucket.objects.filter(Prefix=relative_path_to_results)
+    issues = get_all_issues(project_key)
     for result_file_name in all_result_files:
         if result_file_name.key.endswith('result.json'):
             content_object = s3.Object(qa_bucket, result_file_name.key)
@@ -50,8 +51,9 @@ def handler(event, context):
                 tableName = dataInFile['labels'][1]['value']
                 failStep = dataInFile['steps'][0]['name']
                 description = dataInFile['description']
-                open_bug(project_key, tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
-                             f'https://{replaced_allure_links}')
+                open_bug(tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
+                         f'https://{replaced_allure_links}', issues)
+    print(failed_test)            
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
     failed = history['data']['0']['failed']
@@ -61,20 +63,20 @@ def handler(event, context):
     else:
         status = 'passed'
     local_item = {
-            'file':str(random.random()),
-            'file_name': file,
-            'all': total,
-            'allure_link': replaced_allure_links,
-            'date': today,
-            'failed': failed,
-            'ge_link': ge_links,
-            'passed': passed,
-            'profiling_link': profiling_link,
-            'status': status,
-            'suite': suite,
-            'path': str(path),
-            'run_name': run_name
-        }
+        'file': str(random.random()),
+        'file_name': file,
+        'all': total,
+        'allure_link': replaced_allure_links,
+        'date': today,
+        'failed': failed,
+        'ge_link': ge_links,
+        'passed': passed,
+        'profiling_link': profiling_link,
+        'status': status,
+        'suite': suite,
+        'path': str(path),
+        'run_name': run_name
+    }
     items.append(local_item)
 
     with table.batch_writer() as batch:
