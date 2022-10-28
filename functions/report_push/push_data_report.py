@@ -53,7 +53,6 @@ def handler(event, context):
                 description = dataInFile['description']
                 open_bug(tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
                          f'https://{replaced_allure_links}', issues)
-    print(failed_test)            
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
     failed = history['data']['0']['failed']
