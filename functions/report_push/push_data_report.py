@@ -36,7 +36,7 @@ def handler(event, context):
     run_name = report.get('run_name')
     bucket = s3.Bucket(qa_bucket)
     items = []
-    failed_test = 0
+    failed_test_from_results = 0
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
     all_result_files = bucket.objects.filter(Prefix=f'allure/{suite}/{key}/result/')
     issues = get_all_issues(project_key)
@@ -46,7 +46,7 @@ def handler(event, context):
             dataInFile = json.load(content_object.get()['Body'])
             status = dataInFile['status']
             if status == "failed":
-                failed_test += 1
+                failed_test_from_results += 1
                 tableName = dataInFile['labels'][1]['value']
                 failStep = dataInFile['steps'][0]['name']
                 description = dataInFile['description']
@@ -73,7 +73,8 @@ def handler(event, context):
         'status': status,
         'suite': suite,
         'path': str(path),
-        'run_name': run_name
+        'run_name': run_name,
+        'failed_test_from_result': failed_test_from_results
     }
     items.append(local_item)
 
@@ -99,7 +100,7 @@ def handler(event, context):
                         'Value': environment
                     }
                 ],
-                'Value': failed_test,
+                'Value': failed_test_from_results,
                 'Unit': 'Count'
             },
         ]
