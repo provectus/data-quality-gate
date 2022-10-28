@@ -32,7 +32,7 @@ def get_all_issues(project_key):
     return issues
 
 
-def create_new_bug(description, project_key, replaced_allure_links, summary):
+def create_new_bug(description, replaced_allure_links, summary):
     print("Will be created bug with name [{0}]".format(summary))
     # jira.create_issue(
     #     fields={
