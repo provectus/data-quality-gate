@@ -38,21 +38,20 @@ def handler(event, context):
     items = []
     failed_test = 0
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
-    relative_path_to_results = f'allure/{suite}/{key}/result/'
-    all_result_files = bucket.objects.filter(Prefix=relative_path_to_results)
+    # relative_path_to_results = f'allure/{suite}/{key}/result/*-result.json'
+    all_result_files = bucket.objects.filter(Prefix=f'allure/{suite}/{key}/result/*-result.json')
     issues = get_all_issues(project_key)
     for result_file_name in all_result_files:
-        if result_file_name.key.endswith('result.json'):
-            content_object = s3.Object(qa_bucket, result_file_name.key)
-            dataInFile = json.load(content_object.get()['Body'])
-            status = dataInFile['status']
-            if status == "failed":
-                failed_test += 1
-                tableName = dataInFile['labels'][1]['value']
-                failStep = dataInFile['steps'][0]['name']
-                description = dataInFile['description']
-                open_bug(tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
-                         f'https://{replaced_allure_links}', issues)
+        content_object = s3.Object(qa_bucket, result_file_name.key)
+        dataInFile = json.load(content_object.get()['Body'])
+        status = dataInFile['status']
+        if status == "failed":
+            failed_test += 1
+            tableName = dataInFile['labels'][1]['value']
+            failStep = dataInFile['steps'][0]['name']
+            description = dataInFile['description']
+            open_bug(tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
+                        f'https://{replaced_allure_links}', issues)
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
     failed = history['data']['0']['failed']

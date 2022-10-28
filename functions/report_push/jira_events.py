@@ -34,8 +34,6 @@ def get_all_issues(project_key):
 
 def create_new_bug(description, replaced_allure_links, summary):
     print("Will be created bug with name [{0}]".format(summary))
-    print(f'With description{description}')
-    print(f'With allure link{replaced_allure_links}')
     # jira.create_issue(
     #     fields={
     #         "project": {"key": project_key},
