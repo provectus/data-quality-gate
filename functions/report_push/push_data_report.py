@@ -42,15 +42,15 @@ def handler(event, context):
     all_result_files = bucket.objects.filter(Prefix=relative_path_to_results)
     for result_file_name in all_result_files:
         if result_file_name.key.endswith('result.json'):
-            with open(f's3://{qa_bucket}/{result_file_name.key}') as json_file:
-                dataInFile = json.load(json_file)
-                status = dataInFile['status']
-                if status == "failed":
-                    failed_test += 1
-                    tableName = dataInFile['labels'][1]['value']
-                    failStep = dataInFile['steps'][0]['name']
-                    description = dataInFile['description']
-                    open_bug(project_key, tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
+            content_object = s3.Object(qa_bucket, result_file_name.key)
+            dataInFile = json.load(content_object.get()['Body'])
+            status = dataInFile['status']
+            if status == "failed":
+                failed_test += 1
+                tableName = dataInFile['labels'][1]['value']
+                failStep = dataInFile['steps'][0]['name']
+                description = dataInFile['description']
+                open_bug(project_key, tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
                              f'https://{replaced_allure_links}')
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
