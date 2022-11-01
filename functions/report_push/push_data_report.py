@@ -20,7 +20,6 @@ dynamo_table_name = os.environ['QA_DYNAMODB_TABLE']
 table = dynamodb.Table(dynamo_table_name)
 qa_bucket = os.environ['QA_BUCKET']
 environment = os.environ['ENVIRONMENT']
-jira_project_key = os.environ['JIRA_PROJECT_KEY']
 
 
 def handler(event, context):
@@ -36,9 +35,11 @@ def handler(event, context):
     run_name = report.get('run_name')
     bucket = s3.Bucket(qa_bucket)
     items = []
-    if jira_project_key != "":
+    if "JIRA_PROJECT_KEY" in os.environ:
+        jira_project_key = os.environ['JIRA_PROJECT_KEY']
         auth_in_jira()
-        failed_test_count_from_results = create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite)
+        failed_test_count_from_results = create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite,
+                                                                             jira_project_key)
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
@@ -96,7 +97,7 @@ def handler(event, context):
     return "Dashboard is ready!"
 
 
-def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite):
+def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite, jira_project_key):
     failed_test_count_from_results = 0
     all_result_files = bucket.objects.filter(Prefix=f'allure/{suite}/{key}/result/')
     issues = get_all_issues(jira_project_key)
