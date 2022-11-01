@@ -6,7 +6,11 @@ API_USERNAME = os.getenv("DATAQA_JIRA_USERNAME")
 API_PASSWORD = os.getenv("DATAQA_JIRA_PASSWORD")
 
 options = {'server': API_URL}
-jira = JIRA(options, basic_auth=(API_USERNAME, API_PASSWORD))
+
+
+def auth_in_jira():
+    global jira
+    jira = JIRA(options, basic_auth=(API_USERNAME, API_PASSWORD))
 
 
 def open_bug(table_name: str, fail_step: str, description: str, replaced_allure_links, issues):

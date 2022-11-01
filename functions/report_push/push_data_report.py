@@ -37,6 +37,7 @@ def handler(event, context):
     bucket = s3.Bucket(qa_bucket)
     items = []
     if jira_project_key != "":
+        auth_in_jira()
         failed_test_count_from_results = create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite)
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
     history = json.loads(df.to_json())
