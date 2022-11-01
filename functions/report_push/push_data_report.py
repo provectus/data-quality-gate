@@ -10,8 +10,7 @@ from datetime import date
 import json
 import awswrangler as wr
 import random
-
-from jira_events import *
+from jira_events import auth_in_jira, get_all_issues, open_bug
 
 cloudWatch = boto3.client('cloudwatch')
 s3 = boto3.resource('s3')
