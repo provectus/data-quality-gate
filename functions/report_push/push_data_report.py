@@ -34,6 +34,7 @@ def handler(event, context):
     key = report.get('folder_key')
     run_name = report.get('run_name')
     bucket = s3.Bucket(qa_bucket)
+    failed_test_count_from_results = ''
     items = []
     if "JIRA_PROJECT_KEY" in os.environ:
         jira_project_key = os.environ['JIRA_PROJECT_KEY']
