@@ -27,8 +27,8 @@ def open_bug(table_name: str, fail_step: str, description: str, replaced_allure_
         create_new_bug(description, replaced_allure_links, summary)
 
 
-def get_all_issues(project_key):
-    issues = jira.search_issues('project=' + project_key, maxResults=None)
+def get_all_issues(jira_project_key):
+    issues = jira.search_issues('project=' + jira_project_key, maxResults=None)
     return issues
 
 
