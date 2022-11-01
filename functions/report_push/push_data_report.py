@@ -39,7 +39,7 @@ def handler(event, context):
         jira_project_key = os.environ['JIRA_PROJECT_KEY']
         auth_in_jira()
         created_bug_count = create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite,
-                                                                             jira_project_key)
+                                                                jira_project_key)
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
@@ -112,5 +112,5 @@ def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suit
                 failStep = dataInFile['steps'][0]['name']
                 description = dataInFile['description']
                 open_bug(tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
-                         f'https://{replaced_allure_links}', issues)
+                         f'https://{replaced_allure_links}', issues, jira_project_key)
     return created_bug_count
