@@ -34,12 +34,12 @@ def handler(event, context):
     key = report.get('folder_key')
     run_name = report.get('run_name')
     bucket = s3.Bucket(qa_bucket)
-    failed_test_count_from_results = 0
+    created_bug_count = 0
     items = []
     if "JIRA_PROJECT_KEY" in os.environ:
         jira_project_key = os.environ['JIRA_PROJECT_KEY']
         auth_in_jira()
-        failed_test_count_from_results = create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite,
+        created_bug_count = create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite,
                                                                              jira_project_key)
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
     history = json.loads(df.to_json())
@@ -64,7 +64,7 @@ def handler(event, context):
         'suite': suite,
         'path': str(path),
         'run_name': run_name,
-        'failed_test_count_from_results': failed_test_count_from_results
+        'created_bug_count': created_bug_count
     }
     items.append(local_item)
 
@@ -90,7 +90,7 @@ def handler(event, context):
                         'Value': environment
                     }
                 ],
-                'Value': failed_test_count_from_results,
+                'Value': created_bug_count,
                 'Unit': 'Count'
             },
         ]
@@ -99,7 +99,7 @@ def handler(event, context):
 
 
 def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite, jira_project_key):
-    failed_test_count_from_results = 0
+    created_bug_count = 0
     all_result_files = bucket.objects.filter(Prefix=f'allure/{suite}/{key}/result/')
     issues = get_all_issues(jira_project_key)
     for result_file_name in all_result_files:
@@ -108,10 +108,10 @@ def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suit
             dataInFile = json.load(content_object.get()['Body'])
             status = dataInFile['status']
             if status == "failed":
-                failed_test_count_from_results += 1
+                created_bug_count += 1
                 tableName = dataInFile['labels'][1]['value']
                 failStep = dataInFile['steps'][0]['name']
                 description = dataInFile['description']
                 open_bug(tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
                          f'https://{replaced_allure_links}', issues)
-    return failed_test_count_from_results
+    return created_bug_count
