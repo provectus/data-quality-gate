@@ -4,7 +4,8 @@
     "engine": "s3",
     "old_suite_name": "planner_raw_softfail",
     "reuse_suite": false,
-    "use_old_suite_only": false
+    "use_old_suite_only": false,
+    "autobug": false
   }
 
 }
