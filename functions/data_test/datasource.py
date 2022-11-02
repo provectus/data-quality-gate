@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 import pandas as pd
 import os
@@ -43,16 +45,33 @@ def read_source(source, engine, extension, run_name, table_name=None):
         if 'redshift' in run_name:
             redshift_db = os.environ['REDSHIFT_DB']
             redshift_secret = os.environ['REDSHIFT_SECRET']
+            try:
+                sort_keys_config = json.loads(
+                    wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/sort_keys.json").to_json())
+                sort_key = sort_keys_config[table_name]['sortKey']
+            except KeyError:
+                sort_key = 'update_dt'
             con = wr.redshift.connect(secret_id=redshift_secret, dbname=redshift_db)
+            if final_df[sort_key].nunique()>1:
+                min_key = final_df[sort_key].min()
+                max_key = final_df[sort_key].max()
+                sql_query = f"SELECT * FROM public.{table_name} WHERE {sort_key} between \\'{min_key}\\' and \\'{max_key}\\'"
+                final_df = wr.redshift.unload(
+                    sql=sql_query,
+                    con=con,
+                    path=f"s3://{qa_bucket_name}/redshift/{table_name}/"
+                )
+                con.close()
+            else:
+                key = str(final_df[sort_key].loc[0])
+                sql_query = f"SELECT * FROM public.{table_name} WHERE {sort_key}=\\'{key}\\'"
+                final_df = wr.redshift.unload(
+                    sql=sql_query,
+                    con=con,
+                    path=f"s3://{qa_bucket_name}/redshift/{table_name}/"
+                )
+                con.close()
 
-            key = str(final_df['update_dt'].loc[0])
-            sql_query = f"SELECT * FROM public.{table_name} WHERE update_dt=\\'{key}\\'"
-            final_df = wr.redshift.unload(
-                sql=sql_query,
-                con=con,
-                path=f"s3://{qa_bucket_name}/redshift/{table_name}/"
-            )
-            con.close()
         return final_df, path
     elif engine == 'hudi':
         columns_to_drop = ['_hoodie_commit_time', '_hoodie_commit_seqno', '_hoodie_record_key',

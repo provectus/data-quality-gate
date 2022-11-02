@@ -15,19 +15,19 @@ def auth_in_jira():
 
 def open_bug(table_name: str, fail_step: str, description: str, replaced_allure_links, issues, jira_project_key):
     summary = f'[DataQA][BUG][{table_name}]{fail_step}'
-    ticketExist = False
-    for singleIssue in issues:
-        if summary == str(singleIssue.fields.summary) and str(
-                singleIssue.fields.status) == 'Open':
-            ticketExist = True
+    ticket_exist = False
+    for single_issue in issues:
+        if summary == str(single_issue.fields.summary) and str(
+                single_issue.fields.status) == 'Open':
+            ticket_exist = True
             break
-        elif summary == str(singleIssue.fields.summary) and str(
-                singleIssue.fields.status) != 'Open':
-            ticketExist = True
+        elif summary == str(single_issue.fields.summary) and str(
+                single_issue.fields.status) != 'Open':
+            ticket_exist = True
             print(f'Will be reopen bug with name[{summary}]')
-            jira.transition_issue(singleIssue.key, transition='19')
+            jira.transition_issue(single_issue.key, transition='19')
             break
-    if not ticketExist:
+    if not ticket_exist:
         create_new_bug(description, replaced_allure_links, summary, jira_project_key)
 
 

@@ -12,15 +12,14 @@ import awswrangler as wr
 import random
 from jira_events import auth_in_jira, get_all_issues, open_bug
 
-cloudWatch = boto3.client('cloudwatch')
+cloudwatch = boto3.client('cloudwatch')
 s3 = boto3.resource('s3')
 dynamodb = boto3.resource('dynamodb')
 dynamo_table_name = os.environ['QA_DYNAMODB_TABLE']
 table = dynamodb.Table(dynamo_table_name)
 qa_bucket = os.environ['QA_BUCKET']
 environment = os.environ['ENVIRONMENT']
-
-
+autobug = False
 def handler(event, context):
     replaced_allure_links = event['links'].get('Payload')
     report = event['report'].get('Payload')
@@ -35,11 +34,6 @@ def handler(event, context):
     bucket = s3.Bucket(qa_bucket)
     created_bug_count = 0
     items = []
-    if "JIRA_PROJECT_KEY" in os.environ:
-        jira_project_key = os.environ['JIRA_PROJECT_KEY']
-        auth_in_jira()
-        created_bug_count = create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite,
-                                                                jira_project_key)
     df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
@@ -74,26 +68,59 @@ def handler(event, context):
                 Item=item
             )
 
-    cloudWatch.put_metric_data(
-        Namespace='Data-QA',
-        MetricData=[
-            {
-                'MetricName': 'bug_created_count',
-                'Dimensions': [
-                    {
-                        'Name': 'table_name',
-                        'Value': suite
-                    },
-                    {
-                        'Name': 'Environment',
-                        'Value': environment
-                    }
-                ],
-                'Value': created_bug_count,
-                'Unit': 'Count'
-            },
-        ]
-    )
+    try:
+        pipeline_config = json.loads(
+            wr.s3.read_json(path=f"s3://{qa_bucket}/test_configs/pipeline.json").to_json())
+        autobug = pipeline_config[run_name]['autobug']
+    except KeyError:
+        print(f"Can't find config for {run_name}")
+
+    if autobug:
+        jira_project_key = os.environ['JIRA_PROJECT_KEY']
+        auth_in_jira()
+        created_bug_count = create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite,
+                                                                jira_project_key)
+        cloudwatch.put_metric_data(
+            Namespace='Data-QA',
+            MetricData=[
+                {
+                    'MetricName': 'bug_created_count',
+                    'Dimensions': [
+                        {
+                            'Name': 'table_name',
+                            'Value': suite
+                        },
+                        {
+                            'Name': 'Environment',
+                            'Value': environment
+                        }
+                    ],
+                    'Value': created_bug_count,
+                    'Unit': 'Count'
+                },
+            ]
+        )
+    else:
+        cloudwatch.put_metric_data(
+            Namespace='Data-QA',
+            MetricData=[
+                {
+                    'MetricName': 'suite_failed_count',
+                    'Dimensions': [
+                        {
+                            'Name': 'table_name',
+                            'Value': suite
+                        },
+                        {
+                            'Name': 'Environment',
+                            'Value': environment
+                        }
+                    ],
+                    'Value': failed,
+                    'Unit': 'Count'
+                },
+            ]
+        )
     return "Dashboard is ready!"
 
 
@@ -104,13 +131,13 @@ def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suit
     for result_file_name in all_result_files:
         if result_file_name.key.endswith('result.json'):
             content_object = s3.Object(qa_bucket, result_file_name.key)
-            dataInFile = json.load(content_object.get()['Body'])
-            status = dataInFile['status']
+            data_in_file = json.load(content_object.get()['Body'])
+            status = data_in_file['status']
             if status == "failed":
                 created_bug_count += 1
-                tableName = dataInFile['labels'][1]['value']
-                failStep = dataInFile['steps'][0]['name']
-                description = dataInFile['description']
-                open_bug(tableName[:tableName.find('.')], failStep[:failStep.find('.')], description,
+                table_name = data_in_file['labels'][1]['value']
+                fail_step = data_in_file['steps'][0]['name']
+                description = data_in_file['description']
+                open_bug(table_name[:table_name.find('.')], fail_step[:fail_step.find('.')], description,
                          f'https://{replaced_allure_links}', issues, jira_project_key)
     return created_bug_count
