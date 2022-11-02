@@ -1,3 +1,5 @@
+import json
+
 import numpy as np
 import pandas as pd
 from pandas_profiling import ProfileReport
@@ -62,112 +64,101 @@ class MyExpectationHandler(Handler):
         super().__init__(mapping, typeset, *args, **kwargs)
 
 
-def change_ge_config(datasource_root,engine):
+def change_ge_config(datasource_root):
     context_ge = DataContext()
 
     configfile_raw = context_ge.get_config().to_yaml_str()
     configfile = yaml.safe_load(configfile_raw)
 
 
-    if engine=='s3':
-        datasources = {
-            "pandas_s3": {
-                "class_name": "PandasDatasource",
-                "batch_kwargs_generators": {
-                    "pandas_s3_generator": {
-                        "class_name": "S3GlobReaderBatchKwargsGenerator",
-                        "bucket": datasource_root,
-                        "assets": {
-                            "your_first_data_asset_name": {
-                                "prefix": "/",
-                                "regex_filter": ".*"
-                            }
+    datasources = {
+        "pandas_s3": {
+            "class_name": "PandasDatasource",
+            "batch_kwargs_generators": {
+                "pandas_s3_generator": {
+                    "class_name": "S3GlobReaderBatchKwargsGenerator",
+                    "bucket": datasource_root,
+                    "assets": {
+                        "your_first_data_asset_name": {
+                            "prefix": "/",
+                            "regex_filter": ".*"
                         }
                     }
-                },
-                "module_name": "great_expectations.datasource",
-                "data_asset_type": {
-                    "class_name": "PandasDataset",
-                    "module_name": "great_expectations.dataset"
                 }
+            },
+            "module_name": "great_expectations.datasource",
+            "data_asset_type": {
+                "class_name": "PandasDataset",
+                "module_name": "great_expectations.dataset"
             }
         }
+    }
 
-        config = DataContextConfig(config_version=configfile['config_version'], datasources=datasources,
-                                   expectations_store_name=configfile['expectations_store_name'],
-                                   validations_store_name=configfile['validations_store_name'],
-                                   evaluation_parameter_store_name=configfile['evaluation_parameter_store_name'],
-                                   plugins_directory='/great_expectations/plugins',
-                                   validation_operators=configfile['validation_operators'],
-                                   config_variables_file_path=configfile['config_variables_file_path'],
-                                   anonymous_usage_statistics=configfile['anonymous_usage_statistics'],
-                                   store_backend_defaults=S3StoreBackendDefaults(
-                                       default_bucket_name=qa_bucket_name,
-                                       expectations_store_prefix=qa_bucket_name + '/great_expectations/expectations/',
-                                       validations_store_prefix=qa_bucket_name + '/great_expectations/uncommitted/validations/'))
-        return config
-    elif engine=='athena':
-        return 2
-    elif engine=='redshift':
-        return 3
-    elif engine=='hudi':
-        return 4
-    elif engine=='postgresql':
-        return 5
-    elif engine=='snowflake':
-        return 6
-    else:
-        return s3.Bucket(datasource_root)
+    config = DataContextConfig(config_version=configfile["config_version"], datasources=datasources,
+                               expectations_store_name=configfile["expectations_store_name"],
+                               validations_store_name=configfile["validations_store_name"],
+                               evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
+                               plugins_directory="/great_expectations/plugins",
+                               validation_operators=configfile["validation_operators"],
+                               config_variables_file_path=configfile["config_variables_file_path"],
+                               anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
+                               store_backend_defaults=S3StoreBackendDefaults(
+                                   default_bucket_name=qa_bucket_name,
+                                   expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
+                                   validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
+    return config
 
 
 
 
 
-def select_engine_source(datasource_root,engine):
-    if engine=='s3':
-        return s3.Bucket(datasource_root)
-    elif engine=='athena':
-        return 2
-    elif engine=='redshift':
-        return 3
-    elif engine=='hudi':
-        return 4
-    elif engine=='postgresql':
-        return 5
-    elif engine=='snowflake':
-        return 6
-    else:
-        return s3.Bucket(datasource_root)
-
-def profile_data(file, file_name, cloudfront, datasource_root, source_covered,engine):
-    qa_bucket = s3.Bucket(qa_bucket_name)
-    config = change_ge_config(datasource_root,engine)
-    context_ge = BaseDataContext(project_config=config)
-    df = file
+def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,mapping_config,run_name):
     try:
-        profile = ProfileReport(df, title=file_name + " Profiling Report", minimal=True)
+        mapping_schema = mapping_config[suite_name.split('_')[0]]
+    except KeyError:
+        mapping_schema = None
+
+
+    qa_bucket = s3.Bucket(qa_bucket_name)
+    config = change_ge_config(datasource_root)
+    context_ge = BaseDataContext(project_config=config)
+    try:
+        profile = ProfileReport(df, title=f"{suite_name} Profiling Report", minimal=True)
         report = profile.to_html()
     except TypeError:
-        profile = ProfileReport(df, title=file_name + " Profiling Report")
+        profile = ProfileReport(df, title=f"{suite_name} Profiling Report")
         report = profile.to_html()
 
-
     if not source_covered:
+        try:
+            pipeline_config = json.loads(
+                wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/pipeline.json").to_json())
+            reuse_suite = pipeline_config[run_name]['reuse_suite']
+            use_old_suite_only = pipeline_config[run_name]['use_old_suite_only']
+            old_suite_name = pipeline_config[run_name]['old_suite_name']
+        except KeyError:
+            reuse_suite = False
+            use_old_suite_only = False
+            old_suite_name = None
         ExpectationsReport.to_expectation_suite = ExpectationsReportNew.to_expectation_suite
         suite = profile.to_expectation_suite(
             data_context=context_ge,
-            suite_name=file_name,
+            suite_name=suite_name,
             save_suite=True,
             run_validation=False,
             build_data_docs=False,
+            reuse_suite=reuse_suite,
+            mapping_schema=mapping_schema,
+            use_old_suite=use_old_suite_only,
+            old_suite_name=old_suite_name,
             handler=MyExpectationHandler(profile.typeset)
         )
 
     folder = 'profiling/'
     now = datetime.now()
     date_time = now.strftime("%y%m%dT%H%M%S")
-    folder = folder + file_name + '/' + str(date_time) + '/'
+    folder = f"{folder}{suite_name}/{str(date_time)}/"
     qa_bucket.put_object(Key=folder)
-    qa_bucket.put_object(Key=folder + file_name + '_profiling.html', Body=report, ContentType='text/html')
-    profile_link = cloudfront + "/" + folder + file_name + "_profiling.html"
+    qa_bucket.put_object(Key=f"{folder}{suite_name}_profiling.html", Body=report, ContentType='text/html')
+    profile_link = f"{cloudfront}/{folder}{suite_name}_profiling.html"
     return profile_link, date_time, config
