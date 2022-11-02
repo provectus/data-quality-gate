@@ -17,6 +17,6 @@ def handler(event, context):
     validate_id = report.get('validate_id')
     link,key = create_json_report(suite,cloudfront,folder_key,validate_id)
     os.system("chmod +x generate_report.sh")
-    os.system("sh generate_report.sh "+key+' '+qa_bucket)
+    os.system(f"sh generate_report.sh {key} {qa_bucket}")
 
     return link
