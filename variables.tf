@@ -82,3 +82,15 @@ variable "lambda_push_secret_name" {
   default     = null
   description = "Lambda function push report env variable JIRA_URL"
 }
+
+variable "redshift_db_name" {
+  type        = string
+  default     = null
+  description = "db name for redshift"
+}
+
+variable "redshift_secret" {
+  type        = string
+  default     = null
+  description = "secret name from Secret Manager for Redshift cluster"
+}
