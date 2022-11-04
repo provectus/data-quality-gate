@@ -39,6 +39,30 @@ variable "test_coverage_path" {
   default     = "configs/test_coverage.json"
 }
 
+variable "pipeline_config_path" {
+  type        = string
+  description = "Path to the pipeline description path, relative to the root TF"
+  default     = "configs/pipeline.json"
+}
+
+variable "pks_path" {
+  type        = string
+  description = "Path to the primary keys description path, relative to the root TF"
+  default     = "configs/pks.json"
+}
+
+variable "sort_keys_path" {
+  type        = string
+  description = "Path to the sort keys description path, relative to the root TF"
+  default     = "configs/sort_keys.json"
+}
+
+variable "mapping_path" {
+  type        = string
+  description = "Path to the mapping description path, relative to the root TF"
+  default     = "configs/mapping.json"
+}
+
 variable "expectations_store" {
   type        = string
   description = "Path to the expectations_store directory, relative to the root TF"
