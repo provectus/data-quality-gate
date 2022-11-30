@@ -121,7 +121,11 @@ def handler(event, context):
                 },
             ]
         )
-    return "Dashboard is ready!"
+    report = {
+        "failed_test_count": failed,
+    }
+
+    return report
 
 
 def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite, jira_project_key):
