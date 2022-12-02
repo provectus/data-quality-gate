@@ -28,7 +28,7 @@ def read_source(source, engine, extension, run_name, table_name=None):
         if extension == 'csv':
             return wr.s3.read_csv(path=source),path
         elif extension == 'parquet':
-            return wr.s3.read_parquet(path=source),path
+            return wr.s3.read_parquet(path=source,ignore_index=True),path
     elif engine == 'athena':
         database_name = f"{ENV}_{table_name.split('.')[0]}"
         athena_table = table_name.split('.')[-1]
@@ -128,7 +128,7 @@ def prepare_final_ds(source, engine, source_engine, run_name, source_name=None):
     if engine == 's3':
         source = concat_source_list(source, source_engine)
         source_extension = get_file_extension(source[0])
-        df = read_source(source, engine, source_extension, run_name)
+        df, path = read_source(source, engine, source_extension, run_name)
     elif engine == 'hudi':
         source = concat_source_list(source, source_engine)
         source_extension = get_file_extension(source[0])
