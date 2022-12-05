@@ -50,12 +50,12 @@ def read_source(source, engine, extension, run_name, table_name=None):
                     wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/sort_keys.json").to_json())
                 sort_key = sort_keys_config[table_name]['sortKey']
             except KeyError:
-                sort_key = 'update_dt'
+                sort_key = ['update_dt']
             con = wr.redshift.connect(secret_id=redshift_secret, dbname=redshift_db)
-            if final_df[sort_key].nunique()>1:
+            if final_df.nunique()[sort_key][0]>1:
                 min_key = final_df[sort_key].min()
                 max_key = final_df[sort_key].max()
-                sql_query = f"SELECT * FROM public.{table_name} WHERE {sort_key} between \\'{min_key}\\' and \\'{max_key}\\'"
+                sql_query = f"SELECT * FROM public.{table_name} WHERE {sort_key[0]} between \\'{min_key}\\' and \\'{max_key}\\'"
                 final_df = wr.redshift.unload(
                     sql=sql_query,
                     con=con,
@@ -64,7 +64,7 @@ def read_source(source, engine, extension, run_name, table_name=None):
                 con.close()
             else:
                 key = str(final_df[sort_key].loc[0])
-                sql_query = f"SELECT * FROM public.{table_name} WHERE {sort_key}=\\'{key}\\'"
+                sql_query = f"SELECT * FROM public.{table_name} WHERE {sort_key[0]}=\\'{key}\\'"
                 final_df = wr.redshift.unload(
                     sql=sql_query,
                     con=con,
