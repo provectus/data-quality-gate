@@ -33,11 +33,12 @@ def handler(event,context):
         source_extension = get_file_extension(source[0])
         source_name = get_source_name(source[0], engine, source_extension)
     final_ds, path = prepare_final_ds(source, engine, source_root, run_name, source_name)
+    suite_name = f"{source_name}_{run_name}"
     try:
-        source_covered = coverage_config[coverage_config['table'] == source_name]['complexSuite'].values[0]
+        source_covered = coverage_config[coverage_config['table'] == suite_name]['complexSuite'].values[0]
     except (IndexError, KeyError) as e:
         source_covered = False
-    suite_name = f"{source_name}_{run_name}"
+
     profile_link, folder_key, config = profile_data(final_ds, suite_name, cloudfront, source_root, source_covered, mapping_config, run_name)
     validate_id = validate_data(final_ds, suite_name, config)
     test_suite = f"{cloudfront}/data_docs/validations/{validate_id}.html"
