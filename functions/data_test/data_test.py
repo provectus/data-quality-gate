@@ -10,6 +10,7 @@ from datasource import prepare_final_ds
 from datasource import get_source_name
 from datasource import get_file_extension
 def handler(event,context):
+    s3 = boto3.resource('s3')
     cloudfront = os.environ['QA_CLOUDFRONT']
     qa_bucket_name = os.environ['QA_BUCKET']
     run_name = event['run_name']
@@ -21,7 +22,7 @@ def handler(event,context):
         engine = pipeline_config[run_name]['engine']
     source_root = event['source_root']
     source_input = event['source_data']
-    coverage_config = wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/test_coverage.json")
+    coverage_config = json.loads(s3.Object(qa_bucket_name,"test_configs/test_coverage.json" ).get()['Body'].read().decode('utf-8'))
     mapping_config = json.loads(wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/mapping.json").to_json())
     if type(source_input) is not list:
         source = [source_input]
@@ -35,7 +36,7 @@ def handler(event,context):
     final_ds, path = prepare_final_ds(source, engine, source_root, run_name, source_name)
     suite_name = f"{source_name}_{run_name}"
     try:
-        source_covered = coverage_config[coverage_config['table'] == suite_name]['complexSuite'].values[0]
+        source_covered = coverage_config[suite_name]['complexSuite']
     except (IndexError, KeyError) as e:
         source_covered = False
 
