@@ -1,6 +1,5 @@
-[
-  {
-    "table": "sample",
+{
+  "sample": {
     "complexSuite": true
   }
-]
+}

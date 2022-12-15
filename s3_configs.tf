@@ -36,6 +36,35 @@ resource "aws_s3_object" "test_configs" {
   etag   = filemd5("${path.module}/${var.test_coverage_path}")
 }
 
+resource "aws_s3_object" "pipeline_config" {
+  bucket = aws_s3_bucket.fast_data_qa.bucket
+  source = "${path.module}/${var.pipeline_config_path}"
+  key    = "test_configs/pipeline.json"
+  etag   = filemd5("${path.module}/${var.pipeline_config_path}")
+}
+
+resource "aws_s3_object" "pks_config" {
+  bucket = aws_s3_bucket.fast_data_qa.bucket
+  source = "${path.module}/${var.pks_path}"
+  key    = "test_configs/pks.json"
+  etag   = filemd5("${path.module}/${var.pks_path}")
+}
+
+resource "aws_s3_object" "sort_keys_config" {
+  bucket = aws_s3_bucket.fast_data_qa.bucket
+  source = "${path.module}/${var.sort_keys_path}"
+  key    = "test_configs/sort_keys.json"
+  etag   = filemd5("${path.module}/${var.sort_keys_path}")
+}
+
+resource "aws_s3_object" "mapping_config" {
+  bucket = aws_s3_bucket.fast_data_qa.bucket
+  source = "${path.module}/${var.mapping_path}"
+  key    = "test_configs/mapping.json"
+  etag   = filemd5("${path.module}/${var.mapping_path}")
+}
+
+
 resource "aws_s3_object" "expectations_store" {
   for_each = fileset("${path.module}/${var.expectations_store}", "**")
   bucket   = aws_s3_bucket.fast_data_qa.bucket

@@ -29,6 +29,9 @@ module "lambda_function_push_report" {
     QA_CLOUDFRONT     = local.aws_cloudfront_distribution
     QA_DYNAMODB_TABLE = aws_dynamodb_table.data_qa_report.name
     ENVIRONMENT       = var.environment
+    JIRA_URL          = var.lambda_push_jira_url
+    SECRET_NAME       = var.lambda_push_secret_name
+    REGION_NAME       = data.aws_region.current.name
   }
   image_uri                      = module.docker_image_push_report.image_uri
   package_type                   = "Image"

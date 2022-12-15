@@ -39,6 +39,30 @@ variable "test_coverage_path" {
   default     = "configs/test_coverage.json"
 }
 
+variable "pipeline_config_path" {
+  type        = string
+  description = "Path to the pipeline description path, relative to the root TF"
+  default     = "configs/pipeline.json"
+}
+
+variable "pks_path" {
+  type        = string
+  description = "Path to the primary keys description path, relative to the root TF"
+  default     = "configs/pks.json"
+}
+
+variable "sort_keys_path" {
+  type        = string
+  description = "Path to the sort keys description path, relative to the root TF"
+  default     = "configs/sort_keys.json"
+}
+
+variable "mapping_path" {
+  type        = string
+  description = "Path to the mapping description path, relative to the root TF"
+  default     = "configs/mapping.json"
+}
+
 variable "expectations_store" {
   type        = string
   description = "Path to the expectations_store directory, relative to the root TF"
@@ -69,4 +93,28 @@ variable "lambda_fast_data_qa_memory" {
 variable "lambda_push_report_memory" {
   description = "Amount of memory allocated to the lambda function lambda_push_report"
   default     = 1024
+}
+
+variable "lambda_push_jira_url" {
+  type        = string
+  default     = null
+  description = "Lambda function push report env variable JIRA_URL"
+}
+
+variable "lambda_push_secret_name" {
+  type        = string
+  default     = null
+  description = "Lambda function push report env variable JIRA_URL"
+}
+
+variable "redshift_db_name" {
+  type        = string
+  default     = null
+  description = "db name for redshift"
+}
+
+variable "redshift_secret" {
+  type        = string
+  default     = null
+  description = "secret name from Secret Manager for Redshift cluster"
 }

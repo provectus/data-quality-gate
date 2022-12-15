@@ -30,38 +30,45 @@ def get_test_human_name(file):
     params = get_params1(file)
     result_string = template_str
     new_params = {}
+    print(params)
     for key,value in params.items():
         if type(value) == list:
             if key == 'value_set':
+                print(1)
                 for i in value:
-                    new_params["v__" + str(value.index(i))] = i
+                    new_params[f"v__{str(value.index(i))}"] = i
             elif key == 'column_set':
+                print(2)
                 for i in value:
-                    new_params["column_list_" + str(value.index(i))] = i
+                    new_params[f"column_list_{str(value.index(i))}"] = i
             else:
+                print(3)
                 for i in value:
-                    new_params[str(key)+"_"+str(value.index(i))] = i
+                    new_params[f"{str(key)}_{str(value.index(i))}"] = i
 
     if new_params:
+        print(4)
         if 'value_set' in params.keys():
+            print(5)
             del params['value_set']
             params.update(new_params)
         elif 'column_list' in params.keys():
+            print(6)
             del params['column_list']
             params.update(new_params)
         else:
+            print(7)
             params = new_params
-
+    print(params)
     for key, value in params.items():
-        result_string = re.sub(rf'\${key}\b', str(value), result_string)
-        # result_string = result_string.replace('$%s' % key, str(value))
+        result_string = re.sub(rf'\${key}\b', re.escape(str(value)), result_string)
 
     return result_string
 
 
 def get_json(json_name,validate_id):
-    file_name ='great_expectations/uncommitted/validations/'+validate_id+'.json'
-    content_object = s3.Object(qa_bucket, qa_bucket+'/'+file_name)
+    file_name = f"great_expectations/uncommitted/validations/{validate_id}.json"
+    content_object = s3.Object(qa_bucket, f"{qa_bucket}/{file_name}")
     file_content = content_object.get()['Body'].read().decode('utf-8')
     json_content = json.loads(file_content)
     return json_content
