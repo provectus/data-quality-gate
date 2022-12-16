@@ -11,7 +11,6 @@ def handler(event, context):
     qa_bucket = os.environ['QA_BUCKET']
     cloudfront = os.environ['QA_CLOUDFRONT']
     report = event['report'].get('Payload')
-    # os.system("aws s3 sync s3://"+qa_bucket+"/"+qa_bucket+"/great_expectations tmp/great_expectations")
     suite = report.get('suite_name')
     folder_key = report.get('folder_key')
     validate_id = report.get('validate_id')
