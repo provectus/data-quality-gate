@@ -63,7 +63,6 @@ def handler(event, context):
 
     with table.batch_writer() as batch:
         for item in items:
-            print(item)
             batch.put_item(
                 Item=item
             )
