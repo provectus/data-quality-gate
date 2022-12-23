@@ -76,7 +76,7 @@ def read_source(source, engine, extension, run_name, table_name=None):
     elif engine == 'hudi':
         columns_to_drop = ['_hoodie_commit_time', '_hoodie_commit_seqno', '_hoodie_record_key',
                            '_hoodie_partition_path', '_hoodie_file_name']
-        pk_config = wr.s3.read_json(path=f"s3://{qa_bucket_name} /test_configs/pks.json")
+        pk_config = wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/pks.json")
         parquet_args = {
             'timestamp_as_object': True
         }
