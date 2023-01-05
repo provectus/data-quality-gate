@@ -118,3 +118,9 @@ variable "redshift_secret" {
   default     = null
   description = "secret name from Secret Manager for Redshift cluster"
 }
+
+variable "push_report_extra_vars" {
+  type        = map(string)
+  default     = {}
+  description = "Extra variables for push report lambda"
+}
