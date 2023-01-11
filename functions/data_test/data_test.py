@@ -9,7 +9,9 @@ import json
 from datasource import prepare_final_ds
 from datasource import get_source_name
 from datasource import get_file_extension
-def handler(event,context):
+
+
+def handler(event, context):
     s3 = boto3.resource('s3')
     cloudfront = os.environ['QA_CLOUDFRONT']
     qa_bucket_name = os.environ['QA_BUCKET']
@@ -22,17 +24,18 @@ def handler(event,context):
         engine = pipeline_config[run_name]['engine']
     source_root = event['source_root']
     source_input = event['source_data']
-    coverage_config = json.loads(s3.Object(qa_bucket_name,"test_configs/test_coverage.json" ).get()['Body'].read().decode('utf-8'))
+    # coverage_config = json.loads(s3.Object(qa_bucket_name,"test_configs/test_coverage.json" ).get()['Body'].read().decode('utf-8'))
+    coverage_config = json.loads(wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/test_coverage.json").to_json())
     mapping_config = json.loads(wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/mapping.json").to_json())
     if type(source_input) is not list:
         source = [source_input]
     else:
         source = source_input
-    try:
+    if event.get('table'):
         source_name = event['table']
-    except KeyError:
+    else:
         source_extension = get_file_extension(source[0])
-        source_name = get_source_name(source[0], engine, source_extension)
+        source_name = get_source_name(source[0], source_extension)
     final_ds, path = prepare_final_ds(source, engine, source_root, run_name, source_name)
     suite_name = f"{source_name}_{run_name}"
     try:
@@ -54,5 +57,4 @@ def handler(event,context):
         "run_name": run_name,
         "validate_id": validate_id
     }
-
     return report
