@@ -1,0 +1,12 @@
+FROM data-test:latest
+RUN pip3 install pytest==7.2.0
+ENV ENVIRONMENT local
+ENV QA_BUCKET demo-data-qa-dev-data-quality-gate20230111085350065800000001
+ENV QA_CLOUDFRONT test
+ENV AWS_ACCESS_KEY_ID test
+ENV AWS_SECRET_ACCESS_KEY test
+ENV AWS_DEFAULT_REGION us-east-1
+ENV S3_HOST host.docker.internal
+COPY test_data ./test_data
+COPY ./*.py /
+ENTRYPOINT ["pytest", "-qvs", "test_data_test.py"]
