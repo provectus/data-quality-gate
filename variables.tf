@@ -16,6 +16,18 @@ variable "slack_webhook_url" {
   description = "The Slack webhook url, which will be used to send notification if some errors will be found it datasets"
 }
 
+variable "slack_cahnnel_name" {
+  type        = string
+  default     = null
+  description = "The Slack channel name, which will be used to send notification if some errors will be found it datasets"
+}
+
+variable "slack_username" {
+  type        = string
+  default     = null
+  description = "The Slack username, which will be used to send notification if some errors will be found it datasets"
+}
+
 variable "cognito_user_pool_id" {
   type        = string
   default     = null

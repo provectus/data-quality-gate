@@ -50,8 +50,8 @@ module "notify_slack" {
   sns_topic_name   = aws_sns_topic.data_qa_alerts_notifications.name
 
   slack_webhook_url = var.slack_webhook_url
-  slack_channel     = "" // TODO ! check this 
-  slack_username    = ""
+  slack_channel     = var.slack_cahnnel_name
+  slack_username    = var.slack_username
 
   tags = merge(
     local.tags,
