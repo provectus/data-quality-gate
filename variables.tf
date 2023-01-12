@@ -57,12 +57,6 @@ variable "sort_keys_path" {
   default     = "configs/sort_keys.json"
 }
 
-variable "mapping_path" {
-  type        = string
-  description = "Path to the mapping description path, relative to the root TF"
-  default     = "configs/mapping.json"
-}
-
 variable "expectations_store" {
   type        = string
   description = "Path to the expectations_store directory, relative to the root TF"
