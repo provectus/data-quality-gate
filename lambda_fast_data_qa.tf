@@ -28,9 +28,9 @@ module "lambda_function_fast_data" {
     QA_BUCKET         = aws_s3_bucket.fast_data_qa.bucket
     QA_CLOUDFRONT     = local.aws_cloudfront_distribution
     QA_DYNAMODB_TABLE = aws_dynamodb_table.data_qa_report.name
-    REDSHIFT_DB      = var.redshift_db_name
-    REDSHIFT_SECRET  = var.redshift_secret
-    ENVIRONMENT = var.environment
+    REDSHIFT_DB       = var.redshift_db_name
+    REDSHIFT_SECRET   = var.redshift_secret
+    ENVIRONMENT       = var.environment
   }
   image_uri                      = module.docker_image_fast_data.image_uri
   package_type                   = "Image"

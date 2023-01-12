@@ -93,27 +93,6 @@ resource "aws_iam_role_policy_attachment" "push_report_s3_lambda_policy" {
   policy_arn = aws_iam_policy.allow_s3_bucket_read.arn
 }
 
-#resource "aws_iam_role" "read_new_files_s3_lambda_role" {
-#  name               = "${local.resource_name_prefix}-read-new-files-s3"
-#  assume_role_policy = data.aws_iam_policy_document.read_new_files_s3_lambda.json
-#}
-
-#data "aws_iam_policy_document" "read_new_files_s3_lambda" {
-#  statement {
-#    principals {
-#      type        = "Service"
-#      identifiers = ["lambda.amazonaws.com"]
-#    }
-#
-#    actions = ["sts:AssumeRole"]
-#  }
-#}
-
-#resource "aws_iam_role_policy_attachment" "read_new_files_s3_lambda_policy" {
-#  role       = aws_iam_role.read_new_files_s3_lambda_role.id
-#  policy_arn = aws_iam_policy.allow_s3_bucket_read.arn
-#}
-
 resource "aws_iam_policy" "athena_dynamodb_connection_basic_lambda_policy" {
   name        = "${local.resource_name_prefix}-athena-dynamodb-connection-basic-lambda-policy"
   description = "Provides write permissions to CloudWatch Logs."
@@ -163,7 +142,3 @@ resource "aws_iam_policy" "airflow_start_step_functions" {
     ]
   })
 }
-
-
-
-

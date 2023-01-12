@@ -40,7 +40,7 @@ resource "aws_sns_topic" "data_qa_alerts_notifications" {
 }
 
 module "notify_slack" {
-  count = var.slack_webhook_url == null ? 0 : 1
+  count   = var.slack_webhook_url == null ? 0 : 1
   source  = "terraform-aws-modules/notify-slack/aws"
   version = "~> 5.3"
 
@@ -50,8 +50,8 @@ module "notify_slack" {
   sns_topic_name   = aws_sns_topic.data_qa_alerts_notifications.name
 
   slack_webhook_url = var.slack_webhook_url
-  slack_channel     = "dataplatform_alarms_prod_qa"
-  slack_username    = "GuardDuty"
+  slack_channel     = "" // TODO ! check this 
+  slack_username    = ""
 
   tags = merge(
     local.tags,
@@ -141,9 +141,9 @@ PATTERN
     },
   )
 }
-
+// TO DO naming
 resource "aws_cloudwatch_event_target" "guardduty" {
-  count = var.slack_webhook_url == null ? 0 : 1
+  count     = var.slack_webhook_url == null ? 0 : 1
   arn       = aws_sns_topic.data_qa_alerts_notifications.arn
   rule      = aws_cloudwatch_event_rule.guardduty_dataqa.name
   target_id = "guardduty_to_slack_sns_topic"
