@@ -162,3 +162,6 @@ fabric.properties
 .serverless
 node_modules
 tmp
+
+# Data
+functions/data_test/great_expectations

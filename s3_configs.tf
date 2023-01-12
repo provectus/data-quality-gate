@@ -57,14 +57,6 @@ resource "aws_s3_object" "sort_keys_config" {
   etag   = filemd5("${path.module}/${var.sort_keys_path}")
 }
 
-resource "aws_s3_object" "mapping_config" {
-  bucket = aws_s3_bucket.fast_data_qa.bucket
-  source = "${path.module}/${var.mapping_path}"
-  key    = "test_configs/mapping.json"
-  etag   = filemd5("${path.module}/${var.mapping_path}")
-}
-
-
 resource "aws_s3_object" "expectations_store" {
   for_each = fileset("${path.module}/${var.expectations_store}", "**")
   bucket   = aws_s3_bucket.fast_data_qa.bucket
