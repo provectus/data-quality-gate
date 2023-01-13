@@ -28,7 +28,7 @@ def open_bug(table_name: str, fail_step: str, description: str, replaced_allure_
             jira.transition_issue(single_issue.key, transition='19')
             break
     if not ticket_exist:
-        create_new_bug(description, replaced_allure_links, summary, jira_project_key)
+        create_new_bug(description, replaced_allure_links, summary[:75], jira_project_key)
 
 
 def get_all_issues(jira_project_key):
