@@ -45,7 +45,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     }
   }
 
-  enabled             = true
+  enabled             = var.cloudfront_distribution_enabled
   is_ipv6_enabled     = true
   comment             = local.resource_name_prefix
   default_root_object = "index.html"
@@ -391,10 +391,13 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
 
   price_class = "PriceClass_200"
 
-  restrictions {
-    geo_restriction {
-      restriction_type = "whitelist"
-      locations        = var.cloudfront_location_restrictions
+  dynamic "restrictions" {
+    for_each = var.cloudfront_location_restrictions != [] ? ["exists"] : []
+    content {
+      geo_restriction {
+        restriction_type = "whitelist"
+        locations        = var.cloudfront_location_restrictions
+      }
     }
   }
 

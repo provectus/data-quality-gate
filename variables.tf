@@ -124,3 +124,9 @@ variable "push_report_extra_vars" {
   default     = {}
   description = "Extra variables for push report lambda"
 }
+
+variable "cloudfront_distribution_enabled" {
+  type        = bool
+  default     = true
+  description = "Enable CloudFront distribution"
+}
