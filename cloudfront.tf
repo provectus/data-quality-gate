@@ -392,10 +392,10 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
   price_class = "PriceClass_200"
 
   dynamic "restrictions" {
-    for_each = var.cloudfront_location_restrictions != [] ? ["exists"] : []
+    for_each = var.cloudfront_location_restrictions != [] ? ["whitelist"] : ["none"]
     content {
       geo_restriction {
-        restriction_type = "whitelist"
+        restriction_type = restrictions.value
         locations        = var.cloudfront_location_restrictions
       }
     }
