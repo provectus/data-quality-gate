@@ -19,5 +19,5 @@ output "push_report_role_arn" {
 }
 
 output "s3_fast_data_qa" {
-  value = aws_s3_bucket.fast_data_qa.bucket
+  value = aws_s3_bucket.settings_bucket.bucket
 }
