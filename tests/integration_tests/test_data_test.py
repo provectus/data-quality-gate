@@ -61,12 +61,13 @@ def test_data_test_csv():
       "source_root": b_name,
       "source_data": file_path,
       "engine": "s3"
-      # "table": file_name
     }
-    s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566")
+    url = f"http://{os.environ['S3_HOST']}:4566"
+    s3 = boto3.resource("s3", endpoint_url=url)
     qa_bucket_name = os.environ['QA_BUCKET']
+    gx_config_local_path = "./great_expectations/great_expectations.yml"
     config_path = f"{qa_bucket_name}/great_expectations/great_expectations.yml"
-    s3.Bucket(qa_bucket_name).download_file(config_path, "./great_expectations/great_expectations.yml")
+    s3.Bucket(qa_bucket_name).download_file(config_path, gx_config_local_path)
     s3.create_bucket(Bucket=b_name)
     s3.Object(b_name, file_path).put(Body=open(local_path, 'rb'))
     result = data_test.handler(event, {})
