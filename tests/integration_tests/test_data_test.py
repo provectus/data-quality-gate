@@ -54,7 +54,7 @@ def test_data_test_csv():
     }
     b_name = "dataqa"
     file_name = "titanic.csv"
-    file_path = f"{file_name}"
+    file_path = f"{b_name}/{file_name}"
     local_path = f"./test_data/{file_name}"
     event = {
       "run_name": "local_test",
