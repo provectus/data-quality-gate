@@ -25,7 +25,7 @@ def open_bug(table_name: str, fail_step: str, description: str, replaced_allure_
                 single_issue.fields.status) != 'Open':
             ticket_exist = True
             print(f'Will be reopen bug with name[{summary}]')
-            jira.transition_issue(single_issue.key, transition='19')
+            jira.transition_issue(single_issue.key, transition='Re-Open')
             break
     if not ticket_exist:
         create_new_bug(description, replaced_allure_links, summary, jira_project_key)
