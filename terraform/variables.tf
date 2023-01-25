@@ -190,4 +190,3 @@ variable "dynamodb_report_table_write_scale_threshold" {
 variable "allure_report_image_uri" { type = string }
 variable "data_test_image_uri" { type = string }
 variable "push_report_image_uri" { type = string }
->>>>>>> global-refactoring:terraform/variables.tf
