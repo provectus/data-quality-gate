@@ -147,10 +147,10 @@ variable "dynamodb_report_table_autoscaling_read_capacity_settings" {
     max = number
   })
 
-  default = object({
+  default = {
     min = 50
     max = 200
-  })
+  }
 }
 
 variable "dynamodb_report_table_autoscaling_write_capacity_settings" {
@@ -160,10 +160,10 @@ variable "dynamodb_report_table_autoscaling_write_capacity_settings" {
     max = number
   })
 
-  default = object({
+  default = {
     min = 2
     max = 50
-  })
+  }
 }
 
 variable "dynamodb_report_table_read_scale_threshold" {
