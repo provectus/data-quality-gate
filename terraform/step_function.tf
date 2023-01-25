@@ -1,3 +1,8 @@
+resource "aws_cloudwatch_log_group" "state-machine-log-group" {
+  name              = "/aws/${local.resource_name_prefix}/states/fast-data-qa-logs"
+  retention_in_days = 0
+}
+
 resource "aws_sfn_state_machine" "fast_data_qa" {
   name     = "${local.resource_name_prefix}-fast-data-qa"
   role_arn = aws_iam_role.step_functions_fast_data_qa.arn
@@ -17,7 +22,7 @@ resource "aws_sfn_state_machine" "fast_data_qa" {
             "Resource": "arn:aws:states:::lambda:invoke",
             "Parameters": {
               "Payload.$": "$",
-              "FunctionName": "${module.lambda_function_fast_data.lambda_function_qualified_arn}"
+              "FunctionName": "${module.lambda_function_data_test.lambda_function_qualified_arn}"
             },
             "Retry": [
               {
@@ -198,7 +203,7 @@ resource "aws_iam_policy" "LambdaInvokeScopedAccessPolicy" {
           Effect = "Allow"
           Resource = [
             "${module.lambda_function_allure_report.lambda_function_arn}*",
-            "${module.lambda_function_fast_data.lambda_function_arn}*",
+            "${module.lambda_function_data_test.lambda_function_arn}*",
             "${module.lambda_function_push_report.lambda_function_arn}*"
           ]
         }

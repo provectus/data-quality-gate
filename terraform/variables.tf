@@ -1,34 +1,31 @@
 variable "project" {
-  type        = string
-  default     = "demo"
-  description = "Name of your project, will be used as a prefix for AWS resources names"
+  type    = string
+  default = "demo"
 }
 
 variable "environment" {
-  type        = string
-  default     = "data-qa-dev"
-  description = "Additional AWS Resource prefix for all resource name, e.g. project-environment"
+  type    = string
+  default = "data-qa-dev"
 }
 
-variable "slack_webhook_url" {
+variable "slack_settings" {
+  type = object({
+    webhook_url = string
+    channel     = string
+    username    = string
+  })
+
+  default     = null
+  description = "Slack notifications settings"
+}
+
+variable "sns_topic_notifications_arn" {
   type        = string
   default     = null
-  description = "The Slack webhook url, which will be used to send notification if some errors will be found it datasets"
+  description = "SNS topic to send cloudwatch events"
 }
 
-variable "cognito_user_pool_id" {
-  type        = string
-  default     = null
-  description = "If you already has Cognito user pool which will be used for authentication, you could provide Cognito user pool id here. If it not provided, new Cognito user pool will be created"
-}
-
-variable "tags" {
-  type        = map(string)
-  default     = null
-  description = "Map of AWS Resource TAG's which will be added to each resource"
-}
-
-variable "s3_source_data_bucket" {
+variable "data_test_storage_bucket_name" {
   type        = string
   description = "Bucket name, with the data on which test will be executed"
 }
@@ -85,8 +82,8 @@ variable "lambda_allure_report_memory" {
   default     = 1024
 }
 
-variable "lambda_fast_data_qa_memory" {
-  description = "Amount of memory allocated to the lambda function lambda_fast_data_qa"
+variable "lambda_data_test_memory" {
+  description = "Amount of memory allocated to the lambda function lambda_data_test"
   default     = 5048
 }
 
@@ -119,6 +116,7 @@ variable "redshift_secret" {
   description = "secret name from Secret Manager for Redshift cluster"
 }
 
+<<<<<<< HEAD:variables.tf
 variable "push_report_extra_vars" {
   type        = map(string)
   default     = {}
@@ -130,3 +128,68 @@ variable "cloudfront_distribution_enabled" {
   default     = true
   description = "Enable CloudFront distribution"
 }
+=======
+#DynamoDB
+variable "dynamodb_table_attributes" {
+  description = "List of nested attribute definitions. Only required for hash_key and range_key attributes. Each attribute has two properties: name - (Required) The name of the attribute, type - (Required) Attribute type, which must be a scalar type: S, N, or B for (S)tring, (N)umber or (B)inary data"
+  type        = list(map(string))
+  default     = []
+}
+
+variable "dynamodb_stream_enabled" {
+  type    = bool
+  default = false
+}
+
+variable "dynamodb_write_capacity" {
+  type        = number
+  description = "Dynamodb data qa report table write capacity"
+  default     = 2
+}
+
+variable "dynamodb_read_capacity" {
+  type        = number
+  description = "Dynamodb data qa report table read capacity"
+  default     = 20
+}
+
+variable "dynamodb_report_table_autoscaling_read_capacity_settings" {
+  description = "Autoscaling read capacity"
+  type = object({
+    min = number
+    max = number
+  })
+
+  default = object({
+    min = 50
+    max = 200
+  })
+}
+
+variable "dynamodb_report_table_autoscaling_write_capacity_settings" {
+  description = "Autoscaling write capacity"
+  type = object({
+    min = number
+    max = number
+  })
+
+  default = object({
+    min = 2
+    max = 50
+  })
+}
+
+variable "dynamodb_report_table_read_scale_threshold" {
+  type    = number
+  default = 60
+}
+variable "dynamodb_report_table_write_scale_threshold" {
+  type    = number
+  default = 70
+}
+
+#Lambda
+variable "allure_report_image_uri" { type = string }
+variable "data_test_image_uri" { type = string }
+variable "push_report_image_uri" { type = string }
+>>>>>>> global-refactoring:terraform/variables.tf
