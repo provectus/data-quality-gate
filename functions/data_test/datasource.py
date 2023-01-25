@@ -9,7 +9,7 @@ import re
 
 ENV = os.environ['ENVIRONMENT']
 qa_bucket_name = os.environ['QA_BUCKET']
-
+s3 = boto3.resource('s3')
 
 def concat_source_list(source, source_engine):
     final_source_files = []
@@ -26,9 +26,12 @@ def read_source(source, engine, extension, run_name, table_name=None):
     path = source
     if engine == 's3':
         if extension == 'csv':
-            return wr.s3.read_csv(path=source),path
+            return wr.s3.read_csv(path=source), path
         elif extension == 'parquet':
-            return wr.s3.read_parquet(path=source,ignore_index=True),path
+            return wr.s3.read_parquet(path=source, ignore_index=True), path
+        elif extension == 'json':
+            return wr.s3.read_json(path=source, lines=True), path
+
     elif engine == 'athena':
         database_name = f"{ENV}_{table_name.split('.')[0]}"
         athena_table = table_name.split('.')[-1]
@@ -52,7 +55,7 @@ def read_source(source, engine, extension, run_name, table_name=None):
             except KeyError:
                 sort_key = ['update_dt']
             con = wr.redshift.connect(secret_id=redshift_secret, dbname=redshift_db)
-            if final_df.nunique()[sort_key][0]>1:
+            if final_df.nunique()[sort_key][0] > 1:
                 min_key = final_df[sort_key].min()
                 max_key = final_df[sort_key].max()
                 sql_query = f"SELECT * FROM public.{table_name} WHERE {sort_key[0]} between \\'{min_key}\\' and \\'{max_key}\\'"
@@ -116,7 +119,7 @@ def read_source(source, engine, extension, run_name, table_name=None):
     elif engine == 'snowflake':
         return 6
     else:
-        return wr.s3.read_parquet(path=source),path
+        return wr.s3.read_parquet(path=source), path
 
 
 def get_source_name(source, extension):
