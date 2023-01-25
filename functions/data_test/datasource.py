@@ -9,7 +9,6 @@ import re
 
 ENV = os.environ['ENVIRONMENT']
 qa_bucket_name = os.environ['QA_BUCKET']
-s3 = boto3.resource('s3')
 
 def concat_source_list(source, source_engine):
     final_source_files = []
