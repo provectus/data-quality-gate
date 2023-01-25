@@ -26,7 +26,7 @@ variable "slack_username" {
   description = "Slack username which will be used to announce cloudwatch alerts"
 }
 
-variable "sns_topic_name" {
+variable "sns_topic_arn" {
   type        = string
   description = "Name of existed sns topic to track"
 }

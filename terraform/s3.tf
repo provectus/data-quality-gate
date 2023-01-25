@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "settings_bucket" {
-  bucket_prefix = "${local.resource_name_prefix}-data-quality-gate"
+  bucket_prefix = var.data_test_storage_bucket_name
 }
 
 resource "aws_s3_bucket_public_access_block" "public_access_block_fast_data_qa" {
@@ -12,6 +12,7 @@ resource "aws_s3_bucket_public_access_block" "public_access_block_fast_data_qa" 
 
 resource "aws_s3_bucket_versioning" "fast-data-qa-bucket" {
   bucket = aws_s3_bucket.settings_bucket.id
+
   versioning_configuration {
     status = "Enabled"
   }
@@ -88,7 +89,6 @@ resource "aws_s3_object" "test_config_manifest" {
   key = "test_configs/manifest.json"
 }
 
-##Lifecycle policy to delete reports older than 2 weeks
 resource "aws_s3_bucket_lifecycle_configuration" "delete_old_reports" {
   bucket = aws_s3_bucket.settings_bucket.id
 

@@ -40,7 +40,7 @@ module "notify_slack" {
   lambda_function_name = "${var.prefix}-notify-slack-data-qa"
 
   create_sns_topic = false
-  sns_topic_name   = var.sns_topic_name
+  sns_topic_name   = ""
 
   slack_webhook_url = var.webhook_url
   slack_channel     = var.slack_channel

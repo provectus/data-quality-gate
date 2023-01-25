@@ -1,17 +1,8 @@
 locals {
   cloudfront_origin_name = "${local.resource_name_prefix}-s3-origin"
-  aws_waf_web_acl_rule = [
-    {
-      action = {
-        type = "ALLOW"
-      }
+  cloudwatch_prefix      = replace(title(replace(local.resource_name_prefix, "-", " ")), " ", "")
 
-      priority = 1
-      rule_id  = aws_waf_rule.wafrule[0].id
-      type     = "REGULAR"
-    }
-  ]
-  aws_cloudfront_distribution = aws_cloudfront_distribution.s3_distribution_ip[0].domain_name
+  aws_cloudfront_distribution = var.cloudfront_allowed_subnets != null ? aws_cloudfront_distribution.s3_distribution_ip.domain_name : "fake_domain.org"
 }
 
 resource "aws_cloudfront_origin_access_identity" "data_qa_oai" {
@@ -178,52 +169,50 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
     cloudfront_default_certificate = true
   }
 
-  web_acl_id = aws_waf_web_acl.waf_acl.id
+  web_acl_id = aws_wafv2_web_acl.waf_acl.id
 }
 
-resource "aws_waf_ipset" "ipset" {
-  count = var.cloudfront_allowed_subnets != null ? 1 : 0
-  name  = "tfIPSet"
+resource "aws_wafv2_ip_set" "vpn_ipset" {
+  name               = "${local.resource_name_prefix}-ip-set"
+  description        = "VPN IP set"
+  scope              = "CLOUDFRONT"
+  ip_address_version = "IPV4"
 
-  dynamic "ip_set_descriptors" {
-    for_each = toset(var.cloudfront_allowed_subnets)
-    content {
-      type  = "IPV4"
-      value = ip_set_descriptors.value
-    }
-  }
+  addresses = var.cloudfront_allowed_subnets
 }
 
-resource "aws_waf_rule" "wafrule" {
-  count       = var.cloudfront_allowed_subnets != null ? 1 : 0
-  depends_on  = [aws_waf_ipset.ipset[0]]
-  name        = "tfWAFRule"
-  metric_name = "tfWAFRule"
-
-  predicates {
-    data_id = aws_waf_ipset.ipset[0].id
-    negated = false
-    type    = "IPMatch"
-  }
-}
-
-resource "aws_waf_web_acl" "waf_acl" {
-  name        = "tfWebACL"
-  metric_name = "tfWebACL"
+resource "aws_wafv2_web_acl" "waf_acl" {
+  name  = "${local.resource_name_prefix}-web-acl"
+  scope = "CLOUDFRONT"
 
   default_action {
-    type = "BLOCK"
+    block {}
   }
 
-  dynamic "rules" {
-    for_each = local.aws_waf_web_acl_rule
-    content {
-      action {
-        type = rules.value["action"]["type"]
-      }
-      priority = rules.value["priority"]
-      rule_id  = rules.value["rule_id"]
-      type     = rules.value["type"]
+  rule {
+    name     = "tfWAFVpnRule"
+    priority = 1
+
+    action {
+      allow {}
     }
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.vpn_ipset.arn
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = false
+      metric_name                = "${local.cloudwatch_prefix}WafVpnIPRule"
+      sampled_requests_enabled   = false
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = false
+    metric_name                = "${local.cloudwatch_prefix}WafAcl"
+    sampled_requests_enabled   = false
   }
 }

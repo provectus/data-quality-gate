@@ -19,7 +19,13 @@ variable "slack_settings" {
   description = "Slack notifications settings"
 }
 
-variable "s3_source_data_bucket" {
+variable "sns_topic_notifications_arn" {
+  type        = string
+  default     = null
+  description = "SNS topic to send cloudwatch events"
+}
+
+variable "data_test_storage_bucket_name" {
   type        = string
   description = "Bucket name, with the data on which test will be executed"
 }

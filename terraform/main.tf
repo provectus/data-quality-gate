@@ -21,4 +21,6 @@ module "slack_notifications" {
 
   slack_channel  = var.slack_settings.channel
   slack_username = var.slack_settings.username
+
+  sns_topic_arn = var.sns_topic_notifications_arn
 }

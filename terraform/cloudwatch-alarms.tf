@@ -1,9 +1,3 @@
-resource "aws_sns_topic" "data_qa_alerts_notifications" {
-  count =
-  name         = "${local.resource_name_prefix}-data-qa-notifications"
-  display_name = "data-qa-notifications"
-}
-
 resource "aws_cloudwatch_metric_alarm" "lambda_allure_report_error" {
   actions_enabled           = "true"
   alarm_name                = "${local.resource_name_prefix} ${module.lambda_function_allure_report.lambda_function_name} lambda function has execution errors"
@@ -16,8 +10,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_allure_report_error" {
   evaluation_periods        = "1"
   statistic                 = "SampleCount"
   treat_missing_data        = "ignore"
-  alarm_actions             = [aws_sns_topic.data_qa_alerts_notifications.arn]
-  ok_actions                = []
+  alarm_actions             = [var.sns_topic_notifications_arn]
+  ok_actions                = [var.sns_topic_notifications_arn]
   insufficient_data_actions = []
 
   dimensions = {
@@ -37,8 +31,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_data_test_error" {
   evaluation_periods        = "1"
   statistic                 = "SampleCount"
   treat_missing_data        = "ignore"
-  alarm_actions             = [aws_sns_topic.data_qa_alerts_notifications.arn]
-  ok_actions                = []
+  alarm_actions             = [var.sns_topic_notifications_arn]
+  ok_actions                = [var.sns_topic_notifications_arn]
   insufficient_data_actions = []
 
   dimensions = {
@@ -58,8 +52,8 @@ resource "aws_cloudwatch_metric_alarm" "lambda_push_report_error" {
   evaluation_periods        = "1"
   statistic                 = "SampleCount"
   treat_missing_data        = "ignore"
-  alarm_actions             = [aws_sns_topic.data_qa_alerts_notifications.arn]
-  ok_actions                = []
+  alarm_actions             = [var.sns_topic_notifications_arn]
+  ok_actions                = [var.sns_topic_notifications_arn]
   insufficient_data_actions = []
 
   dimensions = {
