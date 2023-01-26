@@ -11,7 +11,7 @@ output "allure_report_role_arn" {
 }
 
 output "fast_data_role_arn" {
-  value = module.lambda_function_fast_data.lambda_role_arn
+  value = module.lambda_function_data_test.lambda_role_arn
 }
 
 output "push_report_role_arn" {

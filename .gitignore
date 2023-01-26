@@ -9,6 +9,7 @@ terraform/secrets.auto.tfvars
 terraform/*plan
 terraform/*.backup
 .terraform
+.terraform.lock.hcl
 
 # C extensions
 *.so
