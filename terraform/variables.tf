@@ -27,43 +27,43 @@ variable "sns_topic_notifications_arn" {
 
 variable "data_test_storage_bucket_name" {
   type        = string
-  description = "Bucket name, with the data on which test will be executed"
+  description = "Bucket name which will be used to store data tests and settings for it's execution"
 }
 
 variable "test_coverage_path" {
   type        = string
   description = "Path to the tests description path, relative to the root TF"
-  default     = "configs/test_coverage.json"
+  default     = "../configs/test_coverage.json"
 }
 
 variable "pipeline_config_path" {
   type        = string
   description = "Path to the pipeline description path, relative to the root TF"
-  default     = "configs/pipeline.json"
+  default     = "../configs/pipeline.json"
 }
 
 variable "pks_path" {
   type        = string
   description = "Path to the primary keys description path, relative to the root TF"
-  default     = "configs/pks.json"
+  default     = "../configs/pks.json"
 }
 
 variable "sort_keys_path" {
   type        = string
   description = "Path to the sort keys description path, relative to the root TF"
-  default     = "configs/sort_keys.json"
+  default     = "../configs/sort_keys.json"
 }
 
 variable "mapping_path" {
   type        = string
   description = "Path to the mapping description path, relative to the root TF"
-  default     = "configs/mapping.json"
+  default     = "../configs/mapping.json"
 }
 
 variable "expectations_store" {
   type        = string
   description = "Path to the expectations_store directory, relative to the root TF"
-  default     = "expectations_store"
+  default     = "../expectations_store"
 }
 
 variable "cloudfront_allowed_subnets" {

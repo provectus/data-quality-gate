@@ -76,12 +76,12 @@ resource "aws_s3_object" "expectations_store" {
 
 resource "aws_s3_object" "test_config_manifest" {
   bucket = aws_s3_bucket.settings_bucket.bucket
-  etag = md5(templatefile("${path.module}/configs/manifest.json", {
+  etag = md5(templatefile("${path.module}/../configs/manifest.json", {
     env_name    = var.environment,
     bucket_name = aws_s3_bucket.settings_bucket.bucket
   }))
   content_type = "application/json"
-  content = templatefile("${path.module}/configs/manifest.json",
+  content = templatefile("${path.module}/../configs/manifest.json",
     {
       env_name    = var.environment,
       bucket_name = aws_s3_bucket.settings_bucket.bucket
