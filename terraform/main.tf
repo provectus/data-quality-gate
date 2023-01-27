@@ -11,7 +11,7 @@ locals {
 module "slack_notifications" {
   count = var.slack_settings == null ? 0 : 1
 
-  source = "./modules/slack"
+  source = "./modules/slack-notification"
   prefix = local.resource_name_prefix
 
   aws_region          = data.aws_region.current.name

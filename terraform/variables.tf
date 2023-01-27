@@ -1,3 +1,5 @@
+variable "aws_account_id" {}
+
 variable "project" {
   type    = string
   default = "demo"
@@ -17,12 +19,6 @@ variable "slack_settings" {
 
   default     = null
   description = "Slack notifications settings"
-}
-
-variable "sns_topic_notifications_arn" {
-  type        = string
-  default     = null
-  description = "SNS topic to send cloudwatch events"
 }
 
 variable "data_test_storage_bucket_name" {
@@ -179,3 +175,15 @@ variable "dynamodb_report_table_write_scale_threshold" {
 variable "allure_report_image_uri" { type = string }
 variable "data_test_image_uri" { type = string }
 variable "push_report_image_uri" { type = string }
+
+#Cloudwatch
+variable "create_cloudwatch_notifications_topic" {
+  type        = bool
+  default     = true
+  description = "Should sns topic for cloudwatch alerts be created"
+}
+variable "sns_cloudwatch_notifications_topic_arn" {
+  type        = string
+  default     = null
+  description = "SNS topic to send cloudwatch events"
+}
