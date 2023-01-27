@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "settings_bucket" {
-  bucket_prefix = var.data_test_storage_bucket_name
+  bucket = var.data_test_storage_bucket_name
 }
 
 resource "aws_s3_bucket_public_access_block" "public_access_block_fast_data_qa" {
