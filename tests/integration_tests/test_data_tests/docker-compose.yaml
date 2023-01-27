@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  data-test:
+    image: data-test
+    build:
+      context: ./../../../functions/data_test/
+      dockerfile: ../../functions/data_test/Dockerfile
+  tests:
+    image: intergation-tests
+    build: .
+    environment:
+      - QA_BUCKET=$QA_BUCKET
