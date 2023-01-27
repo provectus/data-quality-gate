@@ -7,4 +7,4 @@ Run  tests:
 check that S3 bucket has been created in local stack with command `aws --endpoint-url=http://localhost:4566 s3 ls s3://`
 build container with lambda from data_test dicrectory `docker build -t data-test  .`
 build container with integration tests from directory `./tests/integration_tests` with command `docker build -t integration-tests .`
-run test `docker run --env QA_BUCKET=BUCKET_NAME integration-tests` where BUCKET_NAME is name of bucket from terraform output 
+run test `docker run --env QA_BUCKET=integration-test-bucket integration-tests` where BUCKET_NAME is name of bucket from terraform output 
