@@ -1,5 +1,12 @@
 provider "aws" {
   region = "us-west-2"
+  s3_force_path_style = true
+
+  endpoints {
+    s3 = "http://localhost:4566"
+    sts = "http://localhost:4566"
+  }
+
 
   # default_tags {
   #   Terraform = true
