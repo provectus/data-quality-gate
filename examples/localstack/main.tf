@@ -1,9 +1,9 @@
 provider "aws" {
   region = "us-west-2"
 
-  default_tags {
-    Terraform = true
-  }
+  # default_tags {
+  #   Terraform = true
+  # }
 }
 
 module "integration_tests_data_qa" {
