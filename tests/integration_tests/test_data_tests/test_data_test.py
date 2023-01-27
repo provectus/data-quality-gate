@@ -6,7 +6,8 @@ import boto3
 
 
 def test_data_test_csv():
-    wr.config.s3_endpoint_url = f"http://{os.environ['S3_HOST']}:4566"
+    url = f"http://{os.environ['S3_HOST']}:4566"
+    wr.config.s3_endpoint_url = url
     schema = {
       "$schema": "http://json-schema.org/draft-04/schema#",
       "type": "object",
@@ -62,7 +63,6 @@ def test_data_test_csv():
       "source_data": file_path,
       "engine": "s3"
     }
-    url = f"http://{os.environ['S3_HOST']}:4566"
     s3 = boto3.resource("s3", endpoint_url=url)
     qa_bucket_name = os.environ['QA_BUCKET']
     gx_config_local_path = "./great_expectations/great_expectations.yml"
