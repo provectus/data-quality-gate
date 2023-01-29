@@ -38,6 +38,7 @@ module "lambda_function_fast_data" {
   timeout                        = 900
   memory_size                    = var.lambda_fast_data_qa_memory
   tracing_mode                   = "PassThrough"
+  ephemeral_storage_size         = var.lambda_fast_data_qa_ephemeral_storage_size
 }
 
 resource "aws_iam_policy" "fast_data_qa_basic_lambda_policy" {

@@ -90,14 +90,29 @@ variable "lambda_allure_report_memory" {
   description = "Amount of memory allocated to the lambda function lambda_allure_report"
   default     = 1024
 }
+variable "lambda_allure_ephemeral_storage_size" {
+  description = "Ephemeral memory allocated to the lambda function lambda_allure_report"
+  default     = 512
+}
 
 variable "lambda_fast_data_qa_memory" {
   description = "Amount of memory allocated to the lambda function lambda_fast_data_qa"
   default     = 5048
 }
 
+variable "lambda_fast_data_qa_ephemeral_storage_size" {
+  description = "Ephemeral memory allocated to the lambda function lambda_fast_data_qa"
+  default     = 512
+}
+
+
 variable "lambda_push_report_memory" {
   description = "Amount of memory allocated to the lambda function lambda_push_report"
+  default     = 1024
+}
+
+variable "lambda_push_report_ephemeral_storage_size" {
+  description = "Ephemeral memory allocated to the lambda function lambda_push_report"
   default     = 1024
 }
 

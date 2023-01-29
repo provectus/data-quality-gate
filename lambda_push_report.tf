@@ -39,4 +39,5 @@ module "lambda_function_push_report" {
   timeout                        = 900
   memory_size                    = var.lambda_push_report_memory
   tracing_mode                   = "PassThrough"
+  ephemeral_storage_size         = var.lambda_push_report_ephemeral_storage_size
 }
