@@ -11,3 +11,4 @@ services:
     build: .
     environment:
       - QA_BUCKET=$QA_BUCKET
+      - S3_HOST=$S3_HOST
