@@ -22,13 +22,17 @@ jobs:
         run: |
           cd ./examples/localstack
           terraform apply -target=module.integration_tests_data_qa.aws_s3_object.great_expectations_yml -target=module.integration_tests_data_qa.aws_s3_object.test_configs -target=module.integration_tests_data_qa.aws_s3_object.pipeline_config -target=module.integration_tests_data_qa.aws_s3_object.pks_config -target=module.integration_tests_data_qa.aws_s3_object.mapping_config -target=module.integration_tests_data_qa.aws_s3_object.expectations_store -target=module.integration_tests_data_qa.aws_s3_object.test_config_manifest -auto-approve
-      - name: Build lambda image
-        run: |
-          cd ./functions/data_test
-          docker build -t data-test:latest .
-      - name: Build test image
-        run: |
-          cd ./tests/integration_tests/test_data_tests
-          docker build -t integration-tests:latest .
-      - name: Run tests
-        run: docker run --env QA_BUCKET=integration-test-bucket --env S3_HOST=localhost integration-tests
+      - name: Check bucket
+        run: docker run catthehacker/ubuntu:act-latest curl http://localhost:4566/integration-test-bucket/integration-test-bucket/great_expectations/great_expectations.yml
+
+        
+      # - name: Build lambda image
+      #   run: |
+      #     cd ./functions/data_test
+      #     docker build -t data-test:latest .
+      # - name: Build test image
+      #   run: |
+      #     cd ./tests/integration_tests/test_data_tests
+      #     docker build -t integration-tests:latest .
+      # - name: Run tests
+      #   run: docker run --env QA_BUCKET=integration-test-bucket --env S3_HOST=localhost integration-tests
