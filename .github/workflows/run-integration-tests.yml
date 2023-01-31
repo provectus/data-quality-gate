@@ -12,21 +12,20 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3
-      # - name: Terraform Install
-      #   uses: hashicorp/setup-terraform@v1
-      #   with:
-      #     terraform_version: 1.3.3
-      # - name: Terraform init
-      #   run: |
-      #     cd ./examples/localstack
-      #     terraform init
-      # - name: Terraform apply
-      #   run: |
-      #     cd ./examples/localstack
-      #     terraform apply -target=module.integration_tests_data_qa.aws_s3_object.great_expectations_yml -target=module.integration_tests_data_qa.aws_s3_object.test_configs -target=module.integration_tests_data_qa.aws_s3_object.pipeline_config -target=module.integration_tests_data_qa.aws_s3_object.pks_config -target=module.integration_tests_data_qa.aws_s3_object.mapping_config -target=module.integration_tests_data_qa.aws_s3_object.expectations_store -target=module.integration_tests_data_qa.aws_s3_object.test_config_manifest -auto-approve  
+      - name: Terraform Install
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.3.3
+      - name: Terraform init
+        run: |
+          cd ./examples/localstack
+          terraform init
+      - name: Terraform apply
+        run: |
+          cd ./examples/localstack
+          terraform apply -target=module.integration_tests_data_qa.aws_s3_object.great_expectations_yml -target=module.integration_tests_data_qa.aws_s3_object.test_configs -target=module.integration_tests_data_qa.aws_s3_object.pipeline_config -target=module.integration_tests_data_qa.aws_s3_object.pks_config -target=module.integration_tests_data_qa.aws_s3_object.mapping_config -target=module.integration_tests_data_qa.aws_s3_object.expectations_store -target=module.integration_tests_data_qa.aws_s3_object.test_config_manifest -auto-approve  
       - name: check localstack  
         run: |
-         sleep 30
          curl http://localhost:4566/_localstack/health -i
       - name: Check bucket
         run: docker run catthehacker/ubuntu:act-latest curl http://172.17.0.1:4566/integration-test-bucket/integration-test-bucket/great_expectations/great_expectations.yml
