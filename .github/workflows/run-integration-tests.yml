@@ -29,7 +29,7 @@ jobs:
          sleep 30
          curl http://localhost:4566/_localstack/health -i
       - name: Check bucket
-        run: docker run catthehacker/ubuntu:act-latest curl http://jib.services.localstack:4566/integration-test-bucket/integration-test-bucket/great_expectations/great_expectations.yml
+        run: docker run catthehacker/ubuntu:act-latest curl http://job.services.localstack.ports['4566']/integration-test-bucket/integration-test-bucket/great_expectations/great_expectations.yml
 
         
       # - name: Build lambda image
