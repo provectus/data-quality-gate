@@ -9,7 +9,7 @@ jobs:
       - name: run localstack
         run: |
           cd ./examples/localstack
-          docker run --rm -d -p 4566:4566 -p 4510-4559:4510-4559 localstack/localstack:1.3.1
+          docker run --rm -d --name localstack -p 4566:4566 -p 4510-4559:4510-4559 localstack/localstack:1.3.1
       - name: Terraform Install
         uses: hashicorp/setup-terraform@v1
         with:
@@ -23,7 +23,7 @@ jobs:
           cd ./examples/localstack
           terraform apply -target=module.integration_tests_data_qa.aws_s3_object.great_expectations_yml -target=module.integration_tests_data_qa.aws_s3_object.test_configs -target=module.integration_tests_data_qa.aws_s3_object.pipeline_config -target=module.integration_tests_data_qa.aws_s3_object.pks_config -target=module.integration_tests_data_qa.aws_s3_object.mapping_config -target=module.integration_tests_data_qa.aws_s3_object.expectations_store -target=module.integration_tests_data_qa.aws_s3_object.test_config_manifest -auto-approve
       - name: Check bucket
-        run: docker run catthehacker/ubuntu:act-latest curl http://localhost:4566/integration-test-bucket/integration-test-bucket/great_expectations/great_expectations.yml
+        run: docker run catthehacker/ubuntu:act-latest curl http://localstack:4566/integration-test-bucket/integration-test-bucket/great_expectations/great_expectations.yml
 
         
       # - name: Build lambda image
