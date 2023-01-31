@@ -7,8 +7,7 @@ locals {
       }
 
       priority = 1
-      //rule_id  = aws_waf_rule.wafrule[0].id
-      type = "REGULAR"
+      type     = "REGULAR"
     }
   ] : []
   aws_cloudfront_distribution = aws_cloudfront_distribution.s3_distribution_oauth.domain_name
@@ -23,7 +22,6 @@ resource "aws_cloudfront_origin_access_identity" "never_be_reached" {
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
-  //count = var.cognito_user_pool_id != null ? 1 : 0
   origin {
     domain_name = aws_s3_bucket.fast_data_qa.bucket_regional_domain_name
     origin_id   = aws_cloudfront_origin_access_identity.data_qa_oai.id
@@ -91,14 +89,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
 
-    # #   lambda_function_association {
-    # #     event_type = "viewer-request"
-    # #     lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.CheckAuthHandler
-    # #   }
-    # #   lambda_function_association {
-    # #     event_type = "origin-response"
-    # #     lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.HttpHeadersHandler
-    # #   }
   }
 
   # # Cache behavior with precedence 1
@@ -122,14 +112,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
 
-    # #   lambda_function_association {
-    # #     event_type = "viewer-request"
-    # #     lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.CheckAuthHandler
-    # #   }
-    # #   lambda_function_association {
-    # #     event_type = "origin-response"
-    # #     lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.HttpHeadersHandler
-    # #   }
   }
 
   # # Cache behavior with precedence 2
@@ -153,14 +135,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
 
-    # #   lambda_function_association {
-    # #     event_type = "viewer-request"
-    # #     lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.CheckAuthHandler
-    # #   }
-    # #   lambda_function_association {
-    # #     event_type = "origin-response"
-    # #     lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.HttpHeadersHandler
-    # #   }
   }
 
   # # Cache behavior with precedence 3
@@ -176,11 +150,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
         forward = "none"
       }
     }
-
-    #   # lambda_function_association {
-    #   #   event_type = "viewer-request"
-    #   #   lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.ParseAuthHandler
-    #   # }
 
     min_ttl                = 0
     default_ttl            = 3600
@@ -203,10 +172,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
       }
     }
 
-    #   # lambda_function_association {
-    #   #   event_type = "viewer-request"
-    #   #   lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.RefreshAuthHandler
-    #   # }
     min_ttl                = 0
     default_ttl            = 3600
     max_ttl                = 86400
@@ -227,10 +192,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
         forward = "none"
       }
     }
-    #   lambda_function_association {
-    #     event_type = "viewer-request"
-    #     lambda_arn = aws_serverlessapplicationrepository_cloudformation_stack.edge[0].outputs.SignOutHandler
-    #   }
 
     min_ttl                = 0
     default_ttl            = 3600

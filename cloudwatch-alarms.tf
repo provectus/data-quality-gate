@@ -10,7 +10,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_allure_report_error" {
   evaluation_periods        = "1"
   statistic                 = "SampleCount" #Average, Maximum, Sum
   treat_missing_data        = "ignore"      #missing
-  alarm_actions             = [aws_sns_topic.data_qa_alerts_notifications.arn]
+  alarm_actions             = [var.sns_topic_arn]
   ok_actions                = []
   insufficient_data_actions = []
   dimensions = {
@@ -33,7 +33,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_fast_data_error" {
   evaluation_periods        = "1"
   statistic                 = "SampleCount" #Average, Maximum, Sum
   treat_missing_data        = "ignore"      #missing
-  alarm_actions             = [aws_sns_topic.data_qa_alerts_notifications.arn]
+  alarm_actions             = [var.sns_topic_arn]
   ok_actions                = []
   insufficient_data_actions = []
   dimensions = {
@@ -56,7 +56,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_push_report_error" {
   evaluation_periods        = "1"
   statistic                 = "SampleCount" #Average, Maximum, Sum
   treat_missing_data        = "ignore"      #missing
-  alarm_actions             = [aws_sns_topic.data_qa_alerts_notifications.arn]
+  alarm_actions             = [var.sns_topic_arn]
   ok_actions                = []
   insufficient_data_actions = []
   dimensions = {

@@ -16,7 +16,7 @@ variable "slack_webhook_url" {
   description = "The Slack webhook url, which will be used to send notification if some errors will be found it datasets"
 }
 
-variable "slack_cahnnel_name" {
+variable "slack_channel_name" {
   type        = string
   default     = null
   description = "The Slack channel name, which will be used to send notification if some errors will be found it datasets"
@@ -144,4 +144,9 @@ variable "push_report_extra_vars" {
   type        = map(string)
   default     = {}
   description = "Extra variables for push report lambda"
+}
+
+variable "sns_topic_arn" {
+  type        = string
+  description = "SNS topic ARN for DQ notifications"
 }
