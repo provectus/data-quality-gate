@@ -22,4 +22,3 @@ qa_bucket = integration-test-bucket
 run-integration-tests: build-data-test-img build-data-test-tests-img
 	cd $(integration_tests_dir)
 	docker run --env QA_BUCKET=$(qa_bucket) --env S3_HOST=$(host) test_data_tests
-	
