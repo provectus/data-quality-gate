@@ -8,11 +8,6 @@ provider "aws" {
     s3 = "http://localhost:4566"
     sts = "http://localhost:4566"
   }
-
-
-  # default_tags {
-  #   Terraform = true
-  # }
 }
 
 module "integration_tests_data_qa" {

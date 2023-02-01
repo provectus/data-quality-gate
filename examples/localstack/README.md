@@ -1,3 +1,4 @@
+0. Install terraform 
 1. Navigate to `./examples/localstack`
 2. Run localstack `docker run --rm -it -p 4566:4566 -p 4510-4559:4510-4559 localstack/localstack:1.3.1`
 3. Run `terraform init`
