@@ -1,7 +1,6 @@
-
-(!) All paths are shown from the project's root
-
+Pre Requirements: 
+- Install terraform
+- Install docker
 Run  tests:
-1. Setup local env for tests from directory `./examples/localstack`
-2. build images from docker compose `DOCKER_BUILDKIT=0 docker-compose build`. You have to disable DOCKER_BUILDKIT because docker is not supported build images in order  [issue](https://github.com/docker/compose/issues/6332)
-3. Run tests: `QA_BUCKET=integration-test-bucket S3_HOST=host.docker.internal docker-compose run tests` where QA_BUCKET is value of `data_test_storage_bucket_name` from `./examples/localstack/main.tf`
+1. Setup local env for test env by running `make run-localstack deploy-qa-infra` from project root dir
+2. Run tests by running `make run-integration-tests` from from project root dir
