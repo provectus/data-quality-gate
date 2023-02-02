@@ -1,5 +1,3 @@
-variable "aws_account_id" {}
-
 variable "project" {
   type    = string
   default = "demo"
@@ -15,6 +13,8 @@ variable "slack_settings" {
     webhook_url = string
     channel     = string
     username    = string
+    image_uri   = string
+    vpc_id      = string
   })
 
   default     = null
@@ -186,4 +186,17 @@ variable "sns_cloudwatch_notifications_topic_arn" {
   type        = string
   default     = null
   description = "SNS topic to send cloudwatch events"
+}
+
+#Lambda
+variable "vpc_subnet_ids" {
+  description = "List of subnet ids to place lambda in"
+  type        = list(string)
+  default     = null
+}
+
+variable "vpc_security_group_ids" {
+  description = "List of security group assigned to lambda"
+  type        = list(string)
+  default     = null
 }

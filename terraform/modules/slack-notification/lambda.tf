@@ -1,12 +1,21 @@
+resource "aws_sns_topic_subscription" "slack_notification_subscription" {
+  topic_arn = var.sns_topic_arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.slack_notification.arn
+}
+
 resource "aws_lambda_function" "slack_notification" {
   function_name = local.lambda_function_name
   memory_size   = var.memory_size
   role          = aws_iam_role.slack_notification.arn
-  kms_key_arn   = aws_kms_key.slack_notification.arn
   package_type  = var.package_type
   image_uri     = var.image_uri
 
   timeout = 30
+
+  environment {
+    variables = var.lambda_env_variables
+  }
 
   image_config {
     command = [var.handler_name]
@@ -19,7 +28,7 @@ resource "aws_lambda_function" "slack_notification" {
   }
 
   vpc_config {
-    subnet_ids         = data.aws_subnet.private_subnet.*.id
+    subnet_ids         = var.subnet_ids
     security_group_ids = [aws_security_group.slack_notification.id]
   }
 }
@@ -79,7 +88,7 @@ resource "aws_lambda_permission" "slack_notification" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.slack_notification.function_name
   principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.slack_notification.arn
+  source_arn    = var.sns_topic_arn
 }
 
 resource "aws_cloudwatch_log_group" "slack_notification" {

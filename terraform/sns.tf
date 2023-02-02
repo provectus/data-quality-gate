@@ -1,7 +1,3 @@
-locals {
-  sns_topic_notifications_arn = var.create_cloudwatch_notifications_topic ? aws_sns_topic.notifications[0].arn : var.sns_cloudwatch_notifications_topic_arn
-}
-
 resource "aws_sns_topic" "notifications" {
   count = var.create_cloudwatch_notifications_topic ? 1 : 0
 
@@ -12,7 +8,7 @@ resource "aws_sns_topic" "notifications" {
 resource "aws_sns_topic_policy" "notification" {
   count = var.create_cloudwatch_notifications_topic ? 1 : 0
 
-  arn    = aws_sns_topic.notifications.arn
+  arn    = aws_sns_topic.notifications[0].arn
   policy = data.aws_iam_policy_document.slack_notification_sns[0].json
 }
 
@@ -35,15 +31,6 @@ data "aws_iam_policy_document" "slack_notification_sns" {
       "SNS:DeleteTopic",
       "SNS:AddPermission",
     ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceOwner"
-
-      values = [
-        var.aws_account_id,
-      ]
-    }
 
     effect = "Allow"
 

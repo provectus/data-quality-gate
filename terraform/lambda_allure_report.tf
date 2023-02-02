@@ -21,4 +21,7 @@ module "lambda_function_allure_report" {
   timeout                        = 900
   memory_size                    = var.lambda_allure_report_memory
   tracing_mode                   = "PassThrough"
+
+  vpc_subnet_ids         = var.vpc_subnet_ids
+  vpc_security_group_ids = var.vpc_security_group_ids
 }

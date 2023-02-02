@@ -1,34 +1,22 @@
-variable "account" {
-  description = "The account. Allowable values for this are services, dev, prod, security"
+variable "vpc_id" {
+  description = "Vpc id that this module runs on"
   type        = string
 }
 
-variable "client" {
-  description = "The name of the client using the resources in this module"
-  type        = string
-  default     = "internal"
+variable "subnet_ids" {
+  description = "List of subnet ids where slack lambda will be placed."
+  type        = list(string)
 }
 
-variable "cost_center" {
-  description = "The cost center attached to the resources in this module"
+variable "sns_topic_arn" {
   type        = string
-  default     = "none"
-}
-
-variable "aws_account_id" {
-  description = "The id of the account we are standing the cluster up in"
-  type        = string
+  description = "Existed sns topic to forward messages from."
 }
 
 variable "primary_aws_region" {
   description = "The region of the primary devops bucket"
   type        = string
   default     = "us-west-2"
-}
-
-variable "vpc_id" {
-  description = "vpc id that this module runs on"
-  type        = string
 }
 
 variable "slack_notification_service_name" {
@@ -43,6 +31,7 @@ variable "cloudwatch_event_rule" {
     detail_type = string
     resources   = string
   }))
+
   default     = {}
   description = "The cloudwatch event rule configuration"
 }
@@ -50,12 +39,6 @@ variable "cloudwatch_event_rule" {
 variable "lambda_env_variables" {
   description = "Environment variables for the lambda"
   type        = map(string)
-
-  default = {
-    SLACK_WEBHOOK_URL = "https://hooks.slack.com/services/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"
-    SLACK_CHANNEL     = "#on-call-sre"
-    SLACK_USERNAME    = "slack_notifier"
-  }
 }
 
 variable "handler_name" {
@@ -79,5 +62,4 @@ variable "package_type" {
 variable "image_uri" {
   description = "The URI for the ECR image to use with the lambda function"
   type        = string
-  default     = "006604769879.dkr.ecr.us-west-2.amazonaws.com/a3-digital/slack-notification-lambda-python:1.0"
 }
