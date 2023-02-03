@@ -118,6 +118,17 @@ variable "redshift_secret" {
   default     = null
 }
 
+variable "push_report_extra_vars" {
+  type        = map(string)
+  default     = {}
+  description = "Extra variables for push report lambda"
+}
+
+variable "cloudfront_distribution_enabled" {
+  type        = bool
+  default     = true
+  description = "Enable CloudFront distribution"
+}
 #DynamoDB
 variable "dynamodb_table_attributes" {
   description = "List of nested attribute definitions. Only required for hash_key and range_key attributes. Each attribute has two properties: name - (Required) The name of the attribute, type - (Required) Attribute type, which must be a scalar type: S, N, or B for (S)tring, (N)umber or (B)inary data"
