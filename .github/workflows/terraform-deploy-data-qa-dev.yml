@@ -49,6 +49,7 @@ jobs:
           repo: slack_notification
           region: eu-west-2
           dockerfile: functions/slack_notification/Dockerfile
+          context: functions/slack_notification
 
 #      - name: Terraform Install
 #        uses: hashicorp/setup-terraform@v1
