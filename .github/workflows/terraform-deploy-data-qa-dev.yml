@@ -40,39 +40,49 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-2
 
-      - name: Terraform Install
-        uses: hashicorp/setup-terraform@v1
+      - name: upload image to ECR
+        uses: appleboy/docker-ecr-action@master
         with:
-          terraform_version: 1.1.7
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: 024975173233.dkr.ecr.us-west-2.amazonaws.com
+          repo: slack_notification
+          region: us-west-2
+          dockerfile: ./deployment-example/functions/slack_notification/Dockerfile
 
-      - name: Terraform init
-        id: init
-        run: |
-          cd $TF_DIR
-          echo "TF_BACKEND_CONFIG: $TF_BACKEND_CONFIG"
-          terraform init --backend-config ./$TF_BACKEND_CONFIG
-
-      - name: Terraform plan
-        id: plan
-        if: ${{ github.event.inputs.applyTerraform == 'plan' }}
-        run: |
-          cd $TF_DIR
-          if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
-          then
-          terraform plan -input=false
-          else 
-          terraform plan -target=${{ github.event.inputs.TerraformTarget }} -input=false
-          fi
-
-      - name: Terraform apply
-        id: apply
-        if: ${{ github.event.inputs.applyTerraform == 'apply' }}
-        run: |
-          cd $TF_DIR
-          if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
-          then
-          terraform apply -auto-approve
-          else 
-          terraform apply -auto-approve -target=${{ github.event.inputs.TerraformTarget }}
-          fi
-          #We should add param to use tfvars for specific env
+#      - name: Terraform Install
+#        uses: hashicorp/setup-terraform@v1
+#        with:
+#          terraform_version: 1.1.7
+#
+#      - name: Terraform init
+#        id: init
+#        run: |
+#          cd $TF_DIR
+#          echo "TF_BACKEND_CONFIG: $TF_BACKEND_CONFIG"
+#          terraform init --backend-config ./$TF_BACKEND_CONFIG
+#
+#      - name: Terraform plan
+#        id: plan
+#        if: ${{ github.event.inputs.applyTerraform == 'plan' }}
+#        run: |
+#          cd $TF_DIR
+#          if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
+#          then
+#          terraform plan -input=false
+#          else
+#          terraform plan -target=${{ github.event.inputs.TerraformTarget }} -input=false
+#          fi
+#
+#      - name: Terraform apply
+#        id: apply
+#        if: ${{ github.event.inputs.applyTerraform == 'apply' }}
+#        run: |
+#          cd $TF_DIR
+#          if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
+#          then
+#          terraform apply -auto-approve
+#          else
+#          terraform apply -auto-approve -target=${{ github.event.inputs.TerraformTarget }}
+#          fi
+#          #We should add param to use tfvars for specific env
