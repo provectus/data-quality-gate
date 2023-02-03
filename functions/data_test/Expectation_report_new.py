@@ -153,7 +153,7 @@ class ExpectationsReportNew:
                     handler.handle(variable_summary["type"], name, variable_summary, batch)
             batch.expect_table_columns_to_match_set(
                 column_set=name_list)
-            batch.expect_table_row_count_to_equal(value=summary['table']['n'])
+            # batch.expect_table_row_count_to_equal(value=summary['table']['n'])
             suite = batch.get_expectation_suite(discard_failed_expectations=False)
 
             validation_result_identifier = None

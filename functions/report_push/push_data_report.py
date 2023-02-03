@@ -19,7 +19,6 @@ dynamo_table_name = os.environ['QA_DYNAMODB_TABLE']
 table = dynamodb.Table(dynamo_table_name)
 qa_bucket = os.environ['QA_BUCKET']
 environment = os.environ['ENVIRONMENT']
-autobug = False
 def handler(event, context):
     replaced_allure_links = event['links'].get('Payload')
     report = event['report'].get('Payload')
@@ -73,6 +72,7 @@ def handler(event, context):
         autobug = pipeline_config[run_name]['autobug']
     except KeyError:
         print(f"Can't find config for {run_name}")
+        autobug = False
 
     if autobug:
         jira_project_key = os.environ['JIRA_PROJECT_KEY']
