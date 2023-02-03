@@ -45,9 +45,9 @@ jobs:
         with:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          registry: 024975173233.dkr.ecr.us-west-2.amazonaws.com
+          registry: 024975173233.dkr.ecr.eu-west-2.amazonaws.com
           repo: slack_notification
-          region: us-west-2
+          region: eu-west-2
           dockerfile: functions/slack_notification/Dockerfile
 
 #      - name: Terraform Install
