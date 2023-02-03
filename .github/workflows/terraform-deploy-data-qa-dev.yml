@@ -40,7 +40,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-2
 
-      - name: upload image to ECR
+      - name: upload SlackNotification to ECR
         uses: appleboy/docker-ecr-action@master
         with:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -51,39 +51,71 @@ jobs:
           dockerfile: functions/slack_notification/Dockerfile
           context: functions/slack_notification
 
-#      - name: Terraform Install
-#        uses: hashicorp/setup-terraform@v1
-#        with:
-#          terraform_version: 1.1.7
-#
-#      - name: Terraform init
-#        id: init
-#        run: |
-#          cd $TF_DIR
-#          echo "TF_BACKEND_CONFIG: $TF_BACKEND_CONFIG"
-#          terraform init --backend-config ./$TF_BACKEND_CONFIG
-#
-#      - name: Terraform plan
-#        id: plan
-#        if: ${{ github.event.inputs.applyTerraform == 'plan' }}
-#        run: |
-#          cd $TF_DIR
-#          if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
-#          then
-#          terraform plan -input=false
-#          else
-#          terraform plan -target=${{ github.event.inputs.TerraformTarget }} -input=false
-#          fi
-#
-#      - name: Terraform apply
-#        id: apply
-#        if: ${{ github.event.inputs.applyTerraform == 'apply' }}
-#        run: |
-#          cd $TF_DIR
-#          if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
-#          then
-#          terraform apply -auto-approve
-#          else
-#          terraform apply -auto-approve -target=${{ github.event.inputs.TerraformTarget }}
-#          fi
-#          #We should add param to use tfvars for specific env
+      - name: upload AllureReport to ECR
+        uses: appleboy/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: 024975173233.dkr.ecr.eu-west-2.amazonaws.com
+          repo: demo-test-ip-allure-report
+          region: eu-west-2
+          dockerfile: functions/allure_report/Dockerfile
+          context: functions/allure_report
+
+      - name: upload DataTest to ECR
+        uses: appleboy/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: 024975173233.dkr.ecr.eu-west-2.amazonaws.com
+          repo: demo-test-ip-fast-data
+          region: eu-west-2
+          dockerfile: functions/data_test/Dockerfile
+          context: functions/data_test
+
+      - name: upload ReportPush to ECR
+        uses: appleboy/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: 024975173233.dkr.ecr.eu-west-2.amazonaws.com
+          repo: demo-test-ip-push-report
+          region: eu-west-2
+          dockerfile: functions/report_push/Dockerfile
+          context: functions/report_push
+
+      - name: Terraform Install
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.1.7
+
+      - name: Terraform init
+        id: init
+        run: |
+          cd $TF_DIR
+          echo "TF_BACKEND_CONFIG: $TF_BACKEND_CONFIG"
+          terraform init --backend-config ./$TF_BACKEND_CONFIG
+
+      - name: Terraform plan
+        id: plan
+        if: ${{ github.event.inputs.applyTerraform == 'plan' }}
+        run: |
+          cd $TF_DIR
+          if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
+          then
+          terraform plan -input=false
+          else
+          terraform plan -target=${{ github.event.inputs.TerraformTarget }} -input=false
+          fi
+
+      - name: Terraform apply
+        id: apply
+        if: ${{ github.event.inputs.applyTerraform == 'apply' }}
+        run: |
+          cd $TF_DIR
+          if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
+          then
+          terraform apply -auto-approve
+          else
+          terraform apply -auto-approve -target=${{ github.event.inputs.TerraformTarget }}
+          fi

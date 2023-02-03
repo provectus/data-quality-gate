@@ -1,14 +1,17 @@
 variable "project" {
-  type    = string
-  default = "demo"
+  description = "Project name used to build fully qualified tags and resource's names"
+  type        = string
+  default     = "demo"
 }
 
 variable "environment" {
-  type    = string
-  default = "data-qa-dev"
+  description = "Environment name used to build fully qualified tags and resource's names"
+  type        = string
+  default     = "data-qa-dev"
 }
 
 variable "slack_settings" {
+  description = "Slack notifications settings. If null - slack notifications will be disabled"
   type = object({
     webhook_url = string
     channel     = string
@@ -17,99 +20,102 @@ variable "slack_settings" {
     vpc_id      = string
   })
 
-  default     = null
-  description = "Slack notifications settings"
+  default = null
 }
 
 variable "data_test_storage_bucket_name" {
-  type        = string
   description = "Bucket name which will be used to store data tests and settings for it's execution"
+  type        = string
 }
 
 variable "test_coverage_path" {
-  type        = string
   description = "Path to the tests description path, relative to the root TF"
+  type        = string
   default     = "../configs/test_coverage.json"
 }
 
 variable "pipeline_config_path" {
-  type        = string
   description = "Path to the pipeline description path, relative to the root TF"
+  type        = string
   default     = "../configs/pipeline.json"
 }
 
 variable "pks_path" {
-  type        = string
   description = "Path to the primary keys description path, relative to the root TF"
+  type        = string
   default     = "../configs/pks.json"
 }
 
 variable "sort_keys_path" {
-  type        = string
   description = "Path to the sort keys description path, relative to the root TF"
+  type        = string
   default     = "../configs/sort_keys.json"
 }
 
 variable "mapping_path" {
-  type        = string
   description = "Path to the mapping description path, relative to the root TF"
+  type        = string
   default     = "../configs/mapping.json"
 }
 
 variable "expectations_store" {
-  type        = string
   description = "Path to the expectations_store directory, relative to the root TF"
+  type        = string
   default     = "../expectations_store"
 }
 
 variable "cloudfront_allowed_subnets" {
+  description = "list of allowed subnets allows users to get reports from specific IP address spaces"
   type        = list(string)
   default     = null
-  description = "list of allowed subnets, suitable if you wan't use Cognito and allow users to get reports from specific IP address spaces"
 }
 
 variable "cloudfront_location_restrictions" {
-  default     = ["US", "CA", "GB", "DE", "TR"]
   description = "List of regions allowed for CloudFront distribution"
+  type        = list(string)
+  default     = ["US", "CA", "GB", "DE", "TR"]
 }
 
 variable "lambda_allure_report_memory" {
   description = "Amount of memory allocated to the lambda function lambda_allure_report"
+  type        = number
   default     = 1024
 }
 
 variable "lambda_data_test_memory" {
   description = "Amount of memory allocated to the lambda function lambda_data_test"
+  type        = number
   default     = 5048
 }
 
 variable "lambda_push_report_memory" {
   description = "Amount of memory allocated to the lambda function lambda_push_report"
+  type        = number
   default     = 1024
 }
 
 variable "lambda_push_jira_url" {
+  description = "Lambda function push report env variable JIRA_URL"
   type        = string
   default     = null
-  description = "Lambda function push report env variable JIRA_URL"
 }
 
 variable "lambda_push_secret_name" {
+  description = "Lambda function push report env variable JIRA_URL"
   type        = string
   default     = null
-  description = "Lambda function push report env variable JIRA_URL"
 }
 
 variable "redshift_db_name" {
+  description = "Database name for source redshift cluster"
   type        = string
   default     = null
-  description = "db name for redshift"
 }
 
 variable "redshift_secret" {
+  description = "Secret name from AWS SecretsManager for Redshift cluster"
   type        = string
   default     = null
-  description = "secret name from Secret Manager for Redshift cluster"
 }
 
 #DynamoDB
@@ -120,24 +126,25 @@ variable "dynamodb_table_attributes" {
 }
 
 variable "dynamodb_stream_enabled" {
-  type    = bool
-  default = false
+  description = "Dynamodb report table stream enabled"
+  type        = bool
+  default     = false
 }
 
 variable "dynamodb_write_capacity" {
+  description = "Dynamodb report table write capacity"
   type        = number
-  description = "Dynamodb data qa report table write capacity"
   default     = 2
 }
 
 variable "dynamodb_read_capacity" {
+  description = "Dynamodb report table read capacity"
   type        = number
-  description = "Dynamodb data qa report table read capacity"
   default     = 20
 }
 
 variable "dynamodb_report_table_autoscaling_read_capacity_settings" {
-  description = "Autoscaling read capacity"
+  description = "Report table autoscaling read capacity"
   type = object({
     min = number
     max = number
@@ -150,7 +157,7 @@ variable "dynamodb_report_table_autoscaling_read_capacity_settings" {
 }
 
 variable "dynamodb_report_table_autoscaling_write_capacity_settings" {
-  description = "Autoscaling write capacity"
+  description = "Report table autoscaling write capacity"
   type = object({
     min = number
     max = number
@@ -163,40 +170,51 @@ variable "dynamodb_report_table_autoscaling_write_capacity_settings" {
 }
 
 variable "dynamodb_report_table_read_scale_threshold" {
-  type    = number
-  default = 60
+  description = "Dynamodb report table read scale up threshold"
+  type        = number
+  default     = 60
 }
 variable "dynamodb_report_table_write_scale_threshold" {
-  type    = number
-  default = 70
+  description = "Dynamodb report table write scale up threshold"
+  type        = number
+  default     = 70
 }
 
 #Lambda
-variable "allure_report_image_uri" { type = string }
-variable "data_test_image_uri" { type = string }
-variable "push_report_image_uri" { type = string }
+variable "allure_report_image_uri" {
+  description = "Allure report image URI(ECR repository)"
+  type        = string
+}
+variable "data_test_image_uri" {
+  description = "Data test image URI(ECR repository)"
+  type        = string
+}
+variable "push_report_image_uri" {
+  description = "Push report image URI(ECR repository)"
+  type        = string
+}
 
 #Cloudwatch
 variable "create_cloudwatch_notifications_topic" {
+  description = "Should sns topic for cloudwatch alerts be created"
   type        = bool
   default     = true
-  description = "Should sns topic for cloudwatch alerts be created"
 }
 variable "sns_cloudwatch_notifications_topic_arn" {
+  description = "SNS topic to send cloudwatch events"
   type        = string
   default     = null
-  description = "SNS topic to send cloudwatch events"
 }
 
 #Lambda
 variable "vpc_subnet_ids" {
-  description = "List of subnet ids to place lambda in"
+  description = "List of subnet ids to place lambda in. If null value, default subnet and vpc will be used"
   type        = list(string)
   default     = null
 }
 
 variable "vpc_security_group_ids" {
-  description = "List of security group assigned to lambda"
+  description = "List of security group assigned to lambda. If null value, default subnet and vpc will be used"
   type        = list(string)
   default     = null
 }

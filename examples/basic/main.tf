@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-west-2"
+  region = "eu-west-2"
 
   default_tags {
     tags = {
@@ -13,10 +13,10 @@ module "data_qa" {
   cloudfront_allowed_subnets = ["255.255.255.255/32"]
 
   data_test_storage_bucket_name = "test-bucket"
-  environment                   = "dev"
+  environment                   = "examples-basic"
 
-  allure_report_image_uri = ""
-  data_test_image_uri     = ""
-  push_report_image_uri   = ""
+  allure_report_image_uri = "024975173233.dkr.ecr.eu-west-2.amazonaws.com/demo-test-ip-allure-report"
+  data_test_image_uri     = "024975173233.dkr.ecr.eu-west-2.amazonaws.com/demo-test-ip-fast-data"
+  push_report_image_uri   = "024975173233.dkr.ecr.eu-west-2.amazonaws.com/demo-test-ip-push-report"
 }
 
