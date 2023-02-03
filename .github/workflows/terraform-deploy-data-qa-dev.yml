@@ -48,7 +48,7 @@ jobs:
           registry: 024975173233.dkr.ecr.us-west-2.amazonaws.com
           repo: slack_notification
           region: us-west-2
-          dockerfile: ./deployment-example/functions/slack_notification/Dockerfile
+          dockerfile: functions/slack_notification/Dockerfile
 
 #      - name: Terraform Install
 #        uses: hashicorp/setup-terraform@v1
