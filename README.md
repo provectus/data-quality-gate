@@ -3,6 +3,15 @@
 ## Description
 Terrafrom module which setup Data-QA solution(bucket,Stepfunctions Pipeline with AWS Lambda, Metadata Storage. Data-QA Reports) in your infrastructure in 'one-click'. AWS Based. Built on top of Great_expectations, Pandas_profiling, Allure
 
+### Data Test
+Main engine based on GX to profile, generate suites and run tests
+
+### Allure Report
+Mapping from GX format to Allure Test Report tool
+
+### Report Push
+Metadata and metrics aggregation
+
 ## Solution Architecture
 ![alt text](https://github.com/provectus/data-quality-gate/blob/master/architecture.png?raw=true)
 
