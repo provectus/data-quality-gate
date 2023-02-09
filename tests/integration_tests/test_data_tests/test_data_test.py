@@ -65,7 +65,7 @@ def test_data_test_csv():
     }
     s3 = boto3.resource("s3", endpoint_url=url)
     qa_bucket_name = os.environ['QA_BUCKET']
-    gx_config_local_path = "./great_expectations/great_expectations.yml"
+    gx_config_local_path = "great_expectations/great_expectations.yml"
     config_path = f"{qa_bucket_name}/great_expectations/great_expectations.yml"
     s3.Bucket(qa_bucket_name).download_file(config_path, gx_config_local_path)
     s3.create_bucket(Bucket=b_name)
