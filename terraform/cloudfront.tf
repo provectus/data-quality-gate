@@ -162,7 +162,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
     cloudfront_default_certificate = true
   }
 
-  web_acl_id = aws_wafv2_web_acl.waf_acl.id
+  web_acl_id = aws_wafv2_web_acl.waf_acl.arn
 }
 
 resource "aws_wafv2_ip_set" "vpn_ipset" {
