@@ -1,3 +1,16 @@
+variable "primary_aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-west-2"
+}
+
+variable "tags" {
+  description = "Default tags"
+  type        = map(string)
+
+  default = {}
+}
+
 variable "project" {
   description = "Project name used to build fully qualified tags and resource's names"
   type        = string
@@ -228,4 +241,16 @@ variable "vpc_security_group_ids" {
   description = "List of security group assigned to lambda. If null value, default subnet and vpc will be used"
   type        = list(string)
   default     = null
+}
+
+variable "athena_dynamodb_connector_name" {
+  type        = string
+  default     = "DQG-dynamodb-connector"
+  description = "Name of aws athena data-catalog"
+}
+
+variable "delete_athena_dynamodb_connector" {
+  type        = bool
+  default     = false
+  description = "Set to True to delete athena dynamodb connector"
 }
