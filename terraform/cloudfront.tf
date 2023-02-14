@@ -153,8 +153,8 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
 
   restrictions {
     geo_restriction {
-      restriction_type = "whitelist"
-      locations        = var.cloudfront_location_restrictions
+      restriction_type = "none"
+      locations        = []
     }
   }
 
