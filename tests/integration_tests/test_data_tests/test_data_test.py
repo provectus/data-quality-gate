@@ -52,6 +52,6 @@ def s3_test_data(request):
     s3.Object(b_name, file_path).delete()
 
 
-@pytest.mark.parametrize("s3_data", ["titanic.csv", "titanic.parquet"], indirect=True)
-def test_data_test(s3_data):
+@pytest.mark.parametrize("s3_test_data", ["titanic.csv", "titanic.parquet"], indirect=True)
+def test_data_test(s3_test_data):
     pass
