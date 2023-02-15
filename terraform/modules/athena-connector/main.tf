@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "athena_spill_bucket" {
-  bucket = "${var.resource_name_prefix}_athena"
+  bucket = "${var.resource_name_prefix}-athena"
 
   server_side_encryption_configuration {
     rule {
@@ -19,7 +19,7 @@ resource "aws_lambda_function" "athena_dynamodb_connector" {
   description   = "Enables Amazon Athena to communicate with DynamoDB, making tables accessible via SQL"
 
   role     = aws_iam_role.athena_connector_lambda_role.arn
-  filename = "${path.module}/../artifacts/aws-athena-dynamodb-connector.zip"
+  filename = "${path.module}/../../artifacts/aws-athena-dynamodb-connector.zip"
 
   runtime = "java11"
   handler = "com.amazonaws.athena.connectors.dynamodb.DynamoDBCompositeHandler"
@@ -28,9 +28,12 @@ resource "aws_lambda_function" "athena_dynamodb_connector" {
   memory_size  = 3008
   package_type = "Zip"
 
-  vpc_config {
-    subnet_ids         = var.vpc_subnet_ids
-    security_group_ids = var.vpc_security_group_ids
+  dynamic "vpc_config" {
+    for_each = var.vpc_subnet_ids != null && var.vpc_security_group_ids != null ? [true] : []
+    content {
+      subnet_ids         = var.vpc_subnet_ids
+      security_group_ids = var.vpc_security_group_ids
+    }
   }
 
   environment {
@@ -130,7 +133,7 @@ resource "aws_iam_role_policy_attachment" "athena_connector_basic_policy" {
 
 resource "null_resource" "athena_dynamodb_connector" {
   provisioner "local-exec" {
-    command = "aws create-data-catalog --name ${var.athena_dynamodb_connector_name} --type LAMBDA --tags ${var.tags} --region ${var.primary_aws_region} --parameters {'function': '${aws_lambda_function.athena_dynamodb_connector.arn}'}"
+    command = "aws athena create-data-catalog --name ${var.athena_dynamodb_connector_name} --type LAMBDA --region ${var.primary_aws_region} --parameters function=${aws_lambda_function.athena_dynamodb_connector.arn}"
   }
 
   depends_on = [aws_lambda_function.athena_dynamodb_connector]
@@ -139,7 +142,7 @@ resource "null_resource" "athena_dynamodb_connector" {
 resource "null_resource" "delete_athena_dynamodb_connector" {
   count = var.delete_athena_dynamodb_connector ? 1 : 0
   provisioner "local-exec" {
-    command = "aws delete-data-catalog --name ${var.athena_dynamodb_connector_name} --region ${var.primary_aws_region}"
+    command = "aws athena delete-data-catalog --name ${var.athena_dynamodb_connector_name} --region ${var.primary_aws_region}"
   }
 
   depends_on = [null_resource.athena_dynamodb_connector]

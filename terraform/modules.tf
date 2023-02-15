@@ -5,16 +5,6 @@ module "athena-connector" {
   resource_name_prefix = local.resource_name_prefix
 }
 
-module "cloudfront_reports" {
-  count = var.cloudfront_allowed_subnets != null ? 1 : 0
-
-  source               = "./modules/cloudfront-reports"
-  resource_name_prefix = local.resource_name_prefix
-
-  bucket_name = aws_s3_bucket.settings_bucket.bucket
-  allowed_ips = var.cloudfront_allowed_subnets
-}
-
 module "slack_notifier" {
   count  = var.slack_settings == null ? 0 : 1
   source = "./modules/slack-notification"
