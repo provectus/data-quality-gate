@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "athena_spill_bucket" {
-  bucket = "${local.resource_name_prefix}_athena"
+  bucket = "${var.resource_name_prefix}_athena"
 
   server_side_encryption_configuration {
     rule {
@@ -15,11 +15,11 @@ resource "aws_s3_bucket" "athena_spill_bucket" {
 }
 
 resource "aws_lambda_function" "athena_dynamodb_connector" {
-  function_name = "${local.resource_name_prefix}_athena_dynamodb_connector"
+  function_name = "${var.resource_name_prefix}_athena_dynamodb_connector"
   description   = "Enables Amazon Athena to communicate with DynamoDB, making tables accessible via SQL"
 
   role     = aws_iam_role.athena_connector_lambda_role.arn
-  filename = "${path.module}/artifacts/aws-athena-dynamodb-connector.zip"
+  filename = "${path.module}/../artifacts/aws-athena-dynamodb-connector.zip"
 
   runtime = "java11"
   handler = "com.amazonaws.athena.connectors.dynamodb.DynamoDBCompositeHandler"
@@ -59,7 +59,7 @@ resource "aws_iam_role" "athena_connector_lambda_role" {
 }
 
 resource "aws_iam_policy" "athena_connector_lambda_policy" {
-  name = "${local.resource_name_prefix}-athena_connector-lambda"
+  name = "${var.resource_name_prefix}-athena_connector-lambda"
   policy = jsonencode(
     {
       Statement = [

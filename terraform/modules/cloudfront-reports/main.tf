@@ -1,5 +1,13 @@
+locals {
+  cloudwatch_prefix = replace(title(replace(var.resource_name_prefix, "-", " ")), " ", "")
+}
+
+data "aws_s3_bucket" "bucket" {
+  bucket = var.bucket_name
+}
+
 resource "aws_cloudfront_origin_access_identity" "data_qa_oai" {
-  comment = local.cloudfront_origin_name
+  comment = "${var.resource_name_prefix}-s3-origin"
 }
 
 resource "aws_cloudfront_origin_access_identity" "never_be_reached" {
@@ -9,7 +17,7 @@ resource "aws_cloudfront_origin_access_identity" "never_be_reached" {
 data "aws_iam_policy_document" "s3_policy_for_cloudfront" {
   statement {
     actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.settings_bucket.arn}/*"]
+    resources = ["${data.aws_s3_bucket.bucket.arn}/*"]
 
     principals {
       type = "AWS"
@@ -20,7 +28,7 @@ data "aws_iam_policy_document" "s3_policy_for_cloudfront" {
   }
   statement {
     actions   = ["s3:ListBucket"]
-    resources = [aws_s3_bucket.settings_bucket.arn]
+    resources = [data.aws_s3_bucket.bucket.arn]
 
     principals {
       type = "AWS"
@@ -32,14 +40,14 @@ data "aws_iam_policy_document" "s3_policy_for_cloudfront" {
 }
 
 resource "aws_s3_bucket_policy" "cloudfront_access" {
-  bucket = aws_s3_bucket.settings_bucket.id
+  bucket = data.aws_s3_bucket.bucket.id
   policy = data.aws_iam_policy_document.s3_policy_for_cloudfront.json
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution_ip" {
   origin {
-    domain_name = aws_s3_bucket.settings_bucket.bucket_regional_domain_name
-    origin_id   = local.resource_name_prefix
+    domain_name = data.aws_s3_bucket.bucket.bucket_regional_domain_name
+    origin_id   = var.resource_name_prefix
 
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.data_qa_oai.cloudfront_access_identity_path
@@ -60,7 +68,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = local.resource_name_prefix
+  comment             = var.resource_name_prefix
   default_root_object = "index.html"
 
   default_cache_behavior {
@@ -87,7 +95,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
     path_pattern     = "/profiling/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = local.resource_name_prefix
+    target_origin_id = var.resource_name_prefix
 
     forwarded_values {
       query_string = false
@@ -110,7 +118,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
     path_pattern     = "/allure/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.resource_name_prefix
+    target_origin_id = var.resource_name_prefix
 
     forwarded_values {
       query_string = false
@@ -132,7 +140,7 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
     path_pattern     = "/data_docs/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.resource_name_prefix
+    target_origin_id = var.resource_name_prefix
 
     forwarded_values {
       query_string = false
@@ -166,16 +174,16 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
 }
 
 resource "aws_wafv2_ip_set" "vpn_ipset" {
-  name               = "${local.resource_name_prefix}-ip-set"
+  name               = "${var.resource_name_prefix}-ip-set"
   description        = "VPN IP set"
   scope              = "CLOUDFRONT"
   ip_address_version = "IPV4"
 
-  addresses = var.cloudfront_allowed_subnets
+  addresses = var.allowed_ips
 }
 
 resource "aws_wafv2_web_acl" "waf_acl" {
-  name  = "${local.resource_name_prefix}-web-acl"
+  name  = "${var.resource_name_prefix}-web-acl"
   scope = "CLOUDFRONT"
 
   default_action {
