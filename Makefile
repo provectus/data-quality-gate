@@ -11,10 +11,15 @@ build-data-test-img:
 	docker build -t data-test:latest .
 
 integration_tests_dir := ./tests/integration_tests/test_data_tests
+unittests_dir := ./tests/unit_tests
 
 build-data-test-tests-img: build-data-test-img
 	cd $(integration_tests_dir) && \
 	docker build -t test_data_tests .
+
+build-unittests-img: build-data-test-img
+	cd $(unittests_dir) && \
+	docker build -t unit_tests .	
 
 host := host.docker.internal
 qa_bucket = integration-test-bucket
@@ -22,3 +27,7 @@ qa_bucket = integration-test-bucket
 run-integration-tests: build-data-test-img build-data-test-tests-img
 	cd $(integration_tests_dir)
 	docker run --env QA_BUCKET=$(qa_bucket) --env S3_HOST=$(host) test_data_tests
+
+run-unit-tests:
+	cd $(unittests_dir)
+	docker run --env QA_BUCKET=$(qa_bucket) --env S3_HOST=$(host) unit_tests
