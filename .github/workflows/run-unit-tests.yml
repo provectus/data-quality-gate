@@ -7,10 +7,12 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    steps:    
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3    
       - name: Build lambda image
         run: |
-          cd ./functions/data_test
+          cd functions/data_test
           docker build -t data-test:latest .
       - name: Build test image
         run: |
