@@ -1,0 +1,19 @@
+name: Run integration tests
+on: 
+  pull_request:
+    types:
+      - opened
+      - synchronize
+jobs:
+  unittests:
+    runs-on: ubuntu-latest    
+      - name: Build lambda image
+        run: |
+          cd ./functions/data_test
+          docker build -t data-test:latest .
+      - name: Build test image
+        run: |
+          cd ./tests/unit_tests
+          docker build -t unit-test-tests:latest .
+      - name: Run tests
+        run: docker run --env QA_BUCKET=integration-test-bucket --env S3_HOST=172.17.0.1 unit-test-tests
