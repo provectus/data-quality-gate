@@ -5,8 +5,9 @@ on:
       - opened
       - synchronize
 jobs:
-  unittests:
-    runs-on: ubuntu-latest    
+  tests:
+    runs-on: ubuntu-latest
+    steps:    
       - name: Build lambda image
         run: |
           cd ./functions/data_test
