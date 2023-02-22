@@ -1,4 +1,4 @@
-import data_test
+from .data_test import handler
 import awswrangler as wr
 import os
 from jsonschema import validate
@@ -46,7 +46,7 @@ def s3_test_data(request):
     s3.Bucket(qa_bucket_name).download_file(config_path, gx_config_local_path)
     s3.create_bucket(Bucket=b_name)
     s3.Object(b_name, file_path).put(Body=open(local_path, 'rb'))
-    result = data_test.handler(event, {})
+    result = handler(event, {})
     validate(instance=result, schema=schema)
     yield file_path
     s3.Object(b_name, file_path).delete()
