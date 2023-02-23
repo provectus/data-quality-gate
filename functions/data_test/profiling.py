@@ -11,7 +11,7 @@ import re
 from pandas_profiling.model import expectation_algorithms
 from pandas_profiling.model.handler import Handler
 import great_expectations as ge
-from .Expectation_report_new import ExpectationsReportNew
+from Expectation_report_new import ExpectationsReportNew
 from pandas_profiling.expectations_report import ExpectationsReport
 from datetime import datetime
 from great_expectations import DataContext

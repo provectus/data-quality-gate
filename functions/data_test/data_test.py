@@ -1,14 +1,14 @@
-from .profiling import profile_data
-from .suite_run import validate_data
+from profiling import profile_data
+from suite_run import validate_data
 import os
 import s3fs
 import re
 import boto3
 import awswrangler as wr
 import json
-from .datasource import prepare_final_ds
-from .datasource import get_source_name
-from .datasource import get_file_extension
+from datasource import prepare_final_ds
+from datasource import get_source_name
+from datasource import get_file_extension
 
 
 def handler(event, context):
