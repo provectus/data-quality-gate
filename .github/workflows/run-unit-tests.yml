@@ -5,18 +5,17 @@ on:
       - opened
       - synchronize
 jobs:
-  tests:
+  unit-tests:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v3    
-      - name: Build lambda image
-        run: |
-          cd functions/data_test
-          docker build -t data-test:latest .
-      - name: Build test image
-        run: |
-          cd ./tests/unit_tests
-          docker build -t unit-test-tests:latest .
-      - name: Run tests
-        run: docker run --env QA_BUCKET=integration-test-bucket --env S3_HOST=172.17.0.1 unit-test-tests
+        uses: actions/checkout@v3  
+      - name: Set up Python  
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.7'
+          cache: 'pip'
+      - name: install dependieces  
+        run: make prepare-unit-tests
+      - name: run tests
+        run: make run-unit-tests
