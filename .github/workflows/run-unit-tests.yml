@@ -1,0 +1,21 @@
+name: Run unit tests
+on: 
+  pull_request:
+    types:
+      - opened
+      - synchronize
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3  
+      - name: Set up Python  
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.7'
+          cache: 'pip'
+      - name: install dependieces  
+        run: make prepare-unit-tests
+      - name: run tests
+        run: make run-unit-tests

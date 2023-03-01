@@ -6,6 +6,7 @@ import os
 import boto3
 import awswrangler as wr
 import re
+import pathlib
 
 ENV = os.environ['ENVIRONMENT']
 qa_bucket_name = os.environ['QA_BUCKET']
@@ -19,7 +20,7 @@ def concat_source_list(source, source_engine):
 
 
 def get_file_extension(source):
-    return source.split(".")[-1]
+    return pathlib.Path(source).suffix[1:]
 
 
 def read_source(source, engine, extension, run_name, table_name=None):
@@ -120,7 +121,7 @@ def read_source(source, engine, extension, run_name, table_name=None):
 
 
 def get_source_name(source, extension):
-    result = re.search(f'.*/(.+?)(\_(\d.*)|).{extension}', source)
+    result = re.search(r'.*/(.+?)(\_(\d.*)|).' + extension, source)
     return result.group(1) if result else None
 
 
