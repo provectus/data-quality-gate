@@ -1,0 +1,43 @@
+name: Run integration tests
+on: 
+  pull_request:
+    types:
+      - opened
+      - synchronize
+jobs:
+  localstack:
+    runs-on: ubuntu-latest
+    services: 
+      localstack:
+        image: localstack/localstack:1.3.1
+        ports: 
+         - 4566:4566
+         - 4510-4559:4510-4559
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: Terraform Install
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.3.3
+      - name: Terraform init
+        run: |
+          cd ./examples/localstack
+          terraform init
+      - name: Terraform apply
+        run: |
+          cd ./examples/localstack
+          terraform apply -target=module.integration_tests_data_qa.aws_s3_object.great_expectations_yml -target=module.integration_tests_data_qa.aws_s3_object.test_configs -target=module.integration_tests_data_qa.aws_s3_object.pipeline_config -target=module.integration_tests_data_qa.aws_s3_object.pks_config -target=module.integration_tests_data_qa.aws_s3_object.mapping_config -target=module.integration_tests_data_qa.aws_s3_object.expectations_store -target=module.integration_tests_data_qa.aws_s3_object.test_config_manifest -auto-approve  
+      - name: check localstack  
+        run: |
+         curl http://localhost:4566/_localstack/health -i
+      - name: Build lambda image
+        run: |
+          cd ./functions/data_test
+          docker build -t data-test:latest .
+      - name: Build test image
+        run: |
+          cd ./tests/integration_tests/test_data_tests
+          docker build -t integration-tests:latest .
+      - name: Run tests
+        run: docker run --env QA_BUCKET=integration-test-bucket --env S3_HOST=172.17.0.1 integration-tests
