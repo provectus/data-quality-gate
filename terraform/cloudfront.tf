@@ -1,8 +1,3 @@
-provider "aws" {
-  alias  = "east1"
-  region = "us-east-1"
-}
-
 resource "aws_cloudfront_origin_access_identity" "data_qa_oai" {
   comment = "${local.resource_name_prefix}-s3-origin"
 }
@@ -171,7 +166,6 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
 }
 
 resource "aws_wafv2_ip_set" "vpn_ipset" {
-  provider           = aws.east1
   name               = "${local.resource_name_prefix}-ip-set"
   description        = "VPN IP set"
   scope              = "CLOUDFRONT"
@@ -181,9 +175,8 @@ resource "aws_wafv2_ip_set" "vpn_ipset" {
 }
 
 resource "aws_wafv2_web_acl" "waf_acl" {
-  provider = aws.east1
-  name     = "${local.resource_name_prefix}-web-acl"
-  scope    = "CLOUDFRONT"
+  name  = "${local.resource_name_prefix}-web-acl"
+  scope = "CLOUDFRONT"
 
   default_action {
     block {}
