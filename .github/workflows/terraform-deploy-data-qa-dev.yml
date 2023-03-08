@@ -38,16 +38,16 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-2
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: upload SlackNotification to ECR
         uses: appleboy/docker-ecr-action@master
         with:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          registry: 024975173233.dkr.ecr.eu-west-2.amazonaws.com
+          registry: ${{ secrets.AWS_ECR_REPO }}
           repo: slack_notification
-          region: eu-west-2
+          region: ${{ secrets.AWS_REGION }}
           dockerfile: functions/slack_notification/Dockerfile
           context: functions/slack_notification
 
@@ -56,9 +56,9 @@ jobs:
         with:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          registry: 024975173233.dkr.ecr.eu-west-2.amazonaws.com
+          registry: ${{ secrets.AWS_ECR_REPO }}
           repo: demo-test-ip-allure-report
-          region: eu-west-2
+          region: ${{ secrets.AWS_REGION }}
           dockerfile: functions/allure_report/Dockerfile
           context: functions/allure_report
 
@@ -67,9 +67,9 @@ jobs:
         with:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          registry: 024975173233.dkr.ecr.eu-west-2.amazonaws.com
+          registry: ${{ secrets.AWS_ECR_REPO }}
           repo: demo-test-ip-fast-data
-          region: eu-west-2
+          region: ${{ secrets.AWS_REGION }}
           dockerfile: functions/data_test/Dockerfile
           context: functions/data_test
 
@@ -78,9 +78,9 @@ jobs:
         with:
           access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          registry: 024975173233.dkr.ecr.eu-west-2.amazonaws.com
+          registry: ${{ secrets.AWS_ECR_REPO }}
           repo: demo-test-ip-push-report
-          region: eu-west-2
+          region: ${{ secrets.AWS_REGION }}
           dockerfile: functions/report_push/Dockerfile
           context: functions/report_push
 
