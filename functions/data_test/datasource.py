@@ -29,7 +29,10 @@ def read_source(source, engine, extension, run_name, table_name=None):
         elif extension == 'parquet':
             return wr.s3.read_parquet(path=source, ignore_index=True), path
         elif extension == 'json':
-            return wr.s3.read_json(path=source, lines=True), path
+            try:
+                return wr.s3.read_json(path=source), path
+            except ValueError:
+                return wr.s3.read_json(path=source, lines=True), path
 
     elif engine == 'athena':
         database_name = f"{ENV}_{table_name.split('.')[0]}"
