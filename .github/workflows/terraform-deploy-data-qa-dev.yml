@@ -29,7 +29,7 @@ jobs:
         run: |
           ls -la
           pwd
-          cd ./deployment-example
+          cd ./examples/basic
           echo "TF_DIR=$(pwd)" >> $GITHUB_ENV
           echo "TF_BACKEND_CONFIG=terraform-backend.tfbackend" >> $GITHUB_ENV
 
@@ -38,7 +38,51 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-2
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: upload SlackNotification to ECR
+        uses: appleboy/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: ${{ secrets.AWS_ECR_REPO }}
+          repo: slack_notification
+          region: ${{ secrets.AWS_REGION }}
+          dockerfile: functions/slack_notification/Dockerfile
+          context: functions/slack_notification
+
+      - name: upload AllureReport to ECR
+        uses: appleboy/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: ${{ secrets.AWS_ECR_REPO }}
+          repo: demo-test-ip-allure-report
+          region: ${{ secrets.AWS_REGION }}
+          dockerfile: functions/allure_report/Dockerfile
+          context: functions/allure_report
+
+      - name: upload DataTest to ECR
+        uses: appleboy/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: ${{ secrets.AWS_ECR_REPO }}
+          repo: demo-test-ip-fast-data
+          region: ${{ secrets.AWS_REGION }}
+          dockerfile: functions/data_test/Dockerfile
+          context: functions/data_test
+
+      - name: upload ReportPush to ECR
+        uses: appleboy/docker-ecr-action@master
+        with:
+          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          registry: ${{ secrets.AWS_ECR_REPO }}
+          repo: demo-test-ip-push-report
+          region: ${{ secrets.AWS_REGION }}
+          dockerfile: functions/report_push/Dockerfile
+          context: functions/report_push
 
       - name: Terraform Install
         uses: hashicorp/setup-terraform@v1
@@ -60,7 +104,7 @@ jobs:
           if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
           then
           terraform plan -input=false
-          else 
+          else
           terraform plan -target=${{ github.event.inputs.TerraformTarget }} -input=false
           fi
 
@@ -72,7 +116,6 @@ jobs:
           if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
           then
           terraform apply -auto-approve
-          else 
+          else
           terraform apply -auto-approve -target=${{ github.event.inputs.TerraformTarget }}
           fi
-          #We should add param to use tfvars for specific env

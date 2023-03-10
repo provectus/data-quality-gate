@@ -9,6 +9,8 @@ terraform/secrets.auto.tfvars
 terraform/*plan
 terraform/*.backup
 .terraform
+terraform.tfstate.backup
+.terraform.lock.hcl
 
 # C extensions
 *.so
@@ -162,3 +164,5 @@ fabric.properties
 .serverless
 node_modules
 tmp
+
+examples/*/plan
