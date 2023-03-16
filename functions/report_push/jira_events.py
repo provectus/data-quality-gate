@@ -38,7 +38,7 @@ def get_all_issues(jira_project_key):
 
 def create_new_bug(description, replaced_allure_links, summary, jira_project_key):
     print(f'Will be created bug with name[{summary}]')
-    tiket =jira.create_issue(
+    jira.create_issue(
         fields={
             "project": {"key": jira_project_key},
             "issuetype": {"name": "Bug"},
@@ -46,8 +46,3 @@ def create_new_bug(description, replaced_allure_links, summary, jira_project_key
             "description": description + replaced_allure_links,
         }
     )
-    inwardIssue = jira.issue("IPA-727")
-    outwardIssue = jira.issue(tiket)
-    issueLinkType = 'Relates'
-    jira.create_issue_link(issueLinkType, inwardIssue, outwardIssue)
-
