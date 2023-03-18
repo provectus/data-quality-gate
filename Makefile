@@ -31,7 +31,8 @@ run-integration-tests: build-data-test-img build-data-test-tests-img
 prepare-unit-tests:
 	cd ./functions/data_test && \
 	pip install -r requirements.txt && \
-	pip install pytest==7.2.1 
+	pip install pytest==7.2.1 && \
+	pip install moto==4.1.6
 
 run-unit-tests:
 	export ENVIRONMENT='local' && \
