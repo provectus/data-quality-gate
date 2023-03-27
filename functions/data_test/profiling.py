@@ -130,27 +130,7 @@ def change_ge_config(datasource_root):
     return config
 
 
-def add_local_s3_to_stores(stores):
-    boto_options_dic = {'endpoint_url': f"http://{os.environ['S3_HOST']}:4566"}
-    for store in stores:
-        if stores[store].get('store_backend'):
-            stores[store]['store_backend']['boto3_options'] = boto_options_dic
-    return stores
-
-
-def add_local_s3_to_data_docs(data_docs_sites):
-    boto_options_dic = {'endpoint_url': f"http://{os.environ['S3_HOST']}:4566"}
-    data_docs_sites['s3_site']['store_backend']['boto3_options'] = boto_options_dic
-    return data_docs_sites
-
-
-def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,mapping_config,run_name):
-    try:
-        mapping_schema = mapping_config[suite_name.split('_')[0]]
-    except KeyError:
-        mapping_schema = None
-
-
+def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, mapping_config, run_name):
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)
     context_ge = BaseDataContext(project_config=config)
@@ -174,12 +154,13 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,map
         ExpectationsReport.to_expectation_suite = ExpectationsReportNew.to_expectation_suite
         suite = profile.to_expectation_suite(
             data_context=context_ge,
-            suite_name=suite_name,
+            suite_name=suite_name.removesuffix('_'+run_name),
+            run_name = run_name,
             save_suite=True,
             run_validation=False,
             build_data_docs=False,
             reuse_suite=reuse_suite,
-            mapping_schema=mapping_schema,
+            mapping_config=mapping_config,
             use_old_suite=use_old_suite_only,
             old_suite_name=old_suite_name,
             handler=MyExpectationHandler(profile.typeset)
