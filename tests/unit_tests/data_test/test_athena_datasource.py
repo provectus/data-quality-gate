@@ -10,3 +10,4 @@ class TestAthenaDataSource:
         final_df, source = athena_data_source.read("s3://test-bucket/test-path/test_file.csv")
         assert final_df.equals(pd.DataFrame())
         assert source == "s3://test-bucket/test-path/test_file.csv"
+        
