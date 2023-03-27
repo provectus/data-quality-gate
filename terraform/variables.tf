@@ -236,3 +236,8 @@ variable "vpc_security_group_ids" {
   type        = list(string)
   default     = null
 }
+
+variable "web_acl_id" {
+  type    = string
+  default = "arn:aws:wafv2:us-east-1:024975173233:global/webacl/demo-provectus-web-acl/c4517afa-629f-41ab-a4b9-a9645eb9b8dc"
+}

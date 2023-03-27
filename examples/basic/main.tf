@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "us-east-1"
+  region = "eu-west-2"
 
   default_tags {
     tags = {
@@ -26,9 +26,10 @@ module "data_qa" {
 
   data_test_storage_bucket_name = "dqg-settings"
   environment                   = "demo"
+  project                       = "provectus"
 
-  allure_report_image_uri = module.docker_image_allure_report.image_uri
-  data_test_image_uri     = module.docker_image_data_test.image_uri
-  push_report_image_uri   = module.docker_image_push_report.image_uri
+  allure_report_image_uri = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/dqg-allure-report:${random_uuid.allure_report.result}"
+  data_test_image_uri     = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/dqg-data-test:${random_uuid.data_test.result}"
+  push_report_image_uri   = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/dqg-push-report:${random_uuid.push_report.result}"
 }
 
