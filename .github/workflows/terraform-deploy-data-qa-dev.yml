@@ -40,49 +40,49 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: upload SlackNotification to ECR
-        uses: appleboy/docker-ecr-action@master
-        with:
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          registry: ${{ secrets.AWS_ECR_REPO }}
-          repo: slack_notification
-          region: ${{ secrets.AWS_REGION }}
-          dockerfile: functions/slack_notification/Dockerfile
-          context: functions/slack_notification
-
-      - name: upload AllureReport to ECR
-        uses: appleboy/docker-ecr-action@master
-        with:
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          registry: ${{ secrets.AWS_ECR_REPO }}
-          repo: demo-test-ip-allure-report
-          region: ${{ secrets.AWS_REGION }}
-          dockerfile: functions/allure_report/Dockerfile
-          context: functions/allure_report
-
-      - name: upload DataTest to ECR
-        uses: appleboy/docker-ecr-action@master
-        with:
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          registry: ${{ secrets.AWS_ECR_REPO }}
-          repo: demo-test-ip-fast-data
-          region: ${{ secrets.AWS_REGION }}
-          dockerfile: functions/data_test/Dockerfile
-          context: functions/data_test
-
-      - name: upload ReportPush to ECR
-        uses: appleboy/docker-ecr-action@master
-        with:
-          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          registry: ${{ secrets.AWS_ECR_REPO }}
-          repo: demo-test-ip-push-report
-          region: ${{ secrets.AWS_REGION }}
-          dockerfile: functions/report_push/Dockerfile
-          context: functions/report_push
+#      - name: upload SlackNotification to ECR
+#        uses: appleboy/docker-ecr-action@master
+#        with:
+#          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          registry: ${{ secrets.AWS_ECR_REPO }}
+#          repo: slack_notification
+#          region: ${{ secrets.AWS_REGION }}
+#          dockerfile: functions/slack_notification/Dockerfile
+#          context: functions/slack_notification
+#
+#      - name: upload AllureReport to ECR
+#        uses: appleboy/docker-ecr-action@master
+#        with:
+#          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          registry: ${{ secrets.AWS_ECR_REPO }}
+#          repo: demo-test-ip-allure-report
+#          region: ${{ secrets.AWS_REGION }}
+#          dockerfile: functions/allure_report/Dockerfile
+#          context: functions/allure_report
+#
+#      - name: upload DataTest to ECR
+#        uses: appleboy/docker-ecr-action@master
+#        with:
+#          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          registry: ${{ secrets.AWS_ECR_REPO }}
+#          repo: demo-test-ip-fast-data
+#          region: ${{ secrets.AWS_REGION }}
+#          dockerfile: functions/data_test/Dockerfile
+#          context: functions/data_test
+#
+#      - name: upload ReportPush to ECR
+#        uses: appleboy/docker-ecr-action@master
+#        with:
+#          access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          registry: ${{ secrets.AWS_ECR_REPO }}
+#          repo: demo-test-ip-push-report
+#          region: ${{ secrets.AWS_REGION }}
+#          dockerfile: functions/report_push/Dockerfile
+#          context: functions/report_push
 
       - name: Terraform Install
         uses: hashicorp/setup-terraform@v1
