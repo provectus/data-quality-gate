@@ -38,5 +38,6 @@ run-unit-tests:
 	export ENVIRONMENT='local' && \
 	export S3_HOST='localhost' && \
 	export QA_BUCKET='test-bucket' && \
+	export AWS_DEFAULT_REGION='us-east-1' && \
 	cd ./functions/data_test && \
 	python -m pytest ../../tests/unit_tests/data_test/ -v
