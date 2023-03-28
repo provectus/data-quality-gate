@@ -41,6 +41,9 @@ def handler(event, context):
     passed = history['data']['0']['passed']
     if failed != 0:
         status = 'failed'
+        report = {
+            "failed_test_count": failed,
+        }
     else:
         status = 'passed'
     local_item = {
@@ -120,9 +123,6 @@ def handler(event, context):
                 },
             ]
         )
-    report = {
-        "failed_test_count": failed,
-    }
 
     return report
 
