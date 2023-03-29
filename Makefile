@@ -39,5 +39,7 @@ run-unit-tests:
 	export S3_HOST='localhost' && \
 	export QA_BUCKET='test-bucket' && \
 	export AWS_DEFAULT_REGION='us-east-1' && \
+	export REDSHIFT_DB='titanic' && \
+	export REDSHIFT_SECRET='titanic' && \
 	cd ./functions/data_test && \
 	python -m pytest ../../tests/unit_tests/data_test/ -v
