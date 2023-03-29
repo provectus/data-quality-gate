@@ -162,50 +162,50 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
     cloudfront_default_certificate = true
   }
 
-  web_acl_id = aws_wafv2_web_acl.waf_acl.arn
+  web_acl_id = var.web_acl_id
 }
 
-resource "aws_wafv2_ip_set" "vpn_ipset" {
-  name               = "${local.resource_name_prefix}-ip-set"
-  description        = "VPN IP set"
-  scope              = "CLOUDFRONT"
-  ip_address_version = "IPV4"
-
-  addresses = var.cloudfront_allowed_subnets
-}
-
-resource "aws_wafv2_web_acl" "waf_acl" {
-  name  = "${local.resource_name_prefix}-web-acl"
-  scope = "CLOUDFRONT"
-
-  default_action {
-    block {}
-  }
-
-  rule {
-    name     = "tfWAFVpnRule"
-    priority = 1
-
-    action {
-      allow {}
-    }
-
-    statement {
-      ip_set_reference_statement {
-        arn = aws_wafv2_ip_set.vpn_ipset.arn
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = false
-      metric_name                = "${local.cloudwatch_prefix}WafVpnIPRule"
-      sampled_requests_enabled   = false
-    }
-  }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = false
-    metric_name                = "${local.cloudwatch_prefix}WafAcl"
-    sampled_requests_enabled   = false
-  }
-}
+#resource "aws_wafv2_ip_set" "vpn_ipset" {
+#  name               = "${local.resource_name_prefix}-ip-set"
+#  description        = "VPN IP set"
+#  scope              = "CLOUDFRONT"
+#  ip_address_version = "IPV4"
+#
+#  addresses = var.cloudfront_allowed_subnets
+#}
+#
+#resource "aws_wafv2_web_acl" "waf_acl" {
+#  name  = "${local.resource_name_prefix}-web-acl"
+#  scope = "CLOUDFRONT"
+#
+#  default_action {
+#    block {}
+#  }
+#
+#  rule {
+#    name     = "tfWAFVpnRule"
+#    priority = 1
+#
+#    action {
+#      allow {}
+#    }
+#
+#    statement {
+#      ip_set_reference_statement {
+#        arn = aws_wafv2_ip_set.vpn_ipset.arn
+#      }
+#    }
+#
+#    visibility_config {
+#      cloudwatch_metrics_enabled = false
+#      metric_name                = "${local.cloudwatch_prefix}WafVpnIPRule"
+#      sampled_requests_enabled   = false
+#    }
+#  }
+#
+#  visibility_config {
+#    cloudwatch_metrics_enabled = false
+#    metric_name                = "${local.cloudwatch_prefix}WafAcl"
+#    sampled_requests_enabled   = false
+#  }
+#}
