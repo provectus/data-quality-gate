@@ -13,7 +13,7 @@ Mapping from GX format to Allure Test Report tool
 Metadata and metrics aggregation
 
 ## Solution Architecture
-![alt text](https://github.com/provectus/data-quality-gate/blob/master/architecture.png?raw=true)
+![Preview Image](https://raw.githubusercontent.com/provectus/data-quality-gate/main/architecture.png)
 
 ## Usage
 Could be used as standard Terraform module, the examples of deployments under `examples` directory.
