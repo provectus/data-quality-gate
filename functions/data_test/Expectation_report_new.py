@@ -68,7 +68,7 @@ class ExpectationsReportNew:
         if reuse_suite:
             if use_old_suite:
                 suite_old = data_context.get_expectation_suite(old_suite_name)
-                data_context.save_expectation_suite(expectation_suite=suite_old,expectation_suite_name=suite_name,overwrite_existing=True)
+                data_context.save_expectation_suite(expectation_suite=f"{suite_name.split('_')[0]}_{suite_old}",expectation_suite_name=suite_name,overwrite_existing=True)
             else:
                 suite_old = data_context.get_expectation_suite(old_suite_name)
                 schema_list = list(mapping_schema.keys())
