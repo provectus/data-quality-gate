@@ -94,25 +94,54 @@ def change_ge_config(datasource_root):
             }
         }
     }
-    stores = configfile["stores"]
-    new_stores = add_local_s3_to_stores(stores) if os.environ['ENVIRONMENT'] == 'local' else stores
-    data_docs_sites = configfile["data_docs_sites"]
-    new_data_docs_sites = add_local_s3_to_data_docs(data_docs_sites) if os.environ['ENVIRONMENT'] == 'local' else data_docs_sites
-   
-    config = DataContextConfig(config_version=configfile["config_version"], datasources=datasources,
-    stores=new_stores, data_docs_sites=new_data_docs_sites,
-                               expectations_store_name=configfile["expectations_store_name"],
-                               validations_store_name=configfile["validations_store_name"],
-                               evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
-                               plugins_directory="/great_expectations/plugins",
-                               validation_operators=configfile["validation_operators"],
-                               config_variables_file_path=configfile["config_variables_file_path"],
-                               anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
-                               store_backend_defaults=S3StoreBackendDefaults(
-                                   default_bucket_name=qa_bucket_name,
-                                   expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
-                                   validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
+
+    if os.environ['ENVIRONMENT'] == 'local':
+        stores = configfile["stores"]
+        new_stores = add_local_s3_to_stores(stores) if os.environ['ENVIRONMENT'] == 'local' else stores
+        data_docs_sites = configfile["data_docs_sites"]
+        new_data_docs_sites = add_local_s3_to_data_docs(data_docs_sites) if os.environ[
+                                                                                'ENVIRONMENT'] == 'local' else data_docs_sites
+        config = DataContextConfig(config_version=configfile["config_version"], datasources=datasources,
+                                   stores=new_stores, data_docs_sites=new_data_docs_sites,
+                                   expectations_store_name=configfile["expectations_store_name"],
+                                   validations_store_name=configfile["validations_store_name"],
+                                   evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
+                                   plugins_directory="/great_expectations/plugins",
+                                   validation_operators=configfile["validation_operators"],
+                                   config_variables_file_path=configfile["config_variables_file_path"],
+                                   anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
+                                   store_backend_defaults=S3StoreBackendDefaults(
+                                       default_bucket_name=qa_bucket_name,
+                                       expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
+                                       validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
+    else:
+        config = DataContextConfig(config_version=configfile["config_version"], datasources=datasources,
+                                   expectations_store_name=configfile["expectations_store_name"],
+                                   validations_store_name=configfile["validations_store_name"],
+                                   evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
+                                   plugins_directory="/great_expectations/plugins",
+                                   validation_operators=configfile["validation_operators"],
+                                   config_variables_file_path=configfile["config_variables_file_path"],
+                                   anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
+                                   store_backend_defaults=S3StoreBackendDefaults(
+                                       default_bucket_name=qa_bucket_name,
+                                       expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
+                                       validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
     return config
+
+
+def add_local_s3_to_stores(stores):
+    boto_options_dic = {'endpoint_url': f"http://{os.environ['S3_HOST']}:4566"}
+    for store in stores:
+        if stores[store].get('store_backend'):
+            stores[store]['store_backend']['boto3_options'] = boto_options_dic
+    return stores
+
+
+def add_local_s3_to_data_docs(data_docs_sites):
+    boto_options_dic = {'endpoint_url': f"http://{os.environ['S3_HOST']}:4566"}
+    data_docs_sites['s3_site']['store_backend']['boto3_options'] = boto_options_dic
+    return data_docs_sites
 
 
 def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, mapping_config, run_name):
