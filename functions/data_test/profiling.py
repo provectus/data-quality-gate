@@ -130,6 +130,20 @@ def change_ge_config(datasource_root):
     return config
 
 
+def add_local_s3_to_stores(stores):
+    boto_options_dic = {'endpoint_url': f"http://{os.environ['S3_HOST']}:4566"}
+    for store in stores:
+        if stores[store].get('store_backend'):
+            stores[store]['store_backend']['boto3_options'] = boto_options_dic
+    return stores
+
+
+def add_local_s3_to_data_docs(data_docs_sites):
+    boto_options_dic = {'endpoint_url': f"http://{os.environ['S3_HOST']}:4566"}
+    data_docs_sites['s3_site']['store_backend']['boto3_options'] = boto_options_dic
+    return data_docs_sites
+
+
 def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, mapping_config, run_name):
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)
