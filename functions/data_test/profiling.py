@@ -173,7 +173,7 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, ma
         ExpectationsReport.to_expectation_suite = ExpectationsReportNew.to_expectation_suite
         suite = profile.to_expectation_suite(
             data_context=context_ge,
-            suite_name=suite_name.removesuffix('_'+run_name),
+            suite_name=remove_suffix(suite_name,f"_{run_name}"),
             run_name = run_name,
             save_suite=True,
             run_validation=False,
