@@ -144,6 +144,11 @@ def add_local_s3_to_data_docs(data_docs_sites):
     return data_docs_sites
 
 
+def remove_suffix(input_string, suffix):
+    if suffix and input_string.endswith(suffix):
+        return input_string[:-len(suffix)]
+    return input_string
+
 def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, mapping_config, run_name):
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)
