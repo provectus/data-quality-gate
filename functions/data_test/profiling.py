@@ -49,7 +49,7 @@ class MyExpectationHandler(Handler):
                             ],
             "Boolean": [expectations_null,
                         ],
-            "Numeric": [generic_expectations_without_null, expectations_null,
+            "Numeric": [generic_expectations_without_null, expectations_null,expectation_algorithms.numeric_expectations
                         ],
             "URL": [expectation_algorithms.url_expectations, expectations_null,
                     ],
