@@ -229,8 +229,6 @@ class ExpectationsReportNew:
                     suite.add_expectation(
                         expectation_configuration=ExpectationConfiguration(kwargs={"column_set": final_schema},
                                                                            expectation_type="expect_table_columns_to_match_set"))
-                    suite.remove_expectation(expectation_configuration=ExpectationConfiguration(kwargs={"value": summary['table']['n']},
-                                                                           expectation_type="expect_table_row_count_to_equal"),match_type="runtime")
                     suite.add_expectation(
                         expectation_configuration=ExpectationConfiguration(kwargs={"value": summary['table']['n']},
                                                                            expectation_type="expect_table_row_count_to_equal"))
