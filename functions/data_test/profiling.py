@@ -144,13 +144,12 @@ def add_local_s3_to_data_docs(data_docs_sites):
     return data_docs_sites
 
 
-def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,mapping_config,run_name):
-    try:
-        mapping_schema = mapping_config[suite_name.split('_')[0]]
-    except KeyError:
-        mapping_schema = None
+def remove_suffix(input_string, suffix):
+    if suffix and input_string.endswith(suffix):
+        return input_string[:-len(suffix)]
+    return input_string
 
-
+def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, mapping_config, run_name):
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)
     context_ge = BaseDataContext(project_config=config)
@@ -174,12 +173,13 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,map
         ExpectationsReport.to_expectation_suite = ExpectationsReportNew.to_expectation_suite
         suite = profile.to_expectation_suite(
             data_context=context_ge,
-            suite_name=suite_name,
+            suite_name=remove_suffix(suite_name,f"_{run_name}"),
+            run_name = run_name,
             save_suite=True,
             run_validation=False,
             build_data_docs=False,
             reuse_suite=reuse_suite,
-            mapping_schema=mapping_schema,
+            mapping_config=mapping_config,
             use_old_suite=use_old_suite_only,
             old_suite_name=old_suite_name,
             handler=MyExpectationHandler(profile.typeset)

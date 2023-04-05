@@ -12,7 +12,7 @@ import s3fs
 import boto3
 BASE_DIR = Path(__file__).resolve().parent
 from great_expectations.data_context import BaseDataContext
-def validate_data(file,suite_name,config):
+def validate_data(file, suite_name, config):
     s3 = boto3.resource("s3")
     context_ge = BaseDataContext(project_config=config)
 

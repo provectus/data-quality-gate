@@ -24,12 +24,28 @@ module "data_qa" {
   source                     = "../../terraform"
   cloudfront_allowed_subnets = ["255.255.255.255/32"]
 
-  data_test_storage_bucket_name = "dqg-settings"
+  data_test_storage_bucket_name = "dqg-settings-dev"
   environment                   = "demo"
   project                       = "provectus"
 
-  allure_report_image_uri = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/dqg-allure-report:${random_uuid.allure_report.result}"
-  data_test_image_uri     = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/dqg-data-test:${random_uuid.data_test.result}"
-  push_report_image_uri   = "${data.aws_caller_identity.current.account_id}.dkr.ecr.${data.aws_region.current.name}.amazonaws.com/dqg-push-report:${random_uuid.push_report.result}"
+  allure_report_image_uri = module.docker_image_allure_report.image_uri
+  data_test_image_uri     = module.docker_image_data_test.image_uri
+  push_report_image_uri   = module.docker_image_push_report.image_uri
+
+  web_acl_id = "arn:aws:wafv2:us-east-1:024975173233:global/webacl/demo-provectus-web-acl/c4517afa-629f-41ab-a4b9-a9645eb9b8dc"
 }
 
+module "data_qa_intg" {
+  source                     = "../../terraform"
+  cloudfront_allowed_subnets = ["255.255.255.255/32"]
+
+  data_test_storage_bucket_name = "dqg-settings-intg"
+  environment                   = "intg"
+  project                       = "provectus"
+
+  allure_report_image_uri = module.docker_image_allure_report.image_uri
+  data_test_image_uri     = module.docker_image_data_test.image_uri
+  push_report_image_uri   = module.docker_image_push_report.image_uri
+
+  web_acl_id = "arn:aws:wafv2:us-east-1:024975173233:global/webacl/demo-provectus-web-acl/c4517afa-629f-41ab-a4b9-a9645eb9b8dc"
+}

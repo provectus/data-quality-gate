@@ -34,7 +34,11 @@ def handler(event, context):
     bucket = s3.Bucket(qa_bucket)
     created_bug_count = 0
     items = []
-    df = wr.s3.read_json(path=[f's3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json'])
+    df = wr.s3.read_json(
+        path=[
+            f"s3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json"
+        ]
+    )
     history = json.loads(df.to_json())
     total = history['data']['0']['total']
     failed = history['data']['0']['failed']
@@ -63,15 +67,14 @@ def handler(event, context):
 
     with table.batch_writer() as batch:
         for item in items:
-            batch.put_item(
-                Item=item
-            )
+            batch.put_item(Item=item)
 
     try:
         pipeline_config = json.loads(
             wr.s3.read_json(path=f"s3://{qa_bucket}/test_configs/pipeline.json").to_json())
         autobug = pipeline_config[run_name]['autobug']
     except KeyError:
+        autobug = False
         print(f"Can't find config for {run_name}")
 
     if autobug:
@@ -129,7 +132,7 @@ def handler(event, context):
 
 def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite, jira_project_key):
     created_bug_count = 0
-    all_result_files = bucket.objects.filter(Prefix=f'allure/{suite}/{key}/result/')
+    all_result_files = bucket.objects.filter(Prefix=f"allure/{suite}/{key}/result/")
     issues = get_all_issues(jira_project_key)
     for result_file_name in all_result_files:
         if result_file_name.key.endswith('result.json'):
@@ -138,9 +141,15 @@ def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suit
             status = data_in_file['status']
             if status == "failed":
                 created_bug_count += 1
-                table_name = data_in_file['labels'][1]['value']
-                fail_step = data_in_file['steps'][0]['name']
-                description = data_in_file['description']
-                open_bug(table_name[:table_name.find('.')], fail_step[:fail_step.find('.')], description,
-                         f'https://{replaced_allure_links}', issues, jira_project_key)
+                table_name = data_in_file["labels"][1]["value"]
+                fail_step = data_in_file["steps"][0]["name"]
+                description = data_in_file["description"]
+                open_bug(
+                    table_name[: table_name.find(".")],
+                    fail_step[: fail_step.find(".")],
+                    description,
+                    f"https://{replaced_allure_links}",
+                    issues,
+                    jira_project_key,
+                )
     return created_bug_count
