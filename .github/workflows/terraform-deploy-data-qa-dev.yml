@@ -11,9 +11,12 @@ on:
         required: true
         default: 'main'
       TerraformTarget:
-        description: 'Terraform Target, please provide resource target name'
+        type: choice
+        description: 'Terraform Target, please provide target env name'
         required: true
-        default: 'all'
+        options:
+          - dev
+          - intg
 
 jobs:
   terraform:
@@ -57,21 +60,11 @@ jobs:
         if: ${{ github.event.inputs.applyTerraform == 'plan' }}
         run: |
           cd $TF_DIR
-          if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
-          then
-          terraform plan -input=false
-          else
-          terraform plan -target=${{ github.event.inputs.TerraformTarget }} -input=false
-          fi
+          terraform plan -target=module.${{ github.event.inputs.TerraformTarget }} -input=false
 
       - name: Terraform apply
         id: apply
         if: ${{ github.event.inputs.applyTerraform == 'apply' }}
         run: |
           cd $TF_DIR
-          if [ ${{ github.event.inputs.TerraformTarget }} = "all" ]
-          then
-          terraform apply -auto-approve
-          else
-          terraform apply -auto-approve -target=${{ github.event.inputs.TerraformTarget }}
-          fi
+          terraform apply -auto-approve -target=module.${{ github.event.inputs.TerraformTarget }}
