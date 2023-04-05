@@ -12,7 +12,7 @@ from datasource import get_file_extension
 
 
 def handler(event, context):
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566") if os.environ['ENVIRONMENT'] == 'local' else boto3.resource("s3")
     cloudfront = os.environ['QA_CLOUDFRONT']
     qa_bucket_name = os.environ['QA_BUCKET']
     run_name = event['run_name']
@@ -21,12 +21,13 @@ def handler(event, context):
     else:
         pipeline_config = json.loads(
             wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/pipeline.json").to_json())
-        engine = pipeline_config[run_name]['engine']
-    source_root = event['source_root']
-    source_input = event['source_data']
-    # coverage_config = json.loads(s3.Object(qa_bucket_name,"test_configs/test_coverage.json" ).get()['Body'].read().decode('utf-8'))
-    coverage_config = json.loads(wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/test_coverage.json").to_json())
-    mapping_config = json.loads(wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/mapping.json").to_json())
+        engine = pipeline_config[run_name]["engine"]
+    source_root = event["source_root"]
+    source_input = event["source_data"]
+    coverage_config = json.loads(
+        s3.Object(qa_bucket_name, "test_configs/test_coverage.json").get()["Body"].read().decode("utf-8"))
+    mapping_config = json.loads(
+        s3.Object(qa_bucket_name, "test_configs/mapping.json").get()["Body"].read().decode("utf-8"))
     if type(source_input) is not list:
         source = [source_input]
     else:
@@ -36,14 +37,20 @@ def handler(event, context):
     else:
         source_extension = get_file_extension(source[0])
         source_name = get_source_name(source[0], source_extension)
-    final_ds, path = prepare_final_ds(source, engine, source_root, run_name, source_name)
     suite_name = f"{source_name}_{run_name}"
     try:
         source_covered = coverage_config[suite_name]['complexSuite']
     except (IndexError, KeyError) as e:
         source_covered = False
+    try:
+        suite_coverage_config = coverage_config[suite_name]
+    except (IndexError, KeyError) as e:
+        suite_coverage_config = None
 
-    profile_link, folder_key, config = profile_data(final_ds, suite_name, cloudfront, source_root, source_covered, mapping_config, run_name)
+    final_ds, path = prepare_final_ds(source, engine, source_root, run_name, source_name, suite_coverage_config)
+
+    profile_link, folder_key, config = profile_data(final_ds, suite_name, cloudfront, source_root, source_covered,
+                                                    mapping_config, run_name)
     validate_id = validate_data(final_ds, suite_name, config)
     test_suite = f"{cloudfront}/data_docs/validations/{validate_id}.html"
 
