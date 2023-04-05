@@ -15,8 +15,8 @@ on:
         description: 'Terraform Target, please provide target env name'
         required: true
         options:
-          - dev
-          - intg
+          - data_qa
+          - data_qa_intg
 
 jobs:
   terraform:
