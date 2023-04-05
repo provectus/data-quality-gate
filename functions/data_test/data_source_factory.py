@@ -8,13 +8,13 @@ ENV = os.environ['ENVIRONMENT']
 class DataSourceFactory:
     
     @staticmethod
-    def create_data_source(engine, qa_bucket_name, extension, run_name, table_name):
+    def create_data_source(engine, qa_bucket_name, extension, run_name, table_name, coverage_config):
         if engine == 's3':
             return S3DataSource(extension)
         elif engine == 'athena':
             return AthenaDataSource(qa_bucket_name, table_name)
         elif engine == 'redshift':
-            return RedshiftDataSource(qa_bucket_name, run_name, table_name)
+            return RedshiftDataSource(qa_bucket_name, run_name, table_name, coverage_config)
         elif engine == 'hudi':
             return HudiDataSource(qa_bucket_name, run_name, table_name)
         else:
@@ -60,10 +60,11 @@ class AthenaDataSource(DataSource):
 
 
 class RedshiftDataSource(DataSource):
-    def __init__(self, qa_bucket_name, run_name, table_name):
+    def __init__(self, qa_bucket_name, run_name, table_name, coverage_config):
         self.qa_bucket_name = qa_bucket_name
         self.run_name = run_name
         self.table_name = table_name
+        self.coverage_config = coverage_config
 
     def read(self, source):
         final_df = wr.s3.read_parquet(path=source, ignore_index=True)
@@ -74,13 +75,26 @@ class RedshiftDataSource(DataSource):
             try:
                 sort_keys_config = json.loads(
                     wr.s3.read_json(path=f"s3://{self.qa_bucket_name}/test_configs/sort_keys.json").to_json())
-                sort_key = sort_keys_config[self.table_name]['sortKey']
+                sort_key = list(map(str.lower, sort_keys_config[self.table_name]["sortKey"]))
             except KeyError:
                 sort_key = ['update_dt']
+            try:
+                target_table = self.coverage_config["targetTable"]
+            except (KeyError, IndexError, TypeError) as e:
+                target_table = None
+            if target_table:
+                table_name = target_table
             con = wr.redshift.connect(secret_id=redshift_secret, dbname=redshift_db)
-            if final_df.nunique()[sort_key][0] > 1:
+            try:
+                nunique = final_df.nunique()[sort_key][0]
+            except (KeyError,IndexError) as e:
+                nunique = final_df.nunique()[sort_key]
+            if nunique > 1:
                 min_key = final_df[sort_key].min()
                 max_key = final_df[sort_key].max()
+                if type(min_key) != str or type(max_key) != str:
+                    min_key = final_df[sort_key].min()[0]
+                    max_key = final_df[sort_key].max()[0]
                 sql_query = f"SELECT * FROM public.{self.table_name} WHERE {sort_key[0]} between \\'{min_key}\\' and \\'{max_key}\\'"
                 final_df = wr.redshift.unload(
                     sql=sql_query,
@@ -89,8 +103,10 @@ class RedshiftDataSource(DataSource):
                 )
                 con.close()
             else:
-                key = str(final_df[sort_key].loc[0])
-                sql_query = f"SELECT * FROM public.{self.table_name} WHERE {sort_key[0]}=\\'{key}\\'"
+                key = final_df[sort_key].values[0]
+                if type(key) != str:
+                    key = str(key[0])
+                sql_query = f"SELECT * FROM {table_name}.{table_name} WHERE {sort_key[0]}=\\'{key}\\'"
                 final_df = wr.redshift.unload(
                     sql=sql_query,
                     con=con,

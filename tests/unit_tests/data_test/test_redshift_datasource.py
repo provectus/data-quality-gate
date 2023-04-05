@@ -20,7 +20,7 @@ class TestRedshiftDataSource:
       df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
       path = 's3://dataqa/titanic.parquet'
       wr.s3.to_parquet(df=df, path=path)
-      redshift_data_source = RedshiftDataSource("dataqa","test_", "titanic.parquet")
+      redshift_data_source = RedshiftDataSource("dataqa","test_", "titanic.parquet","coverage.json")
       final_df, source = redshift_data_source.read("s3://dataqa/titanic.parquet")
       assert len(final_df.index) == 3
       assert source == "s3://dataqa/titanic.parquet"

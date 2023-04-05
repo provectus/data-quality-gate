@@ -23,5 +23,6 @@ class TestDataSourceFactory:
                                                            qa_bucket_name="test_qa_bucket", 
                                                            extension="test_extension", 
                                                            run_name="test_run_name", 
-                                                           table_name="test_table_name")
+                                                           table_name="test_table_name",
+                                                           coverage_config="test_coverage.json")
         assert isinstance(data_source, expected_class)
