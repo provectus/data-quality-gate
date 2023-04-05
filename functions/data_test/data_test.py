@@ -12,7 +12,7 @@ from datasource import get_file_extension
 
 
 def handler(event, context):
-    s3 = boto3.resource('s3')
+    s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566") if os.environ['ENVIRONMENT'] == 'local' else boto3.resource("s3")
     cloudfront = os.environ['QA_CLOUDFRONT']
     qa_bucket_name = os.environ['QA_BUCKET']
     run_name = event['run_name']
