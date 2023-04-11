@@ -58,18 +58,6 @@ variable "expectations_store" {
   default     = "../expectations_store"
 }
 
-variable "cloudfront_allowed_subnets" {
-  description = "list of allowed subnets allows users to get reports from specific IP address spaces"
-  type        = list(string)
-  default     = null
-}
-
-variable "cloudfront_location_restrictions" {
-  description = "List of regions allowed for CloudFront distribution"
-  type        = list(string)
-  default     = ["US", "CA", "GB", "DE", "TR"]
-}
-
 variable "lambda_allure_report_memory" {
   description = "Amount of memory allocated to the lambda function lambda_allure_report"
   type        = number
@@ -205,32 +193,14 @@ variable "lambda_alerts_sns_topic_arn" {
   default     = null
 }
 
-#Lambda
-variable "vpc_to_create" {
-  description = "Configs used to create VPC and endpoints if needed"
-  type = object({
-    cidr                 = string
-    private_subnets_cidr = list(string)
-  })
-
-  default = null
-}
-
-variable "vpc_subnet_ids" {
-  description = "List of subnet ids to place lambda in. If null value, default subnet and vpc will be used"
+variable "lambda_private_subnet_ids" {
+  description = "List of private subnets assigned to lambda"
   type        = list(string)
-  default     = null
 }
 
-variable "vpc_security_group_ids" {
-  description = "List of security group assigned to lambda. If null value, default subnet and vpc will be used"
+variable "lambda_security_group_ids" {
+  description = "List of security group assigned to lambda"
   type        = list(string)
-  default     = null
-}
-
-variable "web_acl_id" {
-  type    = string
-  default = "arn:aws:wafv2:us-east-1:024975173233:global/webacl/demo-provectus-web-acl/c4517afa-629f-41ab-a4b9-a9645eb9b8dc"
 }
 
 variable "basic_alert_notification_settings" {
@@ -251,4 +221,19 @@ variable "data_reports_notification_settings" {
   })
 
   default = null
+}
+
+variable "reports_whitelist_ips" {
+  description = "List of allowed IPs to see reports"
+  type        = list(string)
+}
+
+variable "reports_vpc_id" {
+  description = "Vpc Id where gateway instance will be placed"
+  type        = string
+}
+
+variable "reports_subnet_id" {
+  description = "Subnet id where gateway instance will be placed"
+  type        = string
 }

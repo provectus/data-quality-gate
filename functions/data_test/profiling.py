@@ -22,7 +22,7 @@ else:
     endpoint_url = None
     s3 = boto3.resource("s3")
 
-qa_bucket_name = os.environ['QA_BUCKET']
+qa_bucket_name = os.environ['BUCKET']
 
 
 def generic_expectations_without_null(name, summary, batch, *args):

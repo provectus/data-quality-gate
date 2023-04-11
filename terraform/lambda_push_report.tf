@@ -1,3 +1,15 @@
+locals {
+  default_push_report_env_vars = {
+    ENVIRONMENT    = var.environment
+    BUCKET         = aws_s3_bucket.settings_bucket.bucket
+    REPORTS_WEB    = module.reports_gateway.s3_gateway_address
+    DYNAMODB_TABLE = aws_dynamodb_table.data_qa_report.name
+    JIRA_URL       = var.lambda_push_jira_url
+    SECRET_NAME    = var.lambda_push_secret_name
+    REGION_NAME    = data.aws_region.current.name
+  }
+}
+
 module "lambda_push_report" {
   source         = "terraform-aws-modules/lambda/aws"
   version        = "3.3.1"
@@ -17,8 +29,8 @@ module "lambda_push_report" {
   memory_size                    = var.lambda_push_report_memory
   tracing_mode                   = "PassThrough"
 
-  vpc_subnet_ids         = local.lambda_vpc_subnet_ids
-  vpc_security_group_ids = local.lambda_vpc_sg_ids
+  vpc_subnet_ids         = var.lambda_private_subnet_ids
+  vpc_security_group_ids = var.lambda_security_group_ids
 }
 
 module "data_reports_alerting" {

@@ -3,7 +3,7 @@ import re
 import pathlib
 from data_source_factory import DataSourceFactory
 
-qa_bucket_name = os.environ['QA_BUCKET']
+qa_bucket_name = os.environ['BUCKET']
 
 
 def concat_source_list(source, source_engine):

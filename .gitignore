@@ -166,3 +166,4 @@ node_modules
 tmp
 
 examples/*/plan
+*.auto.tfvars
