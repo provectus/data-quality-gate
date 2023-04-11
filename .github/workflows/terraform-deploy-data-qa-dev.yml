@@ -34,7 +34,6 @@ jobs:
           pwd
           cd ./examples/basic
           echo "TF_DIR=$(pwd)" >> $GITHUB_ENV
-          echo "TF_BACKEND_CONFIG=terraform-backend.tfbackend" >> $GITHUB_ENV
 
       - name: Configure AWS credentials for dev account
         uses: aws-actions/configure-aws-credentials@v1
