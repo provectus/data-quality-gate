@@ -51,8 +51,7 @@ jobs:
         id: init
         run: |
           cd $TF_DIR
-          echo "TF_BACKEND_CONFIG: $TF_BACKEND_CONFIG"
-          terraform init --backend-config ./$TF_BACKEND_CONFIG
+          terraform init
 
       - name: Terraform plan
         id: plan
