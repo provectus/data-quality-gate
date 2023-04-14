@@ -60,3 +60,22 @@ resource "aws_cloudwatch_metric_alarm" "lambda_push_report_error" {
     FunctionName = module.lambda_function_push_report.lambda_function_name
   }
 }
+
+resource "aws_cloudwatch_metric_alarm" "bugs" {
+  actions_enabled   = "true"
+  alarm_name        = "DQ data bug found"
+  alarm_description = "DQG found a bug."
+
+  comparison_operator = "GreaterThanThreshold"
+  treat_missing_data  = "ignore"
+
+  metric_name = "suite_failed_count"
+  namespace   = "Data-QA"
+
+  threshold          = 0
+  period             = 1
+  evaluation_periods = 1
+
+  alarm_actions             = ["arn:aws:sns:eu-west-2:024975173233:test-bugs-topic"]
+  insufficient_data_actions = []
+}
