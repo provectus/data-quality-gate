@@ -75,6 +75,7 @@ resource "aws_cloudwatch_metric_alarm" "bugs" {
   threshold          = 0
   period             = 900
   evaluation_periods = 1
+  statistic          = "SampleCount"
 
   alarm_actions             = ["arn:aws:sns:eu-west-2:024975173233:test-bugs-topic"]
   insufficient_data_actions = []
