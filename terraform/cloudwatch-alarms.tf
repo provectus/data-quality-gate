@@ -73,7 +73,7 @@ resource "aws_cloudwatch_metric_alarm" "bugs" {
   namespace   = "Data-QA"
 
   threshold          = 0
-  period             = 1
+  period             = 900
   evaluation_periods = 1
 
   alarm_actions             = ["arn:aws:sns:eu-west-2:024975173233:test-bugs-topic"]
