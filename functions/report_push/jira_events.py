@@ -29,6 +29,7 @@ def open_bug(table_name: str, fail_step: str, description: str, replaced_allure_
             break
     if not ticket_exist:
         create_new_bug(description, replaced_allure_links, summary, jira_project_key)
+    return summary
 
 
 def get_all_issues(jira_project_key):
