@@ -6,10 +6,10 @@ import os
 import boto3
 import awswrangler as wr
 import re
-import pathlib
 
 ENV = os.environ['ENVIRONMENT']
 qa_bucket_name = os.environ['QA_BUCKET']
+
 
 def concat_source_list(source, source_engine):
     final_source_files = []
@@ -19,19 +19,16 @@ def concat_source_list(source, source_engine):
 
 
 def get_file_extension(source):
-    return pathlib.Path(source).suffix[1:]
+    return source.split(".")[-1]
 
 
-def read_source(source, engine, extension, run_name, table_name=None, coverage_config=None):
+def read_source(source, engine, extension, run_name, table_name=None):
     path = source
     if engine == 's3':
         if extension == 'csv':
-            return wr.s3.read_csv(path=source), path
+            return wr.s3.read_csv(path=source),path
         elif extension == 'parquet':
-            return wr.s3.read_parquet(path=source, ignore_index=True), path
-        elif extension == 'json':
-            return wr.s3.read_json(path=source, lines=True), path
-
+            return wr.s3.read_parquet(path=source,ignore_index=True),path
     elif engine == 'athena':
         database_name = f"{ENV}_{table_name.split('.')[0]}"
         athena_table = table_name.split('.')[-1]
@@ -51,27 +48,13 @@ def read_source(source, engine, extension, run_name, table_name=None, coverage_c
             try:
                 sort_keys_config = json.loads(
                     wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/sort_keys.json").to_json())
-                sort_key = list(map(str.lower, sort_keys_config[table_name]["sortKey"]))
+                sort_key = sort_keys_config[table_name]['sortKey']
             except KeyError:
                 sort_key = ['update_dt']
-            try:
-                target_table = coverage_config["targetTable"]
-            except (KeyError, IndexError, TypeError) as e:
-                target_table = None
-            if target_table:
-                table_name = target_table
             con = wr.redshift.connect(secret_id=redshift_secret, dbname=redshift_db)
-            try:
-                nunique = final_df.nunique()[sort_key][0]
-            except (KeyError,IndexError) as e:
-                nunique = final_df.nunique()[sort_key]
-
-            if nunique > 1:
+            if final_df.nunique()[sort_key][0]>1:
                 min_key = final_df[sort_key].min()
                 max_key = final_df[sort_key].max()
-                if type(min_key) != str or type(max_key) != str:
-                    min_key = final_df[sort_key].min()[0]
-                    max_key = final_df[sort_key].max()[0]
                 sql_query = f"SELECT * FROM public.{table_name} WHERE {sort_key[0]} between \\'{min_key}\\' and \\'{max_key}\\'"
                 final_df = wr.redshift.unload(
                     sql=sql_query,
@@ -80,10 +63,8 @@ def read_source(source, engine, extension, run_name, table_name=None, coverage_c
                 )
                 con.close()
             else:
-                key = final_df[sort_key].values[0]
-                if type(key) != str:
-                    key = str(key[0])
-                sql_query = f"SELECT * FROM {table_name}.{table_name} WHERE {sort_key[0]}=\\'{key}\\'"
+                key = str(final_df[sort_key].loc[0])
+                sql_query = f"SELECT * FROM public.{table_name} WHERE {sort_key[0]}=\\'{key}\\'"
                 final_df = wr.redshift.unload(
                     sql=sql_query,
                     con=con,
@@ -130,16 +111,19 @@ def read_source(source, engine, extension, run_name, table_name=None, coverage_c
             except KeyError:
                 print('Op column not exist')
             return final_df, path
+    elif engine == 'postgresql':
+        return 5
+    elif engine == 'snowflake':
+        return 6
     else:
-        return wr.s3.read_parquet(path=source), path
+        return wr.s3.read_parquet(path=source),path
 
 
 def get_source_name(source, extension):
-    result = re.search(r'.*/(.+?)(\_(\d.*)|).' + extension, source)
-    return result.group(1) if result else None
+    return re.search(f'.*/(.+?)(\_(\d.*)|).{extension}', source).group(1)
 
 
-def prepare_final_ds(source, engine, source_engine, run_name, source_name=None, coverage_config=None):
+def prepare_final_ds(source, engine, source_engine, run_name, source_name=None):
     path = source
     if engine == 's3':
         source = concat_source_list(source, source_engine)
@@ -151,5 +135,5 @@ def prepare_final_ds(source, engine, source_engine, run_name, source_name=None, 
         df, path = read_source(source, engine, source_extension, run_name, source_name)
     else:
         source = concat_source_list(source, source_engine)
-        df, path = read_source(source, engine, None, run_name, source_name,coverage_config)
+        df, path = read_source(source, engine, None, run_name, source_name)
     return df, path

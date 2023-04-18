@@ -1,48 +1,33 @@
+locals {
+  cloudfront_origin_name = "${local.resource_name_prefix}-s3-origin"
+  aws_waf_web_acl_rule = var.cognito_user_pool_id == null ? [
+    {
+      action = {
+        type = "ALLOW"
+      }
+
+      priority = 1
+      type     = "REGULAR"
+    }
+  ] : []
+  aws_cloudfront_distribution = aws_cloudfront_distribution.s3_distribution_oauth.domain_name
+}
+
 resource "aws_cloudfront_origin_access_identity" "data_qa_oai" {
-  comment = "${local.resource_name_prefix}-s3-origin"
+  comment = local.cloudfront_origin_name
 }
 
 resource "aws_cloudfront_origin_access_identity" "never_be_reached" {
   comment = "will-never-be-reached.org"
 }
 
-data "aws_iam_policy_document" "s3_policy_for_cloudfront" {
-  statement {
-    actions   = ["s3:GetObject"]
-    resources = ["${aws_s3_bucket.settings_bucket.arn}/*"]
-
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.data_qa_oai.id}"
-      ]
-    }
-  }
-  statement {
-    actions   = ["s3:ListBucket"]
-    resources = [aws_s3_bucket.settings_bucket.arn]
-
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.data_qa_oai.id}"
-      ]
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "cloudfront_access" {
-  bucket = aws_s3_bucket.settings_bucket.id
-  policy = data.aws_iam_policy_document.s3_policy_for_cloudfront.json
-}
-
-resource "aws_cloudfront_distribution" "s3_distribution_ip" {
+resource "aws_cloudfront_distribution" "s3_distribution_oauth" {
   origin {
-    domain_name = aws_s3_bucket.settings_bucket.bucket_regional_domain_name
-    origin_id   = local.resource_name_prefix
+    domain_name = aws_s3_bucket.fast_data_qa.bucket_regional_domain_name
+    origin_id   = aws_cloudfront_origin_access_identity.data_qa_oai.id
 
     s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.data_qa_oai.cloudfront_access_identity_path
+      origin_access_identity = "origin-access-identity/cloudfront/${aws_cloudfront_origin_access_identity.data_qa_oai.id}"
     }
   }
 
@@ -87,10 +72,10 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
     path_pattern     = "/profiling/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD", "OPTIONS"]
-    target_origin_id = local.resource_name_prefix
+    target_origin_id = aws_cloudfront_origin_access_identity.data_qa_oai.id
 
     forwarded_values {
-      query_string = false
+      query_string = true
       headers      = ["Origin"]
 
       cookies {
@@ -103,17 +88,18 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
     max_ttl                = 31536000
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
+
   }
 
-  # Cache behavior with precedence 1
+  # # Cache behavior with precedence 1
   ordered_cache_behavior {
     path_pattern     = "/allure/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.resource_name_prefix
+    target_origin_id = aws_cloudfront_origin_access_identity.data_qa_oai.id
 
     forwarded_values {
-      query_string = false
+      query_string = true
 
       cookies {
         forward = "none"
@@ -125,18 +111,41 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
     max_ttl                = 86400
     compress               = true
     viewer_protocol_policy = "redirect-to-https"
+
   }
 
-  # Cache behavior with precedence 2
+  # # Cache behavior with precedence 2
   ordered_cache_behavior {
     path_pattern     = "/data_docs/*"
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]
     cached_methods   = ["GET", "HEAD"]
-    target_origin_id = local.resource_name_prefix
+    target_origin_id = aws_cloudfront_origin_access_identity.data_qa_oai.id
 
     forwarded_values {
-      query_string = false
+      query_string = true
 
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+
+  }
+
+  # # Cache behavior with precedence 3
+  ordered_cache_behavior {
+    path_pattern     = "/parseauth"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "dummy-origin"
+
+    forwarded_values {
+      query_string = true
       cookies {
         forward = "none"
       }
@@ -149,63 +158,88 @@ resource "aws_cloudfront_distribution" "s3_distribution_ip" {
     viewer_protocol_policy = "redirect-to-https"
   }
 
+  # # Cache behavior with precedence 4
+  ordered_cache_behavior {
+    path_pattern     = "/refreshauth"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "dummy-origin"
+
+    forwarded_values {
+      query_string = true
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
+  # # Cache behavior with precedence 5
+
+  ordered_cache_behavior {
+    path_pattern     = "/signout"
+    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = "dummy-origin"
+
+    forwarded_values {
+      query_string = true
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+    compress               = true
+    viewer_protocol_policy = "redirect-to-https"
+  }
   price_class = "PriceClass_200"
 
   restrictions {
     geo_restriction {
       restriction_type = "none"
-      locations        = []
     }
   }
+
+  tags = var.tags
 
   viewer_certificate {
     cloudfront_default_certificate = true
   }
-
-  web_acl_id = var.web_acl_id
 }
 
-#resource "aws_wafv2_ip_set" "vpn_ipset" {
-#  name               = "${local.resource_name_prefix}-ip-set"
-#  description        = "VPN IP set"
-#  scope              = "CLOUDFRONT"
-#  ip_address_version = "IPV4"
-#
-#  addresses = var.cloudfront_allowed_subnets
-#}
-#
-#resource "aws_wafv2_web_acl" "waf_acl" {
-#  name  = "${local.resource_name_prefix}-web-acl"
-#  scope = "CLOUDFRONT"
-#
-#  default_action {
-#    block {}
-#  }
-#
-#  rule {
-#    name     = "tfWAFVpnRule"
-#    priority = 1
-#
-#    action {
-#      allow {}
-#    }
-#
-#    statement {
-#      ip_set_reference_statement {
-#        arn = aws_wafv2_ip_set.vpn_ipset.arn
-#      }
-#    }
-#
-#    visibility_config {
-#      cloudwatch_metrics_enabled = false
-#      metric_name                = "${local.cloudwatch_prefix}WafVpnIPRule"
-#      sampled_requests_enabled   = false
-#    }
-#  }
-#
-#  visibility_config {
-#    cloudwatch_metrics_enabled = false
-#    metric_name                = "${local.cloudwatch_prefix}WafAcl"
-#    sampled_requests_enabled   = false
-#  }
-#}
+data "aws_iam_policy_document" "s3_policy_for_cloudfront" {
+  statement {
+    actions   = ["s3:GetObject"]
+    resources = ["${aws_s3_bucket.fast_data_qa.arn}/*"]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.data_qa_oai.id}"
+      ]
+    }
+  }
+  statement {
+    actions   = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.fast_data_qa.arn]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${aws_cloudfront_origin_access_identity.data_qa_oai.id}"
+      ]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "cloudfront_access" {
+  bucket = aws_s3_bucket.fast_data_qa.id
+  policy = data.aws_iam_policy_document.s3_policy_for_cloudfront.json
+}

@@ -1,46 +1,36 @@
-resource "aws_sns_topic" "notifications" {
-  count = var.create_cloudwatch_notifications_topic ? 1 : 0
 
-  name         = "${local.resource_name_prefix}-DataQA-Notifications"
-  display_name = "DataQA-Notifications"
+resource "aws_ssm_parameter" "data_qa_cloudfront" {
+  data_type   = "text"
+  description = "domain for cloudfront"
+  name        = "/${local.resource_name_prefix}/data-qa/cloudfront"
+  type        = "String"
+  value       = local.aws_cloudfront_distribution
 }
 
-resource "aws_sns_topic_policy" "notification" {
-  count = var.create_cloudwatch_notifications_topic ? 1 : 0
-
-  arn    = aws_sns_topic.notifications[0].arn
-  policy = data.aws_iam_policy_document.slack_notification_sns[0].json
+resource "aws_ssm_parameter" "data_qa_datasource_bucket" {
+  data_type = "text"
+  name      = "/${local.resource_name_prefix}/data-qa/datasource-bucket"
+  type      = "String"
+  value     = aws_s3_bucket.fast_data_qa.bucket
 }
 
-data "aws_iam_policy_document" "slack_notification_sns" {
-  count = var.create_cloudwatch_notifications_topic ? 1 : 0
+resource "aws_ssm_parameter" "data_qa_datasource_folder" {
+  data_type = "text"
+  name      = "/${local.resource_name_prefix}/data-qa/datasource-folder"
+  type      = "String"
+  value     = "data"
+}
 
-  policy_id = "${local.resource_name_prefix}-notification-sns"
+resource "aws_ssm_parameter" "data_qa_dynamo_table" {
+  data_type = "text"
+  name      = "/${local.resource_name_prefix}/data-qa/dynamo-table"
+  type      = "String"
+  value     = "${local.resource_name_prefix}-dataqareport"
+}
 
-  statement {
-    sid = "SlackNotificationSNS"
-
-    actions = [
-      "SNS:Subscribe",
-      "SNS:SetTopicAttributes",
-      "SNS:RemovePermission",
-      "SNS:Receive",
-      "SNS:Publish",
-      "SNS:ListSubscriptionsByTopic",
-      "SNS:GetTopicAttributes",
-      "SNS:DeleteTopic",
-      "SNS:AddPermission",
-    ]
-
-    effect = "Allow"
-
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-
-    resources = [
-      aws_sns_topic.notifications[0].arn,
-    ]
-  }
+resource "aws_ssm_parameter" "data_qa_qa_bucket" {
+  data_type = "text"
+  name      = "/${local.resource_name_prefix}/data-qa/qa-bucket"
+  type      = "String"
+  value     = aws_s3_bucket.fast_data_qa.bucket
 }
