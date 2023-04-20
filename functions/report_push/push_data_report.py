@@ -15,13 +15,16 @@ from jira_events import auth_in_jira, get_all_issues, open_bug
 cloudwatch = boto3.client('cloudwatch')
 s3 = boto3.resource('s3')
 sns = boto3.client('sns')
+
 dynamodb = boto3.resource('dynamodb')
 dynamo_table_name = os.environ['QA_DYNAMODB_TABLE']
 table = dynamodb.Table(dynamo_table_name)
 qa_bucket = os.environ['QA_BUCKET']
 environment = os.environ['ENVIRONMENT']
-sns_topic = os.environ['SNS_TOPIC']
+sns_bugs_topic = os.environ.get('SNS_BUGS_TOPIC_ARN', None)
 autobug = False
+
+
 def handler(event, context):
     replaced_allure_links = event['links'].get('Payload')
     report = event['report'].get('Payload')
@@ -83,7 +86,7 @@ def handler(event, context):
         jira_project_key = os.environ['JIRA_PROJECT_KEY']
         auth_in_jira()
         created_bug_count, bug_name = create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite,
-                                                                jira_project_key)
+                                                                          jira_project_key)
         cloudwatch.put_metric_data(
             Namespace='Data-QA',
             MetricData=[
@@ -105,17 +108,18 @@ def handler(event, context):
             ]
         )
         if not bug_name:
-            sns_message = {
-                "table": suite,
-                "pipeline_step": run_name,
-                "source_name": file,
-                "new_bugs": bug_name,
-                "new_bugs_count": created_bug_count,
-                "allure_report":  f"https://{replaced_allure_links}"
-            }
-            sns.publish(TopicArn=sns_topic,
-            Message=json.dumps(sns_message),
-            MessageStructure='json',)
+            if sns_bugs_topic:
+                sns_message = {
+                    "table": suite,
+                    "pipeline_step": run_name,
+                    "source_name": file,
+                    "new_bugs": bug_name,
+                    "new_bugs_count": created_bug_count,
+                    "allure_report":  f"https://{replaced_allure_links}"
+                }
+                sns.publish(TopicArn=sns_bugs_topic,
+                            Message=json.dumps(sns_message),
+                            MessageStructure='json',)
 
     else:
         cloudwatch.put_metric_data(
@@ -138,18 +142,19 @@ def handler(event, context):
                 },
             ]
         )
-        sns_message = {
-            "table": suite,
-            "pipeline_step": run_name,
-            "source_name": file,
-            "all": total,
-            "failed": failed,
-            "passed": passed,
-            "allure_report": f"https://{replaced_allure_links}"
-        }
-        sns.publish(TopicArn=sns_topic,
-                    Message=json.dumps(sns_message),
-                    MessageStructure='json', )
+        if sns_bugs_topic:
+            sns_message = {
+                "table": suite,
+                "pipeline_step": run_name,
+                "source_name": file,
+                "all": total,
+                "failed": failed,
+                "passed": passed,
+                "allure_report": f"https://{replaced_allure_links}"
+            }
+            sns.publish(TopicArn=sns_bugs_topic,
+                        Message=json.dumps(sns_message),
+                        MessageStructure='json', )
     report = {
         "failed_test_count": failed,
     }
@@ -160,7 +165,8 @@ def handler(event, context):
 def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite, jira_project_key):
     created_bug_count = 0
     bug_name = []
-    all_result_files = bucket.objects.filter(Prefix=f"allure/{suite}/{key}/result/")
+    all_result_files = bucket.objects.filter(
+        Prefix=f"allure/{suite}/{key}/result/")
     issues = get_all_issues(jira_project_key)
     for result_file_name in all_result_files:
         if result_file_name.key.endswith('result.json'):

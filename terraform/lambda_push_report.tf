@@ -8,7 +8,7 @@ module "lambda_function_push_report" {
   attach_policy = true
   policy        = aws_iam_policy.basic_lambda_policy.arn
 
-  environment_variables = {
+  environment_variables = merge({
     QA_BUCKET         = aws_s3_bucket.settings_bucket.bucket
     QA_CLOUDFRONT     = local.aws_cloudfront_distribution
     QA_DYNAMODB_TABLE = aws_dynamodb_table.data_qa_report.name
@@ -16,7 +16,9 @@ module "lambda_function_push_report" {
     JIRA_URL          = var.lambda_push_jira_url
     SECRET_NAME       = var.lambda_push_secret_name
     REGION_NAME       = data.aws_region.current.name
-  }
+    },
+    try(module.data_reports_alerting[0].sns_topic_arn, { SNS_BUGS_TOPIC_ARN = module.data_reports_alerting[0].sns_topic_arn }, {})
+  )
 
   image_uri                      = var.push_report_image_uri
   package_type                   = "Image"

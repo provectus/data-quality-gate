@@ -5,21 +5,26 @@ module "athena-connector" {
   resource_name_prefix = local.resource_name_prefix
 }
 
-module "slack_notifier" {
-  count  = var.slack_settings == null ? 0 : 1
-  source = "./modules/slack-notification"
+module "basic_slack_alerting" {
+  count  = var.basic_alert_notification_settings == null ? 0 : 1
+  source = "./modules/alerting"
 
-  image_uri = var.slack_settings.image_uri
+  slack_channel     = var.basic_alert_notification_settings.channel
+  slack_webhook_url = var.basic_alert_notification_settings.webhook_url
 
-  lambda_env_variables = {
-    SLACK_WEBHOOK_URL = var.slack_settings.webhook_url
-    SLACK_CHANNEL     = var.slack_settings.channel
-    SLACK_USERNAME    = var.slack_settings.username
-  }
+  slack_sns_topic_name = "dqg-basic_alerting"
+  slack_username       = "DQG-alerting"
 
-  primary_aws_region = data.aws_region.current.name
-  sns_topic_arn      = local.sns_topic_notifications_arn
-  subnet_ids         = var.vpc_subnet_ids
+  step_functions_to_monitor = ["${local.resource_name_prefix}-fast-data-qa"]
+}
 
-  vpc_id = var.slack_settings.vpc_id
+module "data_reports_alerting" {
+  count  = var.data_reports_notification_settings == null ? 0 : 1
+  source = "./modules/alerting"
+
+  slack_channel     = var.data_reports_notification_settings.channel
+  slack_webhook_url = var.data_reports_notification_settings.webhook_url
+
+  slack_sns_topic_name = "dqg-data_reports"
+  slack_username       = "DQG-alerting"
 }
