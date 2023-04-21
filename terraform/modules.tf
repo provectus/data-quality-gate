@@ -3,6 +3,8 @@ module "athena-connector" {
 
   primary_aws_region   = data.aws_region.current.name
   resource_name_prefix = local.resource_name_prefix
+
+  athena_dynamodb_connector_name = "DQG-dynamodb-connector-${var.environment}"
 }
 
 module "basic_slack_alerting" {
