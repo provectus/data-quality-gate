@@ -153,7 +153,7 @@ def handler(event, context):
                 "allure_report": f"https://{replaced_allure_links}"
             }
             sns.publish(TopicArn=sns_bugs_topic,
-                        Message=json.dumps(sns_message),
+                        Message=json.dumps({"default": json.dumps(sns_message)}),
                         MessageStructure='json', )
     report = {
         "failed_test_count": failed,
