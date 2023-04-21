@@ -5,7 +5,9 @@ on:
       applyTerraform:
         description: 'Do you want to apply the infra-repo terraform? Possible values [plan/apply].'
         required: true
-        default: 'plan'
+        options:
+          - plan
+          - apply
       Branch:
         description: 'Branch name on which jobs will be executed'
         required: true
@@ -22,6 +24,9 @@ jobs:
   terraform:
     name: setup-envs
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_slack_channel: ${{ secrets.TF_VAR_SLACK_CHANNEL }}
+      TF_VAR_slack_webhook_url: ${{ secrets.TF_VAR_SLACK_WEBHOOK_URL }}
     steps:
       - name: checkout
         uses: actions/checkout@v3
@@ -59,6 +64,7 @@ jobs:
         run: |
           cd $TF_DIR
           terraform plan -target=module.${{ github.event.inputs.TerraformTarget }} -input=false
+        with:
 
       - name: Terraform apply
         id: apply
