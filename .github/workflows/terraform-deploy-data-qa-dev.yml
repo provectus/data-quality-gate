@@ -3,7 +3,8 @@ on:
   workflow_dispatch:
     inputs:
       applyTerraform:
-        description: 'Do you want to apply the infra-repo terraform? Possible values [plan/apply].'
+        type: choice
+        description: 'Do you want to apply the infra-repo terraform?'
         required: true
         options:
           - plan
@@ -64,7 +65,6 @@ jobs:
         run: |
           cd $TF_DIR
           terraform plan -target=module.${{ github.event.inputs.TerraformTarget }} -input=false
-        with:
 
       - name: Terraform apply
         id: apply
