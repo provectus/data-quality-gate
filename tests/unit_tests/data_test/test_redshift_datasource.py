@@ -30,12 +30,9 @@ class TestRedshiftDataSource:
       assert source == "s3://dataqa/titanic.parquet"
 
 
-
     def test_unload_final_df(self, upload_files):
       with patch('awswrangler.redshift.connect') as mock_connect:
           mock_con = mock_connect.return_value.__enter__.return_value
           mock_con.cursor.return_value.fetchall.return_value = [(1, 2), (3, 4)]
-
           final_df = RedshiftDataSource("dataqa","test_", "titanic.parquet","coverage.json").unload_final_df('SELECT * FROM mytable', mock_con, 's3://dataqa/')
-
           assert final_df.shape == (3, 2)
