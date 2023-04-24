@@ -96,26 +96,25 @@ class RedshiftDataSource(DataSource):
                     min_key = final_df[sort_key].min()[0]
                     max_key = final_df[sort_key].max()[0]
                 sql_query = f"SELECT * FROM public.{self.table_name} WHERE {sort_key[0]} between \\'{min_key}\\' and \\'{max_key}\\'"
-                final_df = wr.redshift.unload(
-                    sql=sql_query,
-                    con=con,
-                    source=f"s3://{self.qa_bucket_name}/redshift/{self.table_name}/"
-                )
-                con.close()
             else:
                 key = final_df[sort_key].values[0]
                 if type(key) != str:
                     key = str(key[0])
                 sql_query = f"SELECT * FROM {table_name}.{table_name} WHERE {sort_key[0]}=\\'{key}\\'"
-                final_df = wr.redshift.unload(
-                    sql=sql_query,
-                    con=con,
-                    source=f"s3://{self.qa_bucket_name}/redshift/{self.table_name}/"
-                )
-                con.close()
-
+            path = f"s3://{self.qa_bucket_name}/redshift/{self.table_name}/"
+            final_df = self.unload_final_df(sql_query, con, path)
         return final_df, source
 
+    def unload_final_df(self, sql_query, con, path):
+        try: 
+            final_df = wr.redshift.unload(
+                sql=sql_query,
+                con=con,
+                path=path
+            )
+        finally:
+            con.close()
+        return final_df
 
 class HudiDataSource(DataSource):
     def __init__(self, qa_bucket_name, run_name, table_name):
