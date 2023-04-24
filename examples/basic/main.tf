@@ -33,6 +33,11 @@ module "data_qa" {
   push_report_image_uri   = module.docker_image_push_report.image_uri
 
   web_acl_id = "arn:aws:wafv2:us-east-1:024975173233:global/webacl/demo-provectus-web-acl/c4517afa-629f-41ab-a4b9-a9645eb9b8dc"
+
+  data_reports_notification_settings = {
+    channel     = var.slack_channel
+    webhook_url = var.slack_webhook_url
+  }
 }
 
 module "data_qa_intg" {
@@ -48,4 +53,9 @@ module "data_qa_intg" {
   push_report_image_uri   = module.docker_image_push_report.image_uri
 
   web_acl_id = "arn:aws:wafv2:us-east-1:024975173233:global/webacl/demo-provectus-web-acl/c4517afa-629f-41ab-a4b9-a9645eb9b8dc"
+
+  data_reports_notification_settings = {
+    channel     = var.slack_channel
+    webhook_url = var.slack_webhook_url
+  }
 }

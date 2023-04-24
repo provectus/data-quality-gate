@@ -17,19 +17,6 @@ variable "environment" {
   default     = "data-qa-dev"
 }
 
-variable "slack_settings" {
-  description = "Slack notifications settings. If null - slack notifications will be disabled"
-  type = object({
-    webhook_url = string
-    channel     = string
-    username    = string
-    image_uri   = string
-    vpc_id      = string
-  })
-
-  default = null
-}
-
 variable "data_test_storage_bucket_name" {
   description = "Bucket name which will be used to store data tests and settings for it's execution"
   type        = string
@@ -212,14 +199,8 @@ variable "push_report_image_uri" {
   type        = string
 }
 
-#Cloudwatch
-variable "create_cloudwatch_notifications_topic" {
-  description = "Should sns topic for cloudwatch alerts be created"
-  type        = bool
-  default     = true
-}
-variable "sns_cloudwatch_notifications_topic_arn" {
-  description = "SNS topic to send cloudwatch events"
+variable "lambda_alerts_sns_topic_arn" {
+  description = "SNS topic used to to publish cloudwatch alerts"
   type        = string
   default     = null
 }
@@ -240,4 +221,24 @@ variable "vpc_security_group_ids" {
 variable "web_acl_id" {
   type    = string
   default = "arn:aws:wafv2:us-east-1:024975173233:global/webacl/demo-provectus-web-acl/c4517afa-629f-41ab-a4b9-a9645eb9b8dc"
+}
+
+variable "basic_alert_notification_settings" {
+  description = "Base alert notifications settings. If empty - basic alerts will be disabled"
+  type = object({
+    channel     = string
+    webhook_url = string
+  })
+
+  default = null
+}
+
+variable "data_reports_notification_settings" {
+  description = "Data reports notifications settings. If empty - notifications will be disabled"
+  type = object({
+    channel     = string
+    webhook_url = string
+  })
+
+  default = null
 }
