@@ -50,6 +50,9 @@ def handler(event, context):
     passed = history['data']['0']['passed']
     if failed != 0:
         status = 'failed'
+        report = {
+            "failed_test_count": failed,
+        }
     else:
         status = 'passed'
     local_item = {
@@ -155,9 +158,6 @@ def handler(event, context):
             sns.publish(TopicArn=sns_bugs_topic,
                         Message=json.dumps({"default": json.dumps(sns_message)}),
                         MessageStructure='json', )
-    report = {
-        "failed_test_count": failed,
-    }
 
     return report
 

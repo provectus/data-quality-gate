@@ -1,0 +1,1 @@
+{ "id": 8024, "Cabin": "Q56", "entityDiff": { "id": 2220, "name": "Kelly, Mr. James", "tripStartDate": "2022-05-09", "tripEndDate": "2023-04-21", "SibSp": 50, "Ticket": "2657", "Parch": null }, "Fare": "MOD", "Cabin": 0, "authorType": "ADMIN", "dateTime": "2023-04-22T00:01:49.039" }
