@@ -30,3 +30,14 @@ module "data_reports_alerting" {
   slack_sns_topic_name = "dqg-data_reports"
   slack_username       = "DQG-alerting"
 }
+
+module "vpc" {
+  count  = var.vpc_to_create == null ? 0 : 1
+  source = "./modules/vpc"
+
+  qualifier = "shared"
+
+  cidr                 = var.vpc_to_create.cidr
+  private_subnets_cidr = var.vpc_to_create.private_subnets_cidr
+  azs                  = data.aws_availability_zones.available.zone_ids
+}
