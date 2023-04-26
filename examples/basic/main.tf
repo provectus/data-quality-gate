@@ -33,6 +33,9 @@ module "data_qa" {
   push_report_image_uri   = module.docker_image_push_report.image_uri
 
   web_acl_id = "arn:aws:wafv2:us-east-1:024975173233:global/webacl/demo-provectus-web-acl/c4517afa-629f-41ab-a4b9-a9645eb9b8dc"
+
+  vpc_subnet_ids         = ["subnet-034f0eb6c64a19cb3"]
+  vpc_security_group_ids = ["sg-01e57996f17b73938"]
 }
 
 module "data_qa_intg" {
