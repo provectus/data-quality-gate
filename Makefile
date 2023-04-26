@@ -31,11 +31,15 @@ run-integration-tests: build-data-test-img build-data-test-tests-img
 prepare-unit-tests:
 	cd ./functions/data_test && \
 	pip install -r requirements.txt && \
-	pip install pytest==7.2.1 
+	pip install pytest==7.2.1 && \
+	pip install moto==4.1.6
 
 run-unit-tests:
 	export ENVIRONMENT='local' && \
 	export S3_HOST='localhost' && \
 	export QA_BUCKET='test-bucket' && \
+	export AWS_DEFAULT_REGION='us-east-1' && \
+	export REDSHIFT_DB='titanic' && \
+	export REDSHIFT_SECRET='titanic' && \
 	cd ./functions/data_test && \
 	python -m pytest ../../tests/unit_tests/data_test/ -v
