@@ -18,6 +18,8 @@ module "basic_slack_alerting" {
   slack_username       = "DQG-alerting"
 
   step_functions_to_monitor = ["${local.resource_name_prefix}-fast-data-qa"]
+
+  resource_name_prefix = local.resource_name_prefix
 }
 
 module "data_reports_alerting" {
@@ -29,4 +31,6 @@ module "data_reports_alerting" {
 
   slack_sns_topic_name = "dqg-data_reports"
   slack_username       = "DQG-alerting"
+
+  resource_name_prefix = local.resource_name_prefix
 }
