@@ -1,1 +1,74 @@
-{ "title": "Passengers", "fields": [ { "id": "passengersNumber", "type": "passengers_number", "name": "Passengers #" }, { "id": "Survived", "type": "bool", "name": "Survived" }, { "id": "Pclass", "type": "int", "name": "Pclass" }, { "id": "Name", "type": "list", "name": "Name of passengers" }, { "id": "Sex", "type": "str", "name": "Sex" } ], "Passengers": [ { "id": "1434", "PassengersNumber": "1891", "Survived": "0", "Pclass": 3, "Name": "Kelly, Mr. James", "sex": "male" }, { "id": "1434", "PassengersNumber": "1891", "Survived": "0", "Pclass": 1, "Name": "Wilkes, Mrs. James (Ellen Needs)", "sex": "female" }, { "id": "1434", "PassengersNumber": "1891", "Survived": "0", "Pclass": 2, "Name": "Myles, Mr. Thomas Francis", "sex": "male" }, { "id": "1434", "PassengersNumber": "1891", "Survived": "0", "Pclass": 3, "Name": "Wirz, Mr. Albert", "sex": "male" } ]}
+[
+  {
+    "entity": {
+      "PassengerId": 3040,
+      "Name": "Kelly, Mr. James",
+      "startDate": "2023-02-12",
+      "endDate": "2023-02-28",
+      "Survived": 0,
+      "Pclass": 3,
+      "Sex": "male",
+      "Age": 34.5,
+      "SibSp": 0,
+      "Parch": 0,
+      "Ticket": "330911",
+      "Fare": 7.8292,
+      "Cabin": null,
+      "Embarked": "Q"
+    },
+    "revisionType": "ADD",
+    "authorId": 1413,
+    "authorType": "EMPLOYEE",
+    "dateTime": "2023-03-02T07:36:10.738Z",
+    "revisionId": 7652,
+    "timestamp": 1677742570738
+  },
+  {
+    "entity": {
+      "PassengerId": 3041,
+      "Name": "Wilkes, Mrs. James (Ellen Needs)",
+      "startDate": "2023-02-12",
+      "endDate": "2023-02-28",
+      "Survived": 0,
+      "Pclass": 3,
+      "Sex": "male",
+      "Age": 54.5,
+      "SibSp": 0,
+      "Parch": 0,
+      "Ticket": "363272",
+      "Fare": 4.343,
+      "Cabin": null,
+      "Embarked": "Q"
+    },
+    "revisionType": "ADD",
+    "authorId": 1413,
+    "authorType": "EMPLOYEE",
+    "dateTime": "2023-03-02T07:36:10.738Z",
+    "revisionId": 7652,
+    "timestamp": 1677742570738
+  },
+  {
+    "entity": {
+      "PassengerId": 3042,
+      "Name": "Myles, Mr. Thomas Francis",
+      "startDate": "2023-02-12",
+      "endDate": "2023-02-28",
+      "Survived": 0,
+      "Pclass": 1,
+      "Sex": "male",
+      "Age": 51.1,
+      "SibSp": 0,
+      "Parch": 0,
+      "Ticket": "363272",
+      "Fare": 4.343,
+      "Cabin": null,
+      "Embarked": "Q"
+    },
+    "revisionType": "ADD",
+    "authorId": 1413,
+    "authorType": "EMPLOYEE",
+    "dateTime": "2023-03-02T07:36:10.738Z",
+    "revisionId": 7652,
+    "timestamp": 1677742570738
+  }
+]
