@@ -22,3 +22,8 @@ variable "datapoints_to_alarm" {
   default     = 1
   description = "The number of datapoints that must be breaching to trigger the alarm."
 }
+
+variable "resource_name_prefix" {
+  description = "Resource name prefix used to generate resources"
+  type        = string
+}

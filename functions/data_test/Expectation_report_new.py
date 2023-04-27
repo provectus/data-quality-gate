@@ -1,3 +1,4 @@
+import itertools
 from typing import Any, Optional
 
 import pandas as pd
@@ -10,6 +11,8 @@ from pandas_profiling.model import expectation_algorithms
 from pandas_profiling.model.handler import Handler
 from pandas_profiling.utils.dataframe import slugify
 import re
+
+
 class ExpectationsReportNew:
     config: Settings
     df: Optional[pd.DataFrame] = None
@@ -77,7 +80,8 @@ class ExpectationsReportNew:
         if reuse_suite:
             if use_old_suite:
                 suite_old = data_context.get_expectation_suite(f"{suite_name}_{old_suite_name}")
-                data_context.save_expectation_suite(expectation_suite=suite_old, expectation_suite_name=f"{suite_name}_{run_name}",
+                data_context.save_expectation_suite(expectation_suite=suite_old,
+                                                    expectation_suite_name=f"{suite_name}_{run_name}",
                                                     overwrite_existing=True)
             else:
                 schema_list = list(mapping_schema.keys())
@@ -106,7 +110,7 @@ class ExpectationsReportNew:
                                     match_type="runtime",
                                 )
                     schema_values = list(mapping_schema.values())
-                    for key, v in zip(schema_list, schema_values):
+                    for key, v in list(itertools.zip_longest(schema_list, schema_values)):
                         exp_conf = []
                         exp_conf.append(suite_old.get_grouped_and_ordered_expectations_by_column()[0][key])
                         for exps in exp_conf:
@@ -127,7 +131,8 @@ class ExpectationsReportNew:
                                         value=v,
                                         match_type="runtime",
                                     )
-                    data_context.save_expectation_suite(expectation_suite=suite_old, expectation_suite_name=f"{suite_name}_{run_name}",
+                    data_context.save_expectation_suite(expectation_suite=suite_old,
+                                                        expectation_suite_name=f"{suite_name}_{run_name}",
                                                         overwrite_existing=True)
 
                     if new_column_in_mapping:
@@ -138,7 +143,8 @@ class ExpectationsReportNew:
                             if name in list(new_column_in_mapping.values()):
                                 handler.handle(variable_summary["type"], name, variable_summary, batch)
                         suite = batch.get_expectation_suite(discard_failed_expectations=False)
-                        data_context.save_expectation_suite(expectation_suite=suite, expectation_suite_name=f"{suite_name}_{run_name}",
+                        data_context.save_expectation_suite(expectation_suite=suite,
+                                                            expectation_suite_name=f"{suite_name}_{run_name}",
                                                             overwrite_existing=True)
 
                 else:  # if we have nested tables
@@ -184,7 +190,8 @@ class ExpectationsReportNew:
                             exp_conf.append(suite_old.get_grouped_and_ordered_expectations_by_column()[0][key])
                             for exps in exp_conf:
                                 for exp in exps:
-                                    if (exp["expectation_type"] == "expect_table_columns_to_match_set" or exp["expectation_type"] == "expect_table_row_count_to_equal"):
+                                    if (exp["expectation_type"] == "expect_table_columns_to_match_set" or exp[
+                                        "expectation_type"] == "expect_table_row_count_to_equal"):
                                         suite_old.remove_expectation(
                                             exp,
                                             match_type="runtime",
@@ -240,13 +247,8 @@ class ExpectationsReportNew:
                 f"{suite_name}_{run_name}", overwrite_existing=True,
             )
 
-
-
-
-
             # Instantiate an in-memory pandas dataset
             batch = ge.dataset.PandasDataset(self.df, expectation_suite=suite)
-
 
             # Obtain the profiling summary
             summary = self.get_description()  # type: ignore

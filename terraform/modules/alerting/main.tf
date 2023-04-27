@@ -20,7 +20,7 @@ module "slack_notification" {
   kms_key_arn = aws_kms_key.slack.arn
   log_events  = true
 
-  lambda_function_name = var.slack_channel
+  lambda_function_name = "${var.resource_name_prefix}-${var.slack_channel}"
 }
 
 resource "aws_cloudwatch_metric_alarm" "alarm" {
