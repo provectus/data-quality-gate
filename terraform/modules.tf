@@ -34,3 +34,14 @@ module "data_reports_alerting" {
 
   resource_name_prefix = local.resource_name_prefix
 }
+
+module "vpc" {
+  count  = var.vpc_to_create == null ? 0 : 1
+  source = "./modules/vpc"
+
+  resource_name_prefix = local.resource_name_prefix
+
+  cidr                 = var.vpc_to_create.cidr
+  private_subnets_cidr = var.vpc_to_create.private_subnets_cidr
+  azs                  = data.aws_availability_zones.available.zone_ids
+}
