@@ -44,7 +44,7 @@ def expectations_null(name, summary, batch, *args):
 class MyExpectationHandler(Handler):
     def __init__(self, typeset, *args, **kwargs):
         mapping = {
-            "Unsupported": [generic_expectations_without_null, expectations_null,
+            "Unsupported": [expectations_null,
                             ],
             "Categorical": [expectation_algorithms.categorical_expectations,
                             expectations_null,

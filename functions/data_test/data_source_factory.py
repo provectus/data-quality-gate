@@ -37,10 +37,13 @@ class S3DataSource(DataSource):
         elif self.extension == 'parquet':
             return wr.s3.read_parquet(path=source, ignore_index=True), source
         elif self.extension == 'json':
-            return wr.s3.read_json(path=source, lines=True), source
+            try:
+                return wr.s3.read_json(path=source), source
+            except ValueError:
+                return wr.s3.read_json(path=source, lines=True), source
         else:
             return wr.s3.read_parquet(path=source), source
-        
+
 
 class AthenaDataSource(DataSource):
     def __init__(self, qa_bucket_name, table_name):
