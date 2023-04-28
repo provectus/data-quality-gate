@@ -38,7 +38,8 @@ resource "aws_iam_policy" "basic_lambda_policy" {
         {
           "Effect" : "Allow",
           "Action" : [
-            "sns:Subscribe"
+            "sns:Subscribe",
+            "sns:Publish"
           ],
           "Resource" : "*"
         },
@@ -63,7 +64,7 @@ resource "aws_iam_policy" "basic_lambda_policy" {
           "Resource" : [
             "*",
           ]
-        }
+        },
       ]
       Version = "2012-10-17"
     }
