@@ -21,10 +21,13 @@ from great_expectations.data_context.types.base import DataContextConfig, S3Stor
 import yaml
 from great_expectations.data_context import BaseDataContext
 
-
-s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566") if os.environ['ENVIRONMENT'] == 'local' else boto3.resource("s3")
+s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566") if os.environ[
+                                                                                      'ENVIRONMENT'] == 'local' else boto3.resource(
+    "s3")
 
 qa_bucket_name = os.environ['QA_BUCKET']
+
+
 def generic_expectations_without_null(name, summary, batch, *args):
     batch.expect_column_to_exist(column=name)
     if summary["p_unique"] >= 0.9:
@@ -41,7 +44,7 @@ def expectations_null(name, summary, batch, *args):
 class MyExpectationHandler(Handler):
     def __init__(self, typeset, *args, **kwargs):
         mapping = {
-            "Unsupported": [expectations_null,
+            "Unsupported": [generic_expectations_without_null, expectations_null,
                             ],
             "Categorical": [expectation_algorithms.categorical_expectations,
                             expectations_null,
@@ -70,7 +73,6 @@ def change_ge_config(datasource_root):
 
     configfile_raw = context_ge.get_config().to_yaml_str()
     configfile = yaml.safe_load(configfile_raw)
-
 
     datasources = {
         "pandas_s3": {
@@ -149,6 +151,7 @@ def remove_suffix(input_string, suffix):
         return input_string[:-len(suffix)]
     return input_string
 
+
 def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, mapping_config, run_name):
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)
@@ -173,8 +176,8 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, ma
         ExpectationsReport.to_expectation_suite = ExpectationsReportNew.to_expectation_suite
         suite = profile.to_expectation_suite(
             data_context=context_ge,
-            suite_name=remove_suffix(suite_name,f"_{run_name}"),
-            run_name = run_name,
+            suite_name=remove_suffix(suite_name, f"_{run_name}"),
+            run_name=run_name,
             save_suite=True,
             run_validation=False,
             build_data_docs=False,
@@ -188,7 +191,7 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, ma
     now = datetime.now()
     date_time = now.strftime("%y%m%dT%H%M%S")
     folder = f"{folder}{suite_name}/{str(date_time)}/"
-    
+
     qa_bucket.put_object(Key=folder)
     qa_bucket.put_object(Key=f"{folder}{suite_name}_profiling.html", Body=report, ContentType='text/html')
     profile_link = f"{cloudfront}/{folder}{suite_name}_profiling.html"
