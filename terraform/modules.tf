@@ -39,7 +39,7 @@ module "vpc" {
   count  = var.vpc_to_create == null ? 0 : 1
   source = "./modules/vpc"
 
-  qualifier = "shared"
+  resource_name_prefix = local.resource_name_prefix
 
   cidr                 = var.vpc_to_create.cidr
   private_subnets_cidr = var.vpc_to_create.private_subnets_cidr

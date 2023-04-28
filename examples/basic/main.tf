@@ -61,4 +61,9 @@ module "data_qa_intg" {
     channel     = var.slack_channel
     webhook_url = var.slack_webhook_url
   }
+
+  vpc_to_create = {
+    cidr = "172.28.0.0/16"
+    private_subnets_cidr = "172.28.0.0/16"
+  }
 }
