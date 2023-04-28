@@ -8,19 +8,6 @@ variable "primary_aws_region" {
   type        = string
 }
 
-variable "tags" {
-  description = "Default tags"
-  type        = map(string)
-
-  default = {}
-}
-
-variable "athena_dynamodb_connector_name" {
-  type        = string
-  default     = "DQG-dynamodb-connector"
-  description = "Name of aws athena data-catalog"
-}
-
 variable "delete_athena_dynamodb_connector" {
   description = "Set to True to delete athena dynamodb connector"
   type        = bool

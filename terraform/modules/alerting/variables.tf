@@ -3,6 +3,11 @@ variable "slack_webhook_url" { type = string }
 variable "slack_channel" { type = string }
 variable "slack_username" { type = string }
 
+variable "resource_name_prefix" {
+  description = "Resource name prefix used to generate resources"
+  type        = string
+}
+
 variable "step_functions_to_monitor" {
   type    = set(string)
   default = []
@@ -23,7 +28,14 @@ variable "datapoints_to_alarm" {
   description = "The number of datapoints that must be breaching to trigger the alarm."
 }
 
-variable "resource_name_prefix" {
-  description = "Resource name prefix used to generate resources"
-  type        = string
+variable "lambda_function_vpc_security_group_ids" {
+  description = "List of security group ids when Lambda Function should run in the VPC."
+  type        = list(string)
+  default     = null
+}
+
+variable "lambda_function_vpc_subnet_ids" {
+  description = "List of subnet ids when Lambda Function should run in the VPC. Usually private or intra subnets."
+  type        = list(string)
+  default     = null
 }

@@ -22,19 +22,6 @@ module "basic_slack_alerting" {
   resource_name_prefix = local.resource_name_prefix
 }
 
-module "data_reports_alerting" {
-  count  = var.data_reports_notification_settings == null ? 0 : 1
-  source = "./modules/alerting"
-
-  slack_channel     = var.data_reports_notification_settings.channel
-  slack_webhook_url = var.data_reports_notification_settings.webhook_url
-
-  slack_sns_topic_name = "dqg-data_reports"
-  slack_username       = "DQG-alerting"
-
-  resource_name_prefix = local.resource_name_prefix
-}
-
 module "vpc" {
   count  = var.vpc_to_create == null ? 0 : 1
   source = "./modules/vpc"

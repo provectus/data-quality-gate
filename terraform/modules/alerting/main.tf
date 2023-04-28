@@ -21,6 +21,9 @@ module "slack_notification" {
   log_events  = true
 
   lambda_function_name = "${var.resource_name_prefix}-${var.slack_channel}"
+
+  lambda_function_vpc_security_group_ids = var.lambda_function_vpc_security_group_ids
+  lambda_function_vpc_subnet_ids         = var.lambda_function_vpc_subnet_ids
 }
 
 resource "aws_cloudwatch_metric_alarm" "alarm" {
