@@ -13,7 +13,7 @@ variable "azs" {
   type        = list(string)
 }
 
-variable "qualifier" {
-  description = "Qualifier used to name resources in specific format"
+variable "resource_name_prefix" {
+  description = "Resource name prefix used to generate resources"
   type        = string
 }

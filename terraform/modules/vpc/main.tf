@@ -1,12 +1,12 @@
 locals {
-  resource_name_prefix = "DQG-${var.qualifier}"
+  resource_name_prefix = "${var.resource_name_prefix}-infra"
 }
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 3.0"
 
-  name = "DQG-${var.qualifier}-vpc"
+  name = "${local.resource_name_prefix}-vpc"
   cidr = var.cidr
 
   azs             = var.azs
