@@ -38,6 +38,9 @@ module "data_qa" {
     channel     = var.slack_channel
     webhook_url = var.slack_webhook_url
   }
+
+  vpc_subnet_ids         = ["subnet-034f0eb6c64a19cb3"]
+  vpc_security_group_ids = ["sg-01e57996f17b73938"]
 }
 
 module "data_qa_intg" {
@@ -57,5 +60,10 @@ module "data_qa_intg" {
   data_reports_notification_settings = {
     channel     = var.slack_channel
     webhook_url = var.slack_webhook_url
+  }
+
+  vpc_to_create = {
+    cidr = "172.28.0.0/16"
+    private_subnets_cidr = ["172.28.16.0/20"]
   }
 }
