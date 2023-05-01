@@ -4,9 +4,7 @@ import os
 import boto3
 import awswrangler as wr
 import json
-from datasource import prepare_final_ds
-from datasource import get_source_name
-from datasource import get_file_extension
+from datasource import prepare_final_ds, get_source_name, get_file_extension
 
 
 def handler(event, context):

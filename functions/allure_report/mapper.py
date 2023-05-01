@@ -1,16 +1,12 @@
 import json
 import os
 from datetime import datetime
-import glob
 from great_expectations.expectations.expectation import (
     ExpectationConfiguration,
 )
 from great_expectations.expectations.registry import (
     get_expectation_impl)
 import shutil
-import s3fs
-import boto
-import boto.s3
 import awswrangler as wr
 import boto3
 import re
@@ -23,7 +19,8 @@ bucket = s3.Bucket(qa_bucket)
 def get_test_human_name(file):
     exp = get_expectation_impl(get_test_name(file))
     template_json = \
-    exp._prescriptive_renderer(configuration=ExpectationConfiguration(get_test_name(file), kwargs=get_params1(file)))[0]
+        exp._prescriptive_renderer(configuration=ExpectationConfiguration(
+            get_test_name(file), kwargs=get_params1(file)))[0]
     if type(template_json) is not dict:
         template_json = template_json.to_json_dict()
     template_str = template_json['string_template']['template']
@@ -52,7 +49,8 @@ def get_test_human_name(file):
         else:
             params = new_params
     for key, value in params.items():
-        result_string = re.sub(rf'\${key}\b', re.escape(str(value)), result_string)
+        result_string = re.sub(
+            rf'\${key}\b', re.escape(str(value)), result_string)
 
     return result_string
 
@@ -78,7 +76,7 @@ def get_suit_name(file, i):
                                                                                                                  i[
                                                                                                                      "expectation_config"][
                                                                                                                      "kwargs"] else \
-    file["meta"]["batch_kwargs"]["data_asset_name"]
+        file["meta"]["batch_kwargs"]["data_asset_name"]
 
 
 def get_jira_ticket(file):
@@ -141,7 +139,8 @@ def get_test_description(file):
     result = ""
     for f in file["result"]:
         if str(f) != "observed_value":
-            result = result + "\n" + f"{str(f)}: {str(file['result'][f])}" + "\n"
+            result = result + "\n" + \
+                f"{str(f)}: {str(file['result'][f])}" + "\n"
     return result
 
 
@@ -197,15 +196,18 @@ def create_categories_json(json_name, key):
     ]
 
     result = json.dumps(data)
-    s3.Object(qa_bucket, f"allure/{json_name}{key}/result/categories.json").put(Body=bytes(result.encode("UTF-8")))
+    s3.Object(qa_bucket, f"allure/{json_name}{key}/result/categories.json").put(
+        Body=bytes(result.encode("UTF-8")))
 
 
 def get_uuid(i, json_name, key):
     fl = ""
-    objs = list(bucket.objects.filter(Prefix=f"allure/{json_name}{key}/allure-report/history"))
+    objs = list(bucket.objects.filter(
+        Prefix=f"allure/{json_name}{key}/allure-report/history"))
     if (len(objs) > 0):
 
-        df = wr.s3.read_json(path=[f"s3://{qa_bucket}/allure/{json_name}{key}/allure-report/history/history.json"])
+        df = wr.s3.read_json(
+            path=[f"s3://{qa_bucket}/allure/{json_name}{key}/allure-report/history/history.json"])
 
         fl = json.loads(df.to_json())
         keys = list(fl.keys())
@@ -223,6 +225,9 @@ def create_suit_json(json_name, key, validate_id):
     stop_time = get_stop_test_time(file)
     for i in file['results']:
         uuid = str(get_uuid(list(file['results']).index(i), json_name, key))
+        message = (get_observed_value(i)
+                   if get_test_status(i) == 'failed'
+                   else "")
         data = {
             "uuid": uuid,
             "historyId": uuid,
@@ -238,13 +243,13 @@ def create_suit_json(json_name, key, validate_id):
                 {
                     "name": "severity",
                     "value": get_severity(i)
-                }
+            }
             ],
             "links": [get_jira_ticket(i)],
             "name": get_test_name(i),
             "description": get_test_description(i),
             "statusDetails": {"known": False, "muted": False, "flaky": False,
-                              "message": get_observed_value(i) if get_test_status(i) == 'failed' else "",
+                              "message": message,
                               "trace": get_exception_traceback(i)},
             "start": start_time,
             "stop": stop_time,

@@ -16,12 +16,13 @@ def validate_data(file, suite_name, config):
     )
     results = context_ge.run_validation_operator(
         "action_list_operator", assets_to_validate=[batch])
-    validation_result_identifiers = results.list_validation_result_identifiers()
-    validation_result_identifier = validation_result_identifiers[0]
+    identifiers = results.list_validation_result_identifiers()
+    validation_result_identifier = identifiers[0]
     if (not results['success']):
         context_ge.build_data_docs(
             site_names='s3_site',
             resource_identifiers=[validation_result_identifier]
         )
-    result = str(validation_result_identifier).replace('ValidationResultIdentifier::', '') 
+    result = str(validation_result_identifier).replace(
+        'ValidationResultIdentifier::', '')
     return result
