@@ -21,9 +21,7 @@ from great_expectations.data_context.types.base import DataContextConfig, S3Stor
 import yaml
 from great_expectations.data_context import BaseDataContext
 
-s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566") if os.environ[
-                                                                                      'ENVIRONMENT'] == 'local' else boto3.resource(
-    "s3")
+s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566") if os.environ['ENVIRONMENT'] == 'local' else boto3.resource("s3")
 
 qa_bucket_name = os.environ['QA_BUCKET']
 
@@ -48,7 +46,6 @@ class MyExpectationHandler(Handler):
                             ],
             "Categorical": [expectation_algorithms.categorical_expectations,
                             expectations_null,
-
                             ],
             "Boolean": [expectations_null,
                         ],
@@ -73,6 +70,7 @@ def change_ge_config(datasource_root):
 
     configfile_raw = context_ge.get_config().to_yaml_str()
     configfile = yaml.safe_load(configfile_raw)
+
 
     datasources = {
         "pandas_s3": {
