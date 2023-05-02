@@ -206,6 +206,16 @@ variable "lambda_alerts_sns_topic_arn" {
 }
 
 #Lambda
+variable "vpc_to_create" {
+  description = "Configs used to create VPC and endpoints if needed"
+  type = object({
+    cidr                 = string
+    private_subnets_cidr = list(string)
+  })
+
+  default = null
+}
+
 variable "vpc_subnet_ids" {
   description = "List of subnet ids to place lambda in. If null value, default subnet and vpc will be used"
   type        = list(string)
