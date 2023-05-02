@@ -85,6 +85,7 @@ resource "aws_iam_policy" "sns" {
           "Resource" : module.data_reports_alerting[0].sns_topic_arn
         }
       ]
+      Version = "2012-10-17"
     }
   )
 }
