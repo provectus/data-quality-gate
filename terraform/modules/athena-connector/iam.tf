@@ -14,7 +14,7 @@ resource "aws_iam_role" "athena_connector_lambda_role" {
 }
 
 resource "aws_iam_policy" "athena_connector_lambda_policy" {
-  name = "${local.connector_name}-lambda"
+  name = "${var.data_catalog_name}-lambda"
   policy = jsonencode(
     {
       Statement = [

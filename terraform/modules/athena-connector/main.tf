@@ -1,9 +1,5 @@
-locals {
-  connector_name = "${var.resource_name_prefix}-athena-dynamodb-connector"
-}
-
 resource "aws_lambda_function" "athena_dynamodb_connector" {
-  function_name = local.connector_name
+  function_name = var.data_catalog_name
   description   = "Enables Amazon Athena to communicate with DynamoDB, making tables accessible via SQL"
 
   role     = aws_iam_role.athena_connector_lambda_role.arn
@@ -35,7 +31,7 @@ resource "aws_lambda_function" "athena_dynamodb_connector" {
 
 resource "null_resource" "athena_dynamodb_connector" {
   provisioner "local-exec" {
-    command = "aws athena create-data-catalog --name ${local.connector_name} --type LAMBDA --region ${var.primary_aws_region} --parameters function=${aws_lambda_function.athena_dynamodb_connector.arn}"
+    command = "aws athena create-data-catalog --name ${var.data_catalog_name} --type LAMBDA --region ${var.primary_aws_region} --parameters function=${aws_lambda_function.athena_dynamodb_connector.arn}"
   }
 
   depends_on = [aws_lambda_function.athena_dynamodb_connector]
@@ -44,7 +40,7 @@ resource "null_resource" "athena_dynamodb_connector" {
 resource "null_resource" "delete_athena_dynamodb_connector" {
   count = var.delete_athena_dynamodb_connector ? 1 : 0
   provisioner "local-exec" {
-    command = "aws athena delete-data-catalog --name ${local.connector_name} --region ${var.primary_aws_region}"
+    command = "aws athena delete-data-catalog --name ${var.data_catalog_name} --region ${var.primary_aws_region}"
   }
 
   depends_on = [null_resource.athena_dynamodb_connector]

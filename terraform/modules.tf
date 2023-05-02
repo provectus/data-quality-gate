@@ -1,10 +1,9 @@
 module "athena-connector" {
   source = "./modules/athena-connector"
 
-  primary_aws_region   = data.aws_region.current.name
-  resource_name_prefix = local.resource_name_prefix
+  primary_aws_region = data.aws_region.current.name
 
-  athena_dynamodb_connector_name = "DQG-dynamodb-connector-${var.environment}"
+  data_catalog_name = "DQG-dynamodb-connector-${var.environment}"
 }
 
 module "basic_slack_alerting" {

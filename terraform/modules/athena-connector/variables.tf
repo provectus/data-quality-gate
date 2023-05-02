@@ -1,5 +1,5 @@
-variable "resource_name_prefix" {
-  description = "Resource name prefix used to generate resources"
+variable "data_catalog_name" {
+  description = "Name of athena data catalog"
   type        = string
 }
 
