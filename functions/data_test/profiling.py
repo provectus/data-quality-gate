@@ -15,10 +15,11 @@ from great_expectations.data_context.types.base import (DataContextConfig,
 import yaml
 
 
-endpoint_url = f"http://{os.environ['S3_HOST']}:4566"
-s3 = (boto3.resource("s3", endpoint_url=endpoint_url)
-      if os.environ['ENVIRONMENT'] == 'local'
-      else boto3.resource("s3"))
+endpoint_url = f"http://{os.environ['S3_HOST']}:{os.environ['S3_PORT']}"
+if os.environ['ENVIRONMENT'] == 'local':
+    s3 = boto3.resource("s3", endpoint_url=endpoint_url)
+else:
+    s3 = boto3.resource("s3")
 
 qa_bucket_name = os.environ['QA_BUCKET']
 
@@ -129,7 +130,7 @@ def change_ge_config(datasource_root):
 
 
 def add_local_s3_to_stores(stores):
-    boto_options_dic = {'endpoint_url': f"http://{os.environ['S3_HOST']}:4566"}
+    boto_options_dic = {'endpoint_url': endpoint_url}
     for store in stores:
         if stores[store].get('store_backend'):
             stores[store]['store_backend']['boto3_options'] = boto_options_dic
@@ -137,7 +138,7 @@ def add_local_s3_to_stores(stores):
 
 
 def add_local_s3_to_data_docs(data_docs_sites):
-    boto_options_dic = {'endpoint_url': f"http://{os.environ['S3_HOST']}:4566"}
+    boto_options_dic = {'endpoint_url': endpoint_url}
     data_docs_sites['s3_site']['store_backend']['boto3_options'] = boto_options_dic
     return data_docs_sites
 

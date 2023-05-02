@@ -40,4 +40,4 @@ jobs:
           cd ./tests/integration_tests/test_data_tests
           docker build -t integration-tests:latest .
       - name: Run tests
-        run: docker run --env QA_BUCKET=integration-test-bucket --env S3_HOST=172.17.0.1 integration-tests
+        run: docker run --env QA_BUCKET=integration-test-bucket --env S3_HOST=172.17.0.1 --env S3_PORT=4566 integration-tests
