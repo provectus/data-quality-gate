@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "athena_spill_bucket" {
-  bucket = "${var.data_catalog_name}-athena"
+  bucket = replace("${var.data_catalog_name}-athena", "-", "_")
 
   server_side_encryption_configuration {
     rule {
@@ -8,6 +8,7 @@ resource "aws_s3_bucket" "athena_spill_bucket" {
       }
     }
   }
+
 }
 
 resource "aws_s3_bucket_public_access_block" "public_access_block" {
