@@ -92,5 +92,5 @@ resource "aws_iam_policy" "sns" {
 resource "aws_iam_role_policy_attachment" "push_report_sns" {
   count      = length(module.data_reports_alerting) == 1 ? 1 : 0
   role       = module.lambda_push_report.lambda_role_name
-  policy_arn = aws_iam_policy.sns.arn
+  policy_arn = aws_iam_policy.sns[0].arn
 }

@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "athena_spill_bucket" {
-  bucket = "${var.resource_name_prefix}-athena"
+  bucket = "${var.data_catalog_name}-athena"
 
   server_side_encryption_configuration {
     rule {
