@@ -1,21 +1,5 @@
-resource "aws_s3_bucket" "athena_spill_bucket" {
-  bucket = "${var.resource_name_prefix}-athena"
-
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
-      }
-    }
-  }
-
-  versioning {
-    enabled = false
-  }
-}
-
 resource "aws_lambda_function" "athena_dynamodb_connector" {
-  function_name = "${var.resource_name_prefix}_athena_dynamodb_connector"
+  function_name = var.data_catalog_name
   description   = "Enables Amazon Athena to communicate with DynamoDB, making tables accessible via SQL"
 
   role     = aws_iam_role.athena_connector_lambda_role.arn
@@ -45,95 +29,9 @@ resource "aws_lambda_function" "athena_dynamodb_connector" {
   }
 }
 
-resource "aws_iam_role" "athena_connector_lambda_role" {
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Sid    = ""
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-      },
-    ]
-  })
-}
-
-resource "aws_iam_policy" "athena_connector_lambda_policy" {
-  name = "${var.resource_name_prefix}-athena_connector-lambda"
-  policy = jsonencode(
-    {
-      Statement = [
-        {
-          "Effect" : "Allow",
-          "Resource" : "*",
-          "Action" : [
-            "dynamodb:DescribeTable",
-            "dynamodb:ListSchemas",
-            "dynamodb:ListTables",
-            "dynamodb:Query",
-            "dynamodb:Scan",
-            "glue:GetTableVersions",
-            "glue:GetPartitions",
-            "glue:GetTables",
-            "glue:GetTableVersion",
-            "glue:GetDatabases",
-            "glue:GetTable",
-            "glue:GetPartition",
-            "glue:GetDatabase",
-            "athena:GetQueryExecution",
-            "s3:ListAllMyBuckets"
-          ],
-        },
-        {
-          "Effect" : "Allow",
-          "Resource" : "*",
-          "Action" : [
-            "cloudwatch:PutMetricData",
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents",
-            "ec2:CreateNetworkInterface",
-            "ec2:DescribeNetworkInterfaces",
-            "ec2:DeleteNetworkInterface",
-            "ec2:AssignPrivateIpAddresses",
-            "ec2:UnassignPrivateIpAddresses"
-          ]
-        },
-        {
-          "Effect" : "Allow",
-          "Resource" : [
-            aws_s3_bucket.athena_spill_bucket.arn,
-            "${aws_s3_bucket.athena_spill_bucket.arn}/*"
-          ],
-          "Action" : [
-            "s3:GetObject",
-            "s3:ListBucket",
-            "s3:GetBucketLocation",
-            "s3:GetObjectVersion",
-            "s3:PutObject",
-            "s3:PutObjectAcl",
-            "s3:GetLifecycleConfiguration",
-            "s3:PutLifecycleConfiguration",
-            "s3:DeleteObject"
-          ]
-        }
-      ]
-      Version = "2012-10-17"
-    }
-  )
-}
-
-resource "aws_iam_role_policy_attachment" "athena_connector_basic_policy" {
-  role       = aws_iam_role.athena_connector_lambda_role.name
-  policy_arn = aws_iam_policy.athena_connector_lambda_policy.arn
-}
-
 resource "null_resource" "athena_dynamodb_connector" {
   provisioner "local-exec" {
-    command = "aws athena create-data-catalog --name ${var.athena_dynamodb_connector_name} --type LAMBDA --region ${var.primary_aws_region} --parameters function=${aws_lambda_function.athena_dynamodb_connector.arn}"
+    command = "aws athena create-data-catalog --name ${var.data_catalog_name} --type LAMBDA --region ${var.primary_aws_region} --parameters function=${aws_lambda_function.athena_dynamodb_connector.arn}"
   }
 
   depends_on = [aws_lambda_function.athena_dynamodb_connector]
@@ -142,7 +40,7 @@ resource "null_resource" "athena_dynamodb_connector" {
 resource "null_resource" "delete_athena_dynamodb_connector" {
   count = var.delete_athena_dynamodb_connector ? 1 : 0
   provisioner "local-exec" {
-    command = "aws athena delete-data-catalog --name ${var.athena_dynamodb_connector_name} --region ${var.primary_aws_region}"
+    command = "aws athena delete-data-catalog --name ${var.data_catalog_name} --region ${var.primary_aws_region}"
   }
 
   depends_on = [null_resource.athena_dynamodb_connector]
