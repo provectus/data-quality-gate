@@ -51,7 +51,6 @@ def get_test_human_name(file):
     for key, value in params.items():
         result_string = re.sub(
             rf'\${key}\b', re.escape(str(value)), result_string)
-
     return result_string
 
 
@@ -72,27 +71,27 @@ def get_test_name(file):
 
 
 def get_suit_name(file, i):
-    return f"{file['meta']['batch_kwargs']['data_asset_name']}.{i['expectation_config']['kwargs']['column']}" if "column" in \
-                                                                                                                 i[
-                                                                                                                     "expectation_config"][
-                                                                                                                     "kwargs"] else \
-        file["meta"]["batch_kwargs"]["data_asset_name"]
+    if "column" in i["expectation_config"]["kwargs"]:
+        column = i["expectation_config"]["kwargs"]["column"]
+        data_asset_name = file["meta"]["batch_kwargs"]["data_asset_name"]
+        return f"{data_asset_name}.{column}"
+    return file["meta"]["batch_kwargs"]["data_asset_name"]
 
 
 def get_jira_ticket(file):
     if 'Bug Ticket' in file['expectation_config']['meta']:
-
         return {
             "name": "Bug ticket",
             "url": file['expectation_config']['meta']['Bug Ticket'],
             "type": "issue"
         }
-    else:
-        return {}
+    return {}
 
 
 def get_severity(file):
-    return file['expectation_config']['meta']['Severity'] if 'Severity' in file['expectation_config']['meta'] else ""
+    if 'Severity' in file['expectation_config']['meta']:
+        return file['expectation_config']['meta']['Severity']
+    return ""
 
 
 def get_start_suit_time(file):
@@ -118,17 +117,18 @@ def get_stop_test_time(file):
 def get_params(file):
     params = file['expectation_config']['kwargs']
     del params['result_format']
-    result = []
+    results = []
     for param in params:
-        result.append({"name": param, "value": str(params[param])}) if isinstance(params[param],
-                                                                                  list) else result.append(
-            {"name": param, "value": params[param]})
-    return result
+        if isinstance(params[param], list):
+            value = str(params[param])
+        else:
+            value = params[param]
+        results.append({"name": param, "value": value})
+    return results
 
 
 def get_params1(file):
-    params = file['expectation_config']['kwargs']
-    return params
+    return file['expectation_config']['kwargs']
 
 
 def get_test_status(file):
@@ -146,8 +146,9 @@ def get_test_description(file):
 
 def get_observed_value(file):
     try:
-        return f"Observed value: {str(file['result']['observed_value'])}" if "observed_value" in file[
-            "result"] else f"Unexpected count: {str(file['result']['unexpected_count'])}"
+        if "observed_value" in file["result"]:
+            return f"Observed value: {str(file['result']['observed_value'])}"
+        return f"Unexpected count: {str(file['result']['unexpected_count'])}"
     except KeyError:
         return 'Column not exist'
 
@@ -163,7 +164,6 @@ def get_exception_traceback(file):
 def get_folder_key(folder, folder_key):
     folder = f"{folder}{str(folder_key)}/"
     bucket.put_object(Key=folder)
-
     return folder_key
 
 
@@ -196,8 +196,9 @@ def create_categories_json(json_name, key):
     ]
 
     result = json.dumps(data)
-    s3.Object(qa_bucket, f"allure/{json_name}{key}/result/categories.json").put(
-        Body=bytes(result.encode("UTF-8")))
+    s3.Object(qa_bucket,
+              f"allure/{json_name}{key}/result/categories.json").put(
+                Body=bytes(result.encode("UTF-8")))
 
 
 def get_uuid(i, json_name, key):
@@ -205,10 +206,8 @@ def get_uuid(i, json_name, key):
     objs = list(bucket.objects.filter(
         Prefix=f"allure/{json_name}{key}/allure-report/history"))
     if (len(objs) > 0):
-
         df = wr.s3.read_json(
             path=[f"s3://{qa_bucket}/allure/{json_name}{key}/allure-report/history/history.json"])
-
         fl = json.loads(df.to_json())
         keys = list(fl.keys())
         keys.sort()
