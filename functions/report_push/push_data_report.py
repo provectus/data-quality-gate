@@ -155,7 +155,7 @@ def push_sns_message(suite, run_name, file, bug_name, created_bug_count, replace
             "allure_report": f"https://{replaced_allure_links}"
         }
     else:
-        sns_message = f"All {total} tests for source: {table} were successful"
+        sns_message = f"All {total} tests for source: {suite} were successful"
         message_structure = 'string'
 
     if message_structure == 'json':
