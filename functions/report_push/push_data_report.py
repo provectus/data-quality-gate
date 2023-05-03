@@ -38,6 +38,7 @@ def handler(event, context):
     run_name = report.get('run_name')
     bucket = s3.Bucket(qa_bucket)
     created_bug_count = 0
+    bug_name = []
     items = []
     df = wr.s3.read_json(
         path=[
@@ -77,87 +78,30 @@ def handler(event, context):
         for item in items:
             batch.put_item(Item=item)
 
+    pipeline_config = json.loads(
+        wr.s3.read_json(path=f"s3://{qa_bucket}/test_configs/pipeline.json").to_json())
     try:
-        pipeline_config = json.loads(
-            wr.s3.read_json(path=f"s3://{qa_bucket}/test_configs/pipeline.json").to_json())
         autobug = pipeline_config[run_name]['autobug']
     except KeyError:
         autobug = False
-        print(f"Can't find config for {run_name}")
+        print(f"Can't find autobug param for {run_name}")
+    try:
+        only_failed = pipeline_config[run_name]["only_failed"]
+    except KeyError:
+        only_failed = True
+        print(f"Can't find only_failed param for {run_name}")
+
 
     if autobug:
         jira_project_key = os.environ['JIRA_PROJECT_KEY']
         auth_in_jira()
         created_bug_count, bug_name = create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite,
                                                                           jira_project_key)
-        cloudwatch.put_metric_data(
-            Namespace='Data-QA',
-            MetricData=[
-                {
-                    'MetricName': 'bug_created_count',
-                    'Dimensions': [
-                        {
-                            'Name': 'table_name',
-                            'Value': suite
-                        },
-                        {
-                            'Name': 'Environment',
-                            'Value': environment
-                        }
-                    ],
-                    'Value': created_bug_count,
-                    'Unit': 'Count'
-                },
-            ]
-        )
-        if not bug_name:
-            if sns_bugs_topic:
-                sns_message = {
-                    "table": suite,
-                    "pipeline_step": run_name,
-                    "source_name": file,
-                    "new_bugs": bug_name,
-                    "new_bugs_count": created_bug_count,
-                    "allure_report":  f"https://{replaced_allure_links}"
-                }
-                sns.publish(TopicArn=sns_bugs_topic,
-                            Message=json.dumps(sns_message),
-                            MessageStructure='json',)
 
-    else:
-        cloudwatch.put_metric_data(
-            Namespace='Data-QA',
-            MetricData=[
-                {
-                    'MetricName': 'suite_failed_count',
-                    'Dimensions': [
-                        {
-                            'Name': 'table_name',
-                            'Value': suite
-                        },
-                        {
-                            'Name': 'Environment',
-                            'Value': environment
-                        }
-                    ],
-                    'Value': failed,
-                    'Unit': 'Count'
-                },
-            ]
-        )
-        if sns_bugs_topic:
-            sns_message = {
-                "table": suite,
-                "pipeline_step": run_name,
-                "source_name": file,
-                "all": total,
-                "failed": failed,
-                "passed": passed,
-                "allure_report": f"https://{replaced_allure_links}"
-            }
-            sns.publish(TopicArn=sns_bugs_topic,
-                        Message=json.dumps({"default": json.dumps(sns_message)}),
-                        MessageStructure='json', )
+    push_cloudwatch_metrics(suite, environment, failed, created_bug_count)
+    push_sns_message(suite, run_name, file, bug_name, created_bug_count, replaced_allure_links, total, failed, passed,
+                     sns_bugs_topic, only_failed)
+
     return report
 
 
@@ -186,3 +130,80 @@ def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suit
                     jira_project_key,
                 ))
     return created_bug_count, bug_name
+
+
+def push_sns_message(suite, run_name, file, bug_name, created_bug_count, replaced_allure_links, total, failed, passed,
+                     sns_bugs_topic, only_failed):
+    message_structure = 'json'
+    if created_bug_count > 0:
+        sns_message = {
+            "table": suite,
+            "pipeline_step": run_name,
+            "source_name": file,
+            "new_bugs": bug_name,
+            "new_bugs_count": created_bug_count,
+            "allure_report": f"https://{replaced_allure_links}"
+        }
+    elif failed > 0:
+        sns_message = {
+            "table": suite,
+            "pipeline_step": run_name,
+            "source_name": file,
+            "all": total,
+            "failed": failed,
+            "passed": passed,
+            "allure_report": f"https://{replaced_allure_links}"
+        }
+    else:
+        sns_message = f"All {total} tests for source: {suite} were successful"
+        message_structure = 'string'
+
+    if message_structure == 'json':
+        sns_message = json.dumps({"default": json.dumps(sns_message)})
+
+    if only_failed and message_structure == 'json' or not only_failed:
+        sns.publish(TopicArn=sns_bugs_topic,
+                    Message=sns_message,
+                    MessageStructure=message_structure)
+
+
+def push_cloudwatch_metrics(suite, environment, failed, created_bug_count):
+    if created_bug_count > 0:
+        metric_data = {
+            'MetricName': 'bug_created_count',
+            'Dimensions': [
+                {
+                    'Name': 'table_name',
+                    'Value': suite
+                },
+                {
+                    'Name': 'Environment',
+                    'Value': environment
+                }
+            ],
+            'Value': created_bug_count,
+            'Unit': 'Count'
+        }
+    else:
+        metric_data = {
+            'MetricName': 'suite_failed_count',
+            'Dimensions': [
+                {
+                    'Name': 'table_name',
+                    'Value': suite
+                },
+                {
+                    'Name': 'Environment',
+                    'Value': environment
+                }
+            ],
+            'Value': failed,
+            'Unit': 'Count'
+        }
+
+    cloudwatch.put_metric_data(
+        Namespace='Data-QA',
+        MetricData=[
+            metric_data,
+        ]
+    )
