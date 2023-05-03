@@ -63,7 +63,7 @@ module "data_qa_intg" {
   }
 
   vpc_to_create = {
-    cidr = "172.28.0.0/16"
+    cidr                 = "172.28.0.0/16"
     private_subnets_cidr = ["172.28.16.0/20"]
   }
 }
