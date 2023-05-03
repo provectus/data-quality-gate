@@ -38,6 +38,7 @@ def handler(event, context):
     run_name = report.get('run_name')
     bucket = s3.Bucket(qa_bucket)
     created_bug_count = 0
+    bug_name = []
     items = []
     df = wr.s3.read_json(
         path=[
