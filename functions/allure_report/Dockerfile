@@ -9,4 +9,5 @@ RUN mkdir allure && curl https://github.com/allure-framework/allure2/releases/do
 RUN ./aws/install
 COPY ./*.py ./
 COPY ./*.sh ./
+ENV JAVA_HOME=/usr/
 CMD ["make_allure_report.handler"]
