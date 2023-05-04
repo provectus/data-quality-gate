@@ -42,7 +42,8 @@ def handler(event, context):
     items = []
     df = wr.s3.read_json(
         path=[
-            f"s3://{qa_bucket}/allure/{suite}/{key}/allure-report/history/history-trend.json"
+            f"s3://{qa_bucket}/allure/{suite}/{key}"
+            f"/allure-report/history/history-trend.json"
         ]
     )
     history = json.loads(df.to_json())
@@ -78,8 +79,8 @@ def handler(event, context):
         for item in items:
             batch.put_item(Item=item)
 
-    pipeline_config = json.loads(
-        wr.s3.read_json(path=f"s3://{qa_bucket}/test_configs/pipeline.json").to_json())
+    pipeline_config = json.loads(wr.s3.read_json(
+        path=f"s3://{qa_bucket}/test_configs/pipeline.json").to_json())
     try:
         autobug = pipeline_config[run_name]['autobug']
     except KeyError:
@@ -91,21 +92,35 @@ def handler(event, context):
         only_failed = True
         print(f"Can't find only_failed param for {run_name}")
 
-
     if autobug:
         jira_project_key = os.environ['JIRA_PROJECT_KEY']
         auth_in_jira()
-        created_bug_count, bug_name = create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite,
-                                                                          jira_project_key)
+        created_bug_count, bug_name = create_jira_bugs_from_allure_result(
+            bucket, key, replaced_allure_links, suite, jira_project_key)
 
     push_cloudwatch_metrics(suite, environment, failed, created_bug_count)
-    push_sns_message(suite, run_name, file, bug_name, created_bug_count, replaced_allure_links, total, failed, passed,
-                     sns_bugs_topic, only_failed)
+    push_sns_message(
+        suite,
+        run_name,
+        file,
+        bug_name,
+        created_bug_count,
+        replaced_allure_links,
+        total,
+        failed,
+        passed,
+        sns_bugs_topic,
+        only_failed)
 
     return report
 
 
-def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suite, jira_project_key):
+def create_jira_bugs_from_allure_result(
+        bucket,
+        key,
+        replaced_allure_links,
+        suite,
+        jira_project_key):
     created_bug_count = 0
     bug_name = []
     all_result_files = bucket.objects.filter(
@@ -132,8 +147,18 @@ def create_jira_bugs_from_allure_result(bucket, key, replaced_allure_links, suit
     return created_bug_count, bug_name
 
 
-def push_sns_message(suite, run_name, file, bug_name, created_bug_count, replaced_allure_links, total, failed, passed,
-                     sns_bugs_topic, only_failed):
+def push_sns_message(
+        suite,
+        run_name,
+        file,
+        bug_name,
+        created_bug_count,
+        replaced_allure_links,
+        total,
+        failed,
+        passed,
+        sns_bugs_topic,
+        only_failed):
     message_structure = 'json'
     if created_bug_count > 0:
         sns_message = {
