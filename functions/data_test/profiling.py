@@ -1,30 +1,30 @@
 import json
-
-import numpy as np
-import pandas as pd
 from pandas_profiling import ProfileReport
 import os
-import s3fs
 import boto3
 import awswrangler as wr
-import re
 from pandas_profiling.model import expectation_algorithms
 from pandas_profiling.model.handler import Handler
-import great_expectations as ge
 from Expectation_report_new import ExpectationsReportNew
 from pandas_profiling.expectations_report import ExpectationsReport
 from datetime import datetime
 from great_expectations import DataContext
 from great_expectations.data_context import BaseDataContext
-from great_expectations.data_context.store import TupleFilesystemStoreBackend
-from great_expectations.data_context.types.base import DataContextConfig, S3StoreBackendDefaults
+from great_expectations.data_context.types.base import (DataContextConfig,
+                                                        S3StoreBackendDefaults)
 import yaml
-from great_expectations.data_context import BaseDataContext
 
 
-s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566") if os.environ['ENVIRONMENT'] == 'local' else boto3.resource("s3")
+if os.environ['ENVIRONMENT'] == 'local':
+    endpoint_url = f"http://{os.environ['S3_HOST']}:{os.environ['S3_PORT']}"
+    s3 = boto3.resource("s3", endpoint_url=endpoint_url)
+else:
+    endpoint_url = None
+    s3 = boto3.resource("s3")
 
 qa_bucket_name = os.environ['QA_BUCKET']
+
+
 def generic_expectations_without_null(name, summary, batch, *args):
     batch.expect_column_to_exist(column=name)
     if summary["p_unique"] >= 0.9:
@@ -53,14 +53,14 @@ class MyExpectationHandler(Handler):
                         ],
             "URL": [expectation_algorithms.url_expectations, expectations_null,
                     ],
-            "File": [expectation_algorithms.file_expectations, expectations_null,
-                     ],
-            "Path": [expectation_algorithms.path_expectations, expectations_null,
-                     ],
-            "DateTime": [expectation_algorithms.datetime_expectations, expectations_null,
-                         ],
-            "Image": [expectation_algorithms.image_expectations, expectations_null,
-                      ],
+            "File": [expectation_algorithms.file_expectations, 
+                     expectations_null, ],
+            "Path": [expectation_algorithms.path_expectations, 
+                     expectations_null, ],
+            "DateTime": [expectation_algorithms.datetime_expectations, 
+                         expectations_null, ],
+            "Image": [expectation_algorithms.image_expectations, 
+                      expectations_null, ],
         }
         super().__init__(mapping, typeset, *args, **kwargs)
 
@@ -70,7 +70,6 @@ def change_ge_config(datasource_root):
 
     configfile_raw = context_ge.get_config().to_yaml_str()
     configfile = yaml.safe_load(configfile_raw)
-
 
     datasources = {
         "pandas_s3": {
@@ -97,12 +96,14 @@ def change_ge_config(datasource_root):
 
     if os.environ['ENVIRONMENT'] == 'local':
         stores = configfile["stores"]
-        new_stores = add_local_s3_to_stores(stores) if os.environ['ENVIRONMENT'] == 'local' else stores
+        new_stores = add_local_s3_to_stores(stores, endpoint_url)
         data_docs_sites = configfile["data_docs_sites"]
-        new_data_docs_sites = add_local_s3_to_data_docs(data_docs_sites) if os.environ[
-                                                                                'ENVIRONMENT'] == 'local' else data_docs_sites
-        config = DataContextConfig(config_version=configfile["config_version"], datasources=datasources,
-                                   stores=new_stores, data_docs_sites=new_data_docs_sites,
+        new_data_docs_sites = add_local_s3_to_data_docs(data_docs_sites,
+                                                        endpoint_url)
+        config = DataContextConfig(config_version=configfile["config_version"],
+                                   datasources=datasources,
+                                   stores=new_stores,
+                                   data_docs_sites=new_data_docs_sites,
                                    expectations_store_name=configfile["expectations_store_name"],
                                    validations_store_name=configfile["validations_store_name"],
                                    evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
@@ -130,16 +131,16 @@ def change_ge_config(datasource_root):
     return config
 
 
-def add_local_s3_to_stores(stores):
-    boto_options_dic = {'endpoint_url': f"http://{os.environ['S3_HOST']}:4566"}
+def add_local_s3_to_stores(stores, endpoint_url):
+    boto_options_dic = {'endpoint_url': endpoint_url}
     for store in stores:
         if stores[store].get('store_backend'):
             stores[store]['store_backend']['boto3_options'] = boto_options_dic
     return stores
 
 
-def add_local_s3_to_data_docs(data_docs_sites):
-    boto_options_dic = {'endpoint_url': f"http://{os.environ['S3_HOST']}:4566"}
+def add_local_s3_to_data_docs(data_docs_sites, endpoint_url):
+    boto_options_dic = {'endpoint_url': endpoint_url}
     data_docs_sites['s3_site']['store_backend']['boto3_options'] = boto_options_dic
     return data_docs_sites
 
@@ -149,12 +150,15 @@ def remove_suffix(input_string, suffix):
         return input_string[:-len(suffix)]
     return input_string
 
-def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, mapping_config, run_name):
+
+def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, 
+                 mapping_config, run_name):
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)
     context_ge = BaseDataContext(project_config=config)
     try:
-        profile = ProfileReport(df, title=f"{suite_name} Profiling Report", minimal=True)
+        profile = ProfileReport(df, title=f"{suite_name} Profiling Report", 
+                                minimal=True)
         report = profile.to_html()
     except TypeError:
         profile = ProfileReport(df, title=f"{suite_name} Profiling Report")
@@ -173,8 +177,8 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, ma
         ExpectationsReport.to_expectation_suite = ExpectationsReportNew.to_expectation_suite
         suite = profile.to_expectation_suite(
             data_context=context_ge,
-            suite_name=remove_suffix(suite_name,f"_{run_name}"),
-            run_name = run_name,
+            suite_name=remove_suffix(suite_name, f"_{run_name}"),
+            run_name=run_name,
             save_suite=True,
             run_validation=False,
             build_data_docs=False,
@@ -190,6 +194,7 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, ma
     folder = f"{folder}{suite_name}/{str(date_time)}/"
     
     qa_bucket.put_object(Key=folder)
-    qa_bucket.put_object(Key=f"{folder}{suite_name}_profiling.html", Body=report, ContentType='text/html')
+    qa_bucket.put_object(Key=f"{folder}{suite_name}_profiling.html",
+                         Body=report, ContentType='text/html')
     profile_link = f"{cloudfront}/{folder}{suite_name}_profiling.html"
     return profile_link, date_time, config
