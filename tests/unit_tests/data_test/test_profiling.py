@@ -8,4 +8,5 @@ from functions.data_test.profiling import (add_local_s3_to_stores)
     ({}, {})
 ])
 def test_add_local_s3_to_stores(stores, expected_output):
-    assert add_local_s3_to_stores(stores) == expected_output
+    endpoint_url = "http://localhost:4566"
+    assert add_local_s3_to_stores(stores, endpoint_url) == expected_output
