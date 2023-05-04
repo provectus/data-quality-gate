@@ -1,6 +1,7 @@
-FROM public.ecr.aws/lambda/python:3.7
+FROM public.ecr.aws/lambda/python:3.8
 ADD ./requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
+RUN yum install -y unzip
 RUN mkdir allure && curl https://github.com/allure-framework/allure2/releases/download/2.14.0/allure-2.14.0.zip -O -L -C - \
 && unzip allure-2.14.0.zip -d allure && rm allure-2.14.0.zip \
 && curl https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip -O -L -C -\
