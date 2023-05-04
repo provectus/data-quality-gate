@@ -8,11 +8,12 @@ from datasource import prepare_final_ds, get_source_name, get_file_extension
 
 
 def handler(event, context):
-    endpoint_url = f"http://{os.environ['S3_HOST']}:{os.environ['S3_PORT']}"
     if os.environ['ENVIRONMENT'] == 'local':
+        endpoint_url = (f"http://{os.environ['S3_HOST']}:"
+                        f"{os.environ['S3_PORT']}")
         s3 = boto3.resource("s3", endpoint_url=endpoint_url)
     else:
-        s3 = boto3.resource("s3")  
+        s3 = boto3.resource("s3")
     cloudfront = os.environ['QA_CLOUDFRONT']
     qa_bucket_name = os.environ['QA_BUCKET']
     run_name = event['run_name']
