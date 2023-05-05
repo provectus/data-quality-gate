@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/python:3.8
+FROM public.ecr.aws/lambda/python:3.9
 ADD ./requirements.txt ./requirements.txt
 RUN pip3 install -r requirements.txt
 RUN yum install -y unzip java-1.8.0-openjdk

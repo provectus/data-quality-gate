@@ -8,6 +8,6 @@ python-dateutil==2.8.1
 botocore==1.20.49
 boto3==1.17.1
 boto==2.49.0
-pyarrow==2
+pyarrow==3.0.0
 fastparquet==0.8.1
 awswrangler==2.12.1
