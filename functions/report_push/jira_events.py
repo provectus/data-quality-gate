@@ -13,7 +13,8 @@ def auth_in_jira():
     jira = JIRA(options, basic_auth=(API_USERNAME, API_PASSWORD))
 
 
-def open_bug(table_name: str, fail_step: str, description: str, replaced_allure_links, issues, jira_project_key):
+def open_bug(table_name: str, fail_step: str, description: str,
+             replaced_allure_links, issues, jira_project_key):
     summary = f'[DataQA][BUG][{table_name}]{fail_step}'[:255]
     ticket_exist = False
     for single_issue in issues:
@@ -28,7 +29,8 @@ def open_bug(table_name: str, fail_step: str, description: str, replaced_allure_
             jira.transition_issue(single_issue.key, transition='Re-Open')
             break
     if not ticket_exist:
-        create_new_bug(description, replaced_allure_links, summary, jira_project_key)
+        create_new_bug(description, replaced_allure_links, summary,
+                       jira_project_key)
     return summary
 
 
@@ -37,7 +39,8 @@ def get_all_issues(jira_project_key):
     return issues
 
 
-def create_new_bug(description, replaced_allure_links, summary, jira_project_key):
+def create_new_bug(description, replaced_allure_links, summary,
+                   jira_project_key):
     print(f'Will be created bug with name[{summary}]')
     jira.create_issue(
         fields={
