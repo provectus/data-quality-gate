@@ -16,17 +16,18 @@ def handler(event, context):
     cloudfront = os.environ['QA_CLOUDFRONT']
     qa_bucket_name = os.environ['QA_BUCKET']
     run_name = event['run_name']
+    project_name = event['project_name']
     if 'engine' in event:
         engine = event['engine']
     else:
         pipeline_config = json.loads(
-            wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/pipeline.json").to_json())
+            wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/{project_name}/pipeline.json").to_json())
         engine = pipeline_config[run_name]['engine']
     source_root = event['source_root']
     source_input = event['source_data']
     # coverage_config = json.loads(s3.Object(qa_bucket_name,"test_configs/test_coverage.json" ).get()['Body'].read().decode('utf-8'))
-    coverage_config = json.loads(wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/test_coverage.json").to_json())
-    mapping_config = json.loads(wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/mapping.json").to_json())
+    coverage_config = json.loads(wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/{project_name}/test_coverage.json").to_json())
+    mapping_config = json.loads(wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/{project_name}/mapping.json").to_json())
     if type(source_input) is not list:
         source = [source_input]
     else:
@@ -43,7 +44,7 @@ def handler(event, context):
     except (IndexError, KeyError) as e:
         source_covered = False
 
-    profile_link, folder_key, config = profile_data(final_ds, suite_name, cloudfront, source_root, source_covered, mapping_config, run_name)
+    profile_link, folder_key, config = profile_data(final_ds, suite_name, cloudfront, source_root, source_covered, mapping_config, run_name,project_name)
     validate_id = validate_data(final_ds, suite_name, config)
     test_suite = f"{cloudfront}/data_docs/validations/{validate_id}.html"
 

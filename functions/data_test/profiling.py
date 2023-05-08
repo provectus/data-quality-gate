@@ -65,7 +65,7 @@ class MyExpectationHandler(Handler):
         super().__init__(mapping, typeset, *args, **kwargs)
 
 
-def change_ge_config(datasource_root):
+def change_ge_config(datasource_root, project_name):
     context_ge = DataContext()
 
     configfile_raw = context_ge.get_config().to_yaml_str()
@@ -112,7 +112,7 @@ def change_ge_config(datasource_root):
                                    anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
                                    store_backend_defaults=S3StoreBackendDefaults(
                                        default_bucket_name=qa_bucket_name,
-                                       expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
+                                       expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/{project_name}/",
                                        validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
     else:
         config = DataContextConfig(config_version=configfile["config_version"], datasources=datasources,
@@ -125,7 +125,7 @@ def change_ge_config(datasource_root):
                                    anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
                                    store_backend_defaults=S3StoreBackendDefaults(
                                        default_bucket_name=qa_bucket_name,
-                                       expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
+                                       expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/{project_name}/",
                                        validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
     return config
 
@@ -144,7 +144,7 @@ def add_local_s3_to_data_docs(data_docs_sites):
     return data_docs_sites
 
 
-def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,mapping_config,run_name):
+def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,mapping_config,run_name,project_name):
     try:
         mapping_schema = mapping_config[suite_name.split('_')[0]]
     except KeyError:
@@ -152,7 +152,7 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,map
 
 
     qa_bucket = s3.Bucket(qa_bucket_name)
-    config = change_ge_config(datasource_root)
+    config = change_ge_config(datasource_root,project_name)
     context_ge = BaseDataContext(project_config=config)
     try:
         profile = ProfileReport(df, title=f"{suite_name} Profiling Report", minimal=True)
@@ -163,7 +163,7 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,map
     if not source_covered:
         try:
             pipeline_config = json.loads(
-                wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/pipeline.json").to_json())
+                wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/{project_name}/pipeline.json").to_json())
             reuse_suite = pipeline_config[run_name]['reuse_suite']
             use_old_suite_only = pipeline_config[run_name]['use_old_suite_only']
             old_suite_name = pipeline_config[run_name]['old_suite_name']
