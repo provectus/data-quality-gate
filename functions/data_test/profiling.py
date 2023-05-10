@@ -146,7 +146,7 @@ def remove_suffix(input_string, suffix):
     return input_string
 
 
-def read_gx_config_file(path: None) -> dict:
+def read_gx_config_file(path=None) -> dict:
     if path is None:
         path = DEFAULT_CONFIG_FILE
     with open(path, "r") as config_file:
