@@ -157,11 +157,12 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
     config = change_ge_config(datasource_root)
     context_ge = BaseDataContext(project_config=config)
     try:
-        profile = ProfileReport(df, title=f"{suite_name} Profiling Report", 
-                                minimal=True)
+        profile = ProfileReport(df, title=f"{suite_name} Profiling Report",
+                                minimal=True, pool_size=1)
         report = profile.to_html()
     except TypeError:
-        profile = ProfileReport(df, title=f"{suite_name} Profiling Report")
+        profile = ProfileReport(df, title=f"{suite_name} Profiling Report",
+                                pool_size=1)
         report = profile.to_html()
     if not source_covered:
         try:

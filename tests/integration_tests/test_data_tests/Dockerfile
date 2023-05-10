@@ -1,5 +1,5 @@
 FROM data-test:latest
-RUN pip3 install pytest==7.2.0
+RUN pip3 install pytest==7.3.1
 ENV ENVIRONMENT local
 ENV QA_CLOUDFRONT test
 ENV AWS_ACCESS_KEY_ID test

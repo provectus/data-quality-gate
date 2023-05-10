@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/python:3.7
+FROM public.ecr.aws/lambda/python:3.9
 COPY requirements.txt ./
 RUN pip3 install -r requirements.txt --no-cache-dir
 COPY ./*.py ./
