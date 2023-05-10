@@ -8,12 +8,11 @@ from pandas_profiling.model.handler import Handler
 from Expectation_report_new import ExpectationsReportNew
 from pandas_profiling.expectations_report import ExpectationsReport
 from datetime import datetime
-from great_expectations import DataContext
 from great_expectations.data_context import BaseDataContext
 from great_expectations.data_context.types.base import (DataContextConfig,
                                                         S3StoreBackendDefaults)
 import yaml
-
+DEFAULT_CONFIG_FILE = "great_expectations/great_expectations.yml"
 
 if os.environ['ENVIRONMENT'] == 'local':
     endpoint_url = f"http://{os.environ['S3_HOST']}:{os.environ['S3_PORT']}"
@@ -66,11 +65,7 @@ class MyExpectationHandler(Handler):
 
 
 def change_ge_config(datasource_root):
-    context_ge = DataContext()
-
-    configfile_raw = context_ge.get_config().to_yaml_str()
-    configfile = yaml.safe_load(configfile_raw)
-
+    configfile = read_gx_config_file()
     datasources = {
         "pandas_s3": {
             "class_name": "PandasDatasource",
@@ -151,7 +146,15 @@ def remove_suffix(input_string, suffix):
     return input_string
 
 
-def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, 
+def read_gx_config_file(path: None) -> dict:
+    if path is None:
+        path = DEFAULT_CONFIG_FILE
+    with open(path, "r") as config_file:
+        configfile = yaml.safe_load(config_file)
+    return configfile
+
+
+def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
                  mapping_config, run_name):
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)

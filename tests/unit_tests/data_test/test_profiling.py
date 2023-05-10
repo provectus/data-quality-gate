@@ -1,5 +1,6 @@
 import pytest
-from functions.data_test.profiling import (add_local_s3_to_stores)
+from functions.data_test.profiling import (add_local_s3_to_stores,
+                                           read_gx_config_file)
 
 
 @pytest.mark.parametrize("stores, expected_output", [
@@ -10,3 +11,8 @@ from functions.data_test.profiling import (add_local_s3_to_stores)
 def test_add_local_s3_to_stores(stores, expected_output):
     endpoint_url = "http://localhost:4566"
     assert add_local_s3_to_stores(stores, endpoint_url) == expected_output
+
+
+def test_gx_config_file():
+    config_file = read_gx_config_file()
+    assert config_file["config_version"] == 2.0
