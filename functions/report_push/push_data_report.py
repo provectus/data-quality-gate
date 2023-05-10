@@ -26,6 +26,7 @@ def handler(event, context):
     profiling_link = (report.get('profiling'))
     ge_links = report.get('test_suite')
     suite = report.get('suite_name')
+    token = report.get('token')
     today = str(date.today())
     path = report.get('path')
     file = report.get('suite_name')
@@ -123,6 +124,21 @@ def handler(event, context):
     report = {
         "failed_test_count": failed,
     }
+
+    if token is not 'None' or not token:
+        baseline = 100 * int(total)/int(failed)
+        sm = boto3.client('sagemaker')
+        response = sm.send_pipeline_execution_step_success(
+            CallbackToken=token,
+            OutputParameters=[
+                {
+                    'Name': 'baseline',
+                    'Value': str(baseline)
+                },
+            ]
+        )
+        print(response)
+
 
     return report
 

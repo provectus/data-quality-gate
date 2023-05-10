@@ -17,6 +17,7 @@ def handler(event, context):
     qa_bucket_name = os.environ['QA_BUCKET']
     run_name = event['run_name']
     project_name = event['project_name']
+    token = event['token']
     if 'engine' in event:
         engine = event['engine']
     else:
@@ -56,6 +57,7 @@ def handler(event, context):
         "suite_name": suite_name,
         "folder_key": folder_key,
         "run_name": run_name,
-        "validate_id": validate_id
+        "validate_id": validate_id,
+        "token": token
     }
     return report
