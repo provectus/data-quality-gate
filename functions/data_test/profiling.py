@@ -20,7 +20,7 @@ from great_expectations.data_context.store import TupleFilesystemStoreBackend
 from great_expectations.data_context.types.base import DataContextConfig, S3StoreBackendDefaults
 import yaml
 from great_expectations.data_context import BaseDataContext
-
+import math
 
 s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566") if os.environ['ENVIRONMENT'] == 'local' else boto3.resource("s3")
 
@@ -37,6 +37,28 @@ def expectations_null(name, summary, batch, *args):
         batch.expect_column_values_to_not_be_null(column=name)
     return name, summary, batch
 
+def expectations_mean(name, summary, batch, *args):
+    n = summary["n"] - summary["n_missing"]
+    k = 0.99 * (summary["std"]/math.sqrt(n))
+    min_mean = summary["mean"] - k
+    max_mean = summary["mean"] + k
+    batch.expect_column_mean_to_be_between(column=name, min_value=min_mean, max_value=max_mean)
+    return name, summary, batch
+
+def expectations_median(name, summary, batch, *args):
+    raw_values = summary["value_counts_without_nan"]
+    values = []
+    for key, v in raw_values.items():
+        key = [key] * v
+        values.extend(key)
+    values.sort()
+    q = summary['25%']
+    j = int(len(values) * q - 0.99 * math.sqrt(len(values) * q * (1 - q)))
+    k = int(len(values) * q + 0.99 * math.sqrt(len(values) * q * (1 - q)))
+    min_median = values[j]
+    max_median = values[k]
+    batch.expect_column_median_to_be_between(column=name, min_value=min_median, max_value=max_median)
+    return name, summary, batch
 
 class MyExpectationHandler(Handler):
     def __init__(self, typeset, *args, **kwargs):
@@ -44,12 +66,12 @@ class MyExpectationHandler(Handler):
             "Unsupported": [generic_expectations_without_null, expectations_null,
                             ],
             "Categorical": [expectation_algorithms.categorical_expectations,
-                            expectations_null,
-
+                            expectations_null, expectations_mean
                             ],
             "Boolean": [expectations_null,
                         ],
-            "Numeric": [generic_expectations_without_null, expectations_null,expectation_algorithms.numeric_expectations
+            "Numeric": [generic_expectations_without_null, expectations_null,expectation_algorithms.numeric_expectations,
+                        expectations_median,
                         ],
             "URL": [expectation_algorithms.url_expectations, expectations_null,
                     ],
