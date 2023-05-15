@@ -21,7 +21,7 @@ from great_expectations.data_context.types.base import DataContextConfig, S3Stor
 import yaml
 from great_expectations.data_context import BaseDataContext
 import math
-
+from scipy.stats import t
 s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566") if os.environ['ENVIRONMENT'] == 'local' else boto3.resource("s3")
 
 qa_bucket_name = os.environ['QA_BUCKET']
@@ -38,7 +38,7 @@ def expectations_null(name, summary, batch, *args):
     return name, summary, batch
 
 def expectations_mean(name, summary, batch, *args):
-    n = summary["n"] - summary["n_missing"]
+    n = summary["n"]
     k = 0.99 * (summary["std"]/math.sqrt(n))
     min_mean = summary["mean"] - k
     max_mean = summary["mean"] + k
@@ -46,18 +46,40 @@ def expectations_mean(name, summary, batch, *args):
     return name, summary, batch
 
 def expectations_median(name, summary, batch, *args):
-    raw_values = summary["value_counts_without_nan"]
+    raw_values = summary["value_counts_index_sorted"]
     values = []
     for key, v in raw_values.items():
         key = [key] * v
         values.extend(key)
-    values.sort()
     q = summary['25%']
     j = int(len(values) * q - 0.99 * math.sqrt(len(values) * q * (1 - q)))
     k = int(len(values) * q + 0.99 * math.sqrt(len(values) * q * (1 - q)))
     min_median = values[j]
     max_median = values[k]
     batch.expect_column_median_to_be_between(column=name, min_value=min_median, max_value=max_median)
+    return name, summary, batch
+
+def expectations_stdev(name, summary, batch, *args):
+    n = summary["n"]
+    std = summary["std"]
+    confidence_level = 0.99
+    degrees_of_freedom = n-1
+    alpha = 1 - confidence_level
+    t_critical = t.ppf(1 - alpha / 2, degrees_of_freedom)
+    margin_of_error = t_critical * (std / math.sqrt(n))
+    min_std = std - margin_of_error
+    max_std = std + margin_of_error
+    batch.expect_column_stdev_to_be_between(column=name, min_value=min_std, max_value=max_std)
+    return name, summary, batch
+
+def expectations_quantile(name, summary, batch, *args):
+    q_array = [summary["5%"], summary["25%"], summary["50%"], summary["75%"], summary["95%"]]
+    q_array[:] = [x / 100 for x in q_array]
+    q_ranges = {
+        "quantiles": q_array,
+        "value_ranges": [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]]
+    }
+    batch.expect_column_quantile_values_to_be_between(column=name, quantile_ranges=q_ranges)
     return name, summary, batch
 
 class MyExpectationHandler(Handler):
@@ -70,8 +92,8 @@ class MyExpectationHandler(Handler):
                             ],
             "Boolean": [expectations_null,
                         ],
-            "Numeric": [generic_expectations_without_null, expectations_null,expectation_algorithms.numeric_expectations,
-                        expectations_median,
+            "Numeric": [generic_expectations_without_null, expectations_null, expectation_algorithms.numeric_expectations,
+                        expectations_median, expectations_stdev, expectations_quantile
                         ],
             "URL": [expectation_algorithms.url_expectations, expectations_null,
                     ],
