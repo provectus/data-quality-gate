@@ -8,6 +8,11 @@ variable "private_subnets_cidr" {
   type        = list(string)
 }
 
+variable "public_subnets_cidr" {
+  description = "List of private subnets cidr"
+  type        = list(string)
+}
+
 variable "azs" {
   description = "List of available zones in selected region"
   type        = list(string)

@@ -9,10 +9,10 @@ module "lambda_allure_report" {
   policy        = aws_iam_policy.basic_lambda_policy.arn
 
   environment_variables = {
-    QA_BUCKET         = aws_s3_bucket.settings_bucket.bucket
-    QA_CLOUDFRONT     = local.aws_cloudfront_distribution
-    QA_DYNAMODB_TABLE = aws_dynamodb_table.data_qa_report.name
-    ENVIRONMENT       = var.environment
+    ENVIRONMENT    = var.environment
+    BUCKET         = aws_s3_bucket.settings_bucket.bucket
+    REPORTS_WEB    = module.reports_gateway.s3_gateway_address
+    DYNAMODB_TABLE = aws_dynamodb_table.data_qa_report.name
   }
 
   image_uri                      = var.allure_report_image_uri
@@ -22,6 +22,6 @@ module "lambda_allure_report" {
   memory_size                    = var.lambda_allure_report_memory
   tracing_mode                   = "PassThrough"
 
-  vpc_subnet_ids         = local.lambda_vpc_subnet_ids
-  vpc_security_group_ids = local.lambda_vpc_sg_ids
+  vpc_subnet_ids         = var.lambda_private_subnet_ids
+  vpc_security_group_ids = var.lambda_security_group_ids
 }

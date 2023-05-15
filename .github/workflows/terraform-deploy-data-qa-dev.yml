@@ -1,4 +1,4 @@
-name: Deploy to DataQA Dev
+name: Deploy to DataQA
 on:
   workflow_dispatch:
     inputs:
@@ -23,7 +23,7 @@ on:
 
 jobs:
   terraform:
-    name: setup-envs
+    name: "Deploy - ${{ github.event.inputs.TerraformTarget }}/${{ github.event.inputs.applyTerraform }}"
     runs-on: ubuntu-latest
     env:
       TF_VAR_slack_channel: ${{ secrets.TF_VAR_SLACK_CHANNEL }}

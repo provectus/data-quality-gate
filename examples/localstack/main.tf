@@ -11,8 +11,7 @@ provider "aws" {
 }
 
 module "integration_tests_data_qa" {
-  source                     = "../../terraform"
-  cloudfront_allowed_subnets = ["255.255.255.255/32"]
+  source = "../../terraform"
 
   data_test_storage_bucket_name = "integration-test-bucket"
   environment                   = "local"
@@ -20,5 +19,13 @@ module "integration_tests_data_qa" {
   allure_report_image_uri = ""
   data_test_image_uri     = ""
   push_report_image_uri   = ""
+
+  reports_subnet_id = ""
+  reports_vpc_id    = ""
+
+  lambda_private_subnet_ids = []
+  lambda_security_group_ids = []
+
+  reports_whitelist_ips = []
 }
 

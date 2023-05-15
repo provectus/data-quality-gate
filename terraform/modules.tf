@@ -13,7 +13,7 @@ module "basic_slack_alerting" {
   slack_channel     = var.basic_alert_notification_settings.channel
   slack_webhook_url = var.basic_alert_notification_settings.webhook_url
 
-  slack_sns_topic_name = "dqg-basic_alerting"
+  slack_sns_topic_name = "dqg-alerting-${var.environment}"
   slack_username       = "DQG-alerting"
 
   step_functions_to_monitor = ["${local.resource_name_prefix}-fast-data-qa"]
@@ -21,13 +21,13 @@ module "basic_slack_alerting" {
   resource_name_prefix = local.resource_name_prefix
 }
 
-module "vpc" {
-  count  = var.vpc_to_create == null ? 0 : 1
-  source = "./modules/vpc"
+module "reports_gateway" {
+  source      = "./modules/s3-gateway"
+  env         = var.environment
+  bucket_name = aws_s3_bucket.settings_bucket.bucket
 
-  resource_name_prefix = local.resource_name_prefix
+  vpc_id             = var.reports_vpc_id
+  instance_subnet_id = var.reports_subnet_id
 
-  cidr                 = var.vpc_to_create.cidr
-  private_subnets_cidr = var.vpc_to_create.private_subnets_cidr
-  azs                  = data.aws_availability_zones.available.zone_ids
+  whitelist_ips = var.reports_whitelist_ips
 }

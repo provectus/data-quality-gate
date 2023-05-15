@@ -17,9 +17,9 @@ s3 = boto3.resource('s3')
 sns = boto3.client('sns')
 
 dynamodb = boto3.resource('dynamodb')
-dynamo_table_name = os.environ['QA_DYNAMODB_TABLE']
+dynamo_table_name = os.environ['DYNAMODB_TABLE']
 table = dynamodb.Table(dynamo_table_name)
-qa_bucket = os.environ['QA_BUCKET']
+qa_bucket = os.environ['BUCKET']
 environment = os.environ['ENVIRONMENT']
 sns_bugs_topic = os.environ.get('SNS_BUGS_TOPIC_ARN', None)
 autobug = False
