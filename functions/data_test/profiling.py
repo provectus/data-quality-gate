@@ -12,7 +12,7 @@ from great_expectations.data_context import BaseDataContext
 from great_expectations.data_context.types.base import (DataContextConfig,
                                                         S3StoreBackendDefaults)
 import yaml
-DEFAULT_CONFIG_FILE = "great_expectations/great_expectations.yml"
+DEFAULT_CONFIG_FILE_PATH = "great_expectations/great_expectations.yml"
 
 if os.environ['ENVIRONMENT'] == 'local':
     endpoint_url = f"http://{os.environ['S3_HOST']}:{os.environ['S3_PORT']}"
@@ -148,7 +148,7 @@ def remove_suffix(input_string, suffix):
 
 def read_gx_config_file(path=None) -> dict:
     if path is None:
-        path = DEFAULT_CONFIG_FILE
+        path = DEFAULT_CONFIG_FILE_PATH
     with open(path, "r") as config_file:
         configfile = yaml.safe_load(config_file)
     return configfile
