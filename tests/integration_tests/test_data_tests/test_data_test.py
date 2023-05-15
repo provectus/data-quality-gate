@@ -40,7 +40,7 @@ def s3_test_data(request):
         "engine": "s3"
     }
     s3 = boto3.resource("s3", endpoint_url=url)
-    qa_bucket_name = os.environ['QA_BUCKET']
+    qa_bucket_name = os.environ['BUCKET']
     gx_config_local_path = "great_expectations/great_expectations.yml"
     config_path = f"{qa_bucket_name}/great_expectations/great_expectations.yml"
     s3.Bucket(qa_bucket_name).download_file(config_path, gx_config_local_path)

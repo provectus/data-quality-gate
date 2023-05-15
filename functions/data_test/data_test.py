@@ -14,8 +14,8 @@ def handler(event, context):
         s3 = boto3.resource("s3", endpoint_url=endpoint_url)
     else:
         s3 = boto3.resource("s3")
-    cloudfront = os.environ['QA_CLOUDFRONT']
-    qa_bucket_name = os.environ['QA_BUCKET']
+    cloudfront = os.environ['REPORTS_WEB']
+    qa_bucket_name = os.environ['BUCKET']
     run_name = event['run_name']
     if 'engine' in event:
         engine = event['engine']

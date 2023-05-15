@@ -9,12 +9,12 @@ module "lambda_data_test" {
   policy        = aws_iam_policy.basic_lambda_policy.arn
 
   environment_variables = {
-    QA_BUCKET         = aws_s3_bucket.settings_bucket.bucket
-    QA_CLOUDFRONT     = local.aws_cloudfront_distribution
-    QA_DYNAMODB_TABLE = aws_dynamodb_table.data_qa_report.name
-    REDSHIFT_DB       = var.redshift_db_name
-    REDSHIFT_SECRET   = var.redshift_secret
-    ENVIRONMENT       = var.environment
+    ENVIRONMENT     = var.environment
+    BUCKET          = aws_s3_bucket.settings_bucket.bucket
+    REPORTS_WEB     = module.reports_gateway.s3_gateway_address
+    DYNAMODB_TABLE  = aws_dynamodb_table.data_qa_report.name
+    REDSHIFT_DB     = var.redshift_db_name
+    REDSHIFT_SECRET = var.redshift_secret
   }
 
   image_uri                      = var.data_test_image_uri
@@ -24,8 +24,8 @@ module "lambda_data_test" {
   memory_size                    = var.lambda_data_test_memory
   tracing_mode                   = "PassThrough"
 
-  vpc_subnet_ids         = local.lambda_vpc_subnet_ids
-  vpc_security_group_ids = local.lambda_vpc_sg_ids
+  vpc_subnet_ids         = var.lambda_private_subnet_ids
+  vpc_security_group_ids = var.lambda_security_group_ids
 }
 
 resource "aws_iam_policy" "athena" {

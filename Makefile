@@ -27,7 +27,7 @@ qa_bucket = integration-test-bucket
 
 run-integration-tests: build-data-test-img build-data-test-tests-img
 	cd $(integration_tests_dir)
-	docker run --env QA_BUCKET=$(qa_bucket) --env S3_HOST=$(host) --env S3_PORT=$(port) test_data_tests
+	docker run --env BUCKET=$(qa_bucket) --env S3_HOST=$(host) --env S3_PORT=$(port) test_data_tests
 
 prepare-unit-tests:
 	cd ./functions/data_test && \
@@ -39,7 +39,7 @@ run-unit-tests:
 	export ENVIRONMENT='local' && \
 	export S3_HOST='localhost' && \
 	export S3_PORT='4566' && \
-	export QA_BUCKET='test-bucket' && \
+	export BUCKET='test-bucket' && \
 	export AWS_DEFAULT_REGION='us-east-1' && \
 	export REDSHIFT_DB='titanic' && \
 	export REDSHIFT_SECRET='titanic' && \

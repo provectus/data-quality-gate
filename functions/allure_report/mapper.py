@@ -11,7 +11,7 @@ import awswrangler as wr
 import boto3
 import re
 
-qa_bucket = os.environ['QA_BUCKET']
+qa_bucket = os.environ['BUCKET']
 s3 = boto3.resource('s3')
 bucket = s3.Bucket(qa_bucket)
 

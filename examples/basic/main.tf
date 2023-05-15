@@ -19,10 +19,23 @@ provider "docker" {
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 data "aws_ecr_authorization_token" "token" {}
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+module "vpc" {
+  source = "./modules/vpc"
+
+  resource_name_prefix = "provectus-infra"
+
+  cidr                 = "172.21.0.0/16"
+  private_subnets_cidr = ["172.21.16.0/20"]
+  public_subnets_cidr  = ["172.21.32.0/20"]
+  azs                  = data.aws_availability_zones.available.zone_ids
+}
 
 module "data_qa" {
-  source                     = "../../terraform"
-  cloudfront_allowed_subnets = ["255.255.255.255/32"]
+  source = "../../terraform"
 
   data_test_storage_bucket_name = "dqg-settings-dev"
   environment                   = "demo"
@@ -32,20 +45,21 @@ module "data_qa" {
   data_test_image_uri     = module.docker_image_data_test.image_uri
   push_report_image_uri   = module.docker_image_push_report.image_uri
 
-  web_acl_id = "arn:aws:wafv2:us-east-1:024975173233:global/webacl/demo-provectus-web-acl/c4517afa-629f-41ab-a4b9-a9645eb9b8dc"
-
   data_reports_notification_settings = {
     channel     = var.slack_channel
     webhook_url = var.slack_webhook_url
   }
 
-  vpc_subnet_ids         = ["subnet-034f0eb6c64a19cb3"]
-  vpc_security_group_ids = ["sg-01e57996f17b73938"]
+  lambda_private_subnet_ids = module.vpc.private_subnet_ids
+  lambda_security_group_ids = module.vpc.security_group_ids
+
+  reports_vpc_id        = module.vpc.vpc_id
+  reports_subnet_id     = module.vpc.public_subnet_ids[0]
+  reports_whitelist_ips = ["195.155.100.203/32"]
 }
 
 module "data_qa_intg" {
-  source                     = "../../terraform"
-  cloudfront_allowed_subnets = ["255.255.255.255/32"]
+  source = "../../terraform"
 
   data_test_storage_bucket_name = "dqg-settings-intg"
   environment                   = "intg"
@@ -55,15 +69,15 @@ module "data_qa_intg" {
   data_test_image_uri     = module.docker_image_data_test.image_uri
   push_report_image_uri   = module.docker_image_push_report.image_uri
 
-  web_acl_id = "arn:aws:wafv2:us-east-1:024975173233:global/webacl/demo-provectus-web-acl/c4517afa-629f-41ab-a4b9-a9645eb9b8dc"
-
   data_reports_notification_settings = {
     channel     = var.slack_channel
     webhook_url = var.slack_webhook_url
   }
 
-  vpc_to_create = {
-    cidr                 = "172.28.0.0/16"
-    private_subnets_cidr = ["172.28.16.0/20"]
-  }
+  lambda_private_subnet_ids = module.vpc.private_subnet_ids
+  lambda_security_group_ids = module.vpc.security_group_ids
+
+  reports_vpc_id        = module.vpc.vpc_id
+  reports_subnet_id     = module.vpc.public_subnet_ids[0]
+  reports_whitelist_ips = ["195.155.100.203/32"]
 }
