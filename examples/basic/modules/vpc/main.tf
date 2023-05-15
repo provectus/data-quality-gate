@@ -4,6 +4,10 @@ locals {
 }
 
 data "aws_region" "current" {}
+data "aws_vpc_endpoint_service" "dynamodb" { service = "dynamodb" }
+data "aws_vpc_endpoint_service" "secretsmanager" { service = "secretsmanager" }
+data "aws_vpc_endpoint_service" "monitoring" { service = "monitoring" }
+data "aws_vpc_endpoint_service" "sns" { service = "sns" }
 
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
@@ -33,10 +37,6 @@ resource "aws_vpc_endpoint_route_table_association" "s3" {
   route_table_id  = local.private_route_table_ids[count.index]
 }
 
-data "aws_vpc_endpoint_service" "dynamodb" {
-  service = "dynamodb"
-}
-
 resource "aws_vpc_endpoint" "dynamodb" {
   vpc_id       = module.vpc.vpc_id
   service_name = data.aws_vpc_endpoint_service.dynamodb.service_name
@@ -49,36 +49,50 @@ resource "aws_vpc_endpoint_route_table_association" "private_dynamodb" {
   route_table_id  = local.private_route_table_ids[count.index]
 }
 
-data "aws_vpc_endpoint_service" "secretsmanager" {
-  service = "secretsmanager"
-}
-
 resource "aws_vpc_endpoint" "secretsmanager" {
   vpc_id            = module.vpc.vpc_id
   service_name      = data.aws_vpc_endpoint_service.secretsmanager.service_name
   vpc_endpoint_type = "Interface"
 
-  security_group_ids  = [aws_security_group.secretsmanager.id]
+  security_group_ids  = [aws_security_group.inbound_ssl_tcp.id]
   subnet_ids          = module.vpc.private_subnets
   private_dns_enabled = true
 }
 
-resource "aws_security_group" "secretsmanager" {
-  name        = "${local.resource_name_prefix}-endpoint-secretsmanager"
-  description = "Allow inbound traffic to the secretsmanager endpoint"
-  vpc_id      = module.vpc.vpc_id
+resource "aws_vpc_endpoint" "monitoring" {
+  vpc_id            = module.vpc.vpc_id
+  service_name      = data.aws_vpc_endpoint_service.monitoring.service_name
+  vpc_endpoint_type = "Interface"
+
+  security_group_ids  = [aws_security_group.inbound_ssl_tcp.id, aws_security_group.lambda_security_group.id]
+  subnet_ids          = module.vpc.private_subnets
+  private_dns_enabled = true
+}
+
+resource "aws_vpc_endpoint" "sns" {
+  vpc_id            = module.vpc.vpc_id
+  service_name      = data.aws_vpc_endpoint_service.sns.service_name
+  vpc_endpoint_type = "Interface"
+
+  security_group_ids  = [aws_security_group.inbound_ssl_tcp.id, aws_security_group.lambda_security_group.id]
+  subnet_ids          = module.vpc.private_subnets
+  private_dns_enabled = true
+}
+
+resource "aws_security_group" "inbound_ssl_tcp" {
+  name   = "${local.resource_name_prefix}-endpoint-443"
+  vpc_id = module.vpc.vpc_id
 }
 
 resource "aws_security_group_rule" "secretsmanager_sg_rule_sg" {
   type                     = "ingress"
-  security_group_id        = aws_security_group.secretsmanager.id
+  security_group_id        = aws_security_group.inbound_ssl_tcp.id
   from_port                = 443
   to_port                  = 443
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.lambda_security_group.id
-  description              = "Allow ingress to secretsmanager from security group"
+  description              = "Allow ingress from security group"
 }
-
 
 resource "aws_security_group" "lambda_security_group" {
   name   = "${local.resource_name_prefix}-service-endpoints"
