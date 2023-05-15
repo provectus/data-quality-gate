@@ -13,7 +13,7 @@ module "basic_slack_alerting" {
   slack_channel     = var.basic_alert_notification_settings.channel
   slack_webhook_url = var.basic_alert_notification_settings.webhook_url
 
-  slack_sns_topic_name = "dqg-basic_alerting"
+  slack_sns_topic_name = "dqg-alerting-${var.environment}"
   slack_username       = "DQG-alerting"
 
   step_functions_to_monitor = ["${local.resource_name_prefix}-fast-data-qa"]
