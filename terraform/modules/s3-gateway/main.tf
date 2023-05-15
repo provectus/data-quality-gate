@@ -25,7 +25,7 @@ data "aws_ami" "ubuntu" {
 
 resource "aws_security_group" "connectable" {
   vpc_id = var.vpc_id
-  name   = "dqg-s3-gateway"
+  name   = "dqg-s3-gateway-${var.env}"
 
   egress {
     from_port   = "0"
@@ -67,8 +67,6 @@ resource "aws_instance" "s3_gateway" {
     volume_size = 8
     volume_type = "gp2"
   }
-
-  key_name = "egorodov-mac-personal"
 
   subnet_id = var.instance_subnet_id
 
