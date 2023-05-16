@@ -22,9 +22,14 @@ import yaml
 from great_expectations.data_context import BaseDataContext
 import math
 from scipy.stats import t
-s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566") if os.environ['ENVIRONMENT'] == 'local' else boto3.resource("s3")
+
+s3 = boto3.resource("s3", endpoint_url=f"http://{os.environ['S3_HOST']}:4566") if os.environ[
+                                                                                      'ENVIRONMENT'] == 'local' else boto3.resource(
+    "s3")
 
 qa_bucket_name = os.environ['QA_BUCKET']
+
+
 def generic_expectations_without_null(name, summary, batch, *args):
     batch.expect_column_to_exist(column=name)
     if summary["p_unique"] >= 0.9:
@@ -37,13 +42,15 @@ def expectations_null(name, summary, batch, *args):
         batch.expect_column_values_to_not_be_null(column=name)
     return name, summary, batch
 
+
 def expectations_mean(name, summary, batch, *args):
     n = summary["n"]
-    k = 0.99 * (summary["std"]/math.sqrt(n))
+    k = 0.99 * (summary["std"] / math.sqrt(n))
     min_mean = summary["mean"] - k
     max_mean = summary["mean"] + k
     batch.expect_column_mean_to_be_between(column=name, min_value=min_mean, max_value=max_mean)
     return name, summary, batch
+
 
 def expectations_median(name, summary, batch, *args):
     raw_values = summary["value_counts_index_sorted"]
@@ -59,11 +66,12 @@ def expectations_median(name, summary, batch, *args):
     batch.expect_column_median_to_be_between(column=name, min_value=min_median, max_value=max_median)
     return name, summary, batch
 
+
 def expectations_stdev(name, summary, batch, *args):
     n = summary["n"]
     std = summary["std"]
     confidence_level = 0.99
-    degrees_of_freedom = n-1
+    degrees_of_freedom = n - 1
     alpha = 1 - confidence_level
     t_critical = t.ppf(1 - alpha / 2, degrees_of_freedom)
     margin_of_error = t_critical * (std / math.sqrt(n))
@@ -71,6 +79,7 @@ def expectations_stdev(name, summary, batch, *args):
     max_std = std + margin_of_error
     batch.expect_column_stdev_to_be_between(column=name, min_value=min_std, max_value=max_std)
     return name, summary, batch
+
 
 def expectations_quantile(name, summary, batch, *args):
     q_array = [summary["5%"], summary["25%"], summary["50%"], summary["75%"], summary["95%"]]
@@ -82,6 +91,17 @@ def expectations_quantile(name, summary, batch, *args):
     batch.expect_column_quantile_values_to_be_between(column=name, quantile_ranges=q_ranges)
     return name, summary, batch
 
+
+# could be used only with V3
+def expectations_z_score(name, summary, batch, *args):
+    mean = summary["mean"]
+    std = summary["std"]
+    maximum = summary["max"]
+    threshold = (maximum - mean) / std
+    batch.expect_column_value_z_scores_to_be_less_than(column=name, threshold=threshold, double_sided=True)
+    return name, summary, batch
+
+
 class MyExpectationHandler(Handler):
     def __init__(self, typeset, *args, **kwargs):
         mapping = {
@@ -92,7 +112,8 @@ class MyExpectationHandler(Handler):
                             ],
             "Boolean": [expectations_null,
                         ],
-            "Numeric": [generic_expectations_without_null, expectations_null, expectation_algorithms.numeric_expectations,
+            "Numeric": [generic_expectations_without_null, expectations_null,
+                        expectation_algorithms.numeric_expectations,
                         expectations_median, expectations_stdev, expectations_quantile
                         ],
             "URL": [expectation_algorithms.url_expectations, expectations_null,
@@ -114,7 +135,6 @@ def change_ge_config(datasource_root, project_name):
 
     configfile_raw = context_ge.get_config().to_yaml_str()
     configfile = yaml.safe_load(configfile_raw)
-
 
     datasources = {
         "pandas_s3": {
@@ -188,15 +208,14 @@ def add_local_s3_to_data_docs(data_docs_sites):
     return data_docs_sites
 
 
-def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,mapping_config,run_name,project_name):
+def profile_data(df, suite_name, cloudfront, datasource_root, source_covered, mapping_config, run_name, project_name):
     try:
         mapping_schema = mapping_config[suite_name.split('_')[0]]
     except KeyError:
         mapping_schema = None
 
-
     qa_bucket = s3.Bucket(qa_bucket_name)
-    config = change_ge_config(datasource_root,project_name)
+    config = change_ge_config(datasource_root, project_name)
     context_ge = BaseDataContext(project_config=config)
     try:
         profile = ProfileReport(df, title=f"{suite_name} Profiling Report", minimal=True)
@@ -232,7 +251,7 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,map
     now = datetime.now()
     date_time = now.strftime("%y%m%dT%H%M%S")
     folder = f"{folder}{suite_name}/{str(date_time)}/"
-    
+
     qa_bucket.put_object(Key=folder)
     qa_bucket.put_object(Key=f"{folder}{suite_name}_profiling.html", Body=report, ContentType='text/html')
     profile_link = f"{cloudfront}/{folder}{suite_name}_profiling.html"
