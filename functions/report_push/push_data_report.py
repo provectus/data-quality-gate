@@ -1,11 +1,5 @@
 import os
-import sys
-import s3fs
 import boto3
-import boto
-import boto.s3
-import re
-import fnmatch
 from datetime import date
 import json
 import awswrangler as wr
@@ -160,6 +154,7 @@ def push_sns_message(
         sns_bugs_topic,
         only_failed):
     message_structure = 'json'
+    allure_link = f"http://{replaced_allure_links}"
     if created_bug_count > 0:
         sns_message = {
             "table": suite,
@@ -167,7 +162,7 @@ def push_sns_message(
             "source_name": file,
             "new_bugs": bug_name,
             "new_bugs_count": created_bug_count,
-            "allure_report": f"https://{replaced_allure_links}"
+            "allure_report": allure_link
         }
     elif failed > 0:
         sns_message = {
@@ -177,7 +172,7 @@ def push_sns_message(
             "all": total,
             "failed": failed,
             "passed": passed,
-            "allure_report": f"https://{replaced_allure_links}"
+            "allure_report": allure_link
         }
     else:
         sns_message = f"All {total} tests for source: {suite} were successful"
