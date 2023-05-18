@@ -17,8 +17,8 @@ resource "aws_iam_policy" "basic_lambda_policy" {
             "s3:*"
           ],
           "Resource" : [
-            "arn:aws:s3:::${aws_s3_bucket.settings_bucket.bucket}",
-            "arn:aws:s3:::${aws_s3_bucket.settings_bucket.bucket}/*",
+            "arn:aws:s3:::${module.s3_bucket.bucket_name}",
+            "arn:aws:s3:::${module.s3_bucket.bucket_name}/*",
           ]
         },
         {

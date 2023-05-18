@@ -10,22 +10,22 @@ provider "aws" {
   }
 }
 
-module "integration_tests_data_qa" {
-  source = "../../terraform"
+module "s3_configs" {
+  source = "../../terraform/modules/s3-configs"
 
-  data_test_storage_bucket_name = "integration-test-bucket"
-  environment                   = "local"
-
-  allure_report_image_uri = ""
-  data_test_image_uri     = ""
-  push_report_image_uri   = ""
-
-  reports_subnet_id = ""
-  reports_vpc_id    = ""
-
-  lambda_private_subnet_ids = []
-  lambda_security_group_ids = []
-
-  reports_whitelist_ips = []
+  #CONFIGs paths here.
 }
+
+#Example
+#module "s3_bucket" {
+#  environment = var.environment
+#
+#  data_test_storage_bucket_name = relative path
+#  test_coverage_path            = relative path
+#  pipeline_config_path          = relative path
+#  pks_path                      = relative path
+#  sort_keys_path                = relative path
+#  mapping_path                  = relative path
+#  expectations_store            = relative path
+#}
 

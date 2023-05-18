@@ -14,7 +14,6 @@ variable "project" {
 variable "environment" {
   description = "Environment name used to build fully qualified tags and resource's names"
   type        = string
-  default     = "data-qa-dev"
 }
 
 variable "data_test_storage_bucket_name" {

@@ -28,5 +28,5 @@ output "report_push_role_arn" {
 
 output "bucket" {
   description = "Data quality gate bucket with settings and generated tests"
-  value       = aws_s3_bucket.settings_bucket.bucket
+  value       = module.s3_bucket.bucket_name
 }
