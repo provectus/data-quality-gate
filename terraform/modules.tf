@@ -17,6 +17,8 @@ module "s3_bucket" {
   sort_keys_path                = var.sort_keys_path
   mapping_path                  = var.mapping_path
   expectations_store            = var.expectations_store
+  manifest_path                 = var.manifest_path
+  great_expectation_path        = var.great_expectation_path
 }
 
 module "basic_slack_alerting" {

@@ -57,6 +57,18 @@ variable "expectations_store" {
   default     = "../expectations_store"
 }
 
+variable "manifest_path" {
+  description = "Path to the manifests"
+  type        = string
+  default     = "../configs/manifest.json"
+}
+
+variable "great_expectation_path" {
+  description = "Path to the great expectations yaml"
+  type        = string
+  default     = "../templates/great_expectations.yml"
+}
+
 variable "lambda_allure_report_memory" {
   description = "Amount of memory allocated to the lambda function lambda_allure_report"
   type        = number
