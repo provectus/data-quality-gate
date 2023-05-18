@@ -4,7 +4,7 @@ run-localstack:
 deploy-qa-infra:
 	cd ./tests/integration_tests/infra && \
 	terraform init && \
-	terraform apply -target=module.integration_tests_data_qa.aws_s3_object.great_expectations_yml -target=module.integration_tests_data_qa.aws_s3_object.test_configs -target=module.integration_tests_data_qa.aws_s3_object.pipeline_config -target=module.integration_tests_data_qa.aws_s3_object.pks_config -target=module.integration_tests_data_qa.aws_s3_object.mapping_config -target=module.integration_tests_data_qa.aws_s3_object.expectations_store -target=module.integration_tests_data_qa.aws_s3_object.test_config_manifest -auto-approve
+	terraform apply -auto-approve
 
 build-data-test-img:
 	cd ./functions/data_test && \
