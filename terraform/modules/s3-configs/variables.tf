@@ -37,3 +37,13 @@ variable "expectations_store" {
   description = "Path to the expectations_store directory, relative to the root TF"
   type        = string
 }
+
+variable "manifest_path" {
+  description = "Path to the manifests"
+  type        = string
+}
+
+variable "great_expectation_path" {
+  description = "Path to the great expectations yaml"
+  type        = string
+}
