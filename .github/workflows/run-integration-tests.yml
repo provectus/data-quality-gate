@@ -22,12 +22,12 @@ jobs:
           terraform_version: 1.3.3
       - name: Terraform init
         run: |
-          cd ./examples/localstack
+          cd ./tests/integration_tests/infra
           terraform init
       - name: Terraform apply
         run: |
-          cd ./examples/localstack
-          terraform apply -target=module.integration_tests_data_qa.aws_s3_object.great_expectations_yml -target=module.integration_tests_data_qa.aws_s3_object.test_configs -target=module.integration_tests_data_qa.aws_s3_object.pipeline_config -target=module.integration_tests_data_qa.aws_s3_object.pks_config -target=module.integration_tests_data_qa.aws_s3_object.mapping_config -target=module.integration_tests_data_qa.aws_s3_object.expectations_store -target=module.integration_tests_data_qa.aws_s3_object.test_config_manifest -auto-approve  
+          cd ./tests/integration_tests/infra
+          terraform apply -auto-approve
       - name: check localstack  
         run: |
          curl http://localhost:4566/_localstack/health -i
@@ -40,4 +40,4 @@ jobs:
           cd ./tests/integration_tests/test_data_tests
           docker build -t integration-tests:latest .
       - name: Run tests
-        run: docker run --env BUCKET=integration-test-bucket --env S3_HOST=172.17.0.1 --env S3_PORT=4566 integration-tests
+        run: docker run --env BUCKET=dqg-settings-local --env S3_HOST=172.17.0.1 --env S3_PORT=4566 integration-tests

@@ -1,0 +1,12 @@
+{
+   "fileLocations":[
+      {
+         "URIPrefixes":[
+               "s3://${bucket_name}/test_configs/test_coverage.json"
+         ]
+      }
+   ],
+   "globalUploadSettings":{
+      "format":"JSON"
+   }
+}
