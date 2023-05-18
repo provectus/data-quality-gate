@@ -40,7 +40,7 @@ module "data_reports_alerting" {
   slack_channel     = var.data_reports_notification_settings.channel
   slack_webhook_url = var.data_reports_notification_settings.webhook_url
 
-  slack_sns_topic_name = "dqg-data_reports"
+  slack_sns_topic_name = "dqg-data_reports-${var.environment}"
   slack_username       = "DQG-alerting"
 
   resource_name_prefix = local.resource_name_prefix
