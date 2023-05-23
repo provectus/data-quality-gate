@@ -112,10 +112,19 @@ variable "cloudfront_distribution_enabled" {
   description = "Enable CloudFront distribution"
 }
 #DynamoDB
+variable "dynamodb_hash_key" {
+  description = "The attribute to use as the hash (partition) key. Must also be defined as an attribute"
+  type        = string
+  default     = "file"
+}
+
 variable "dynamodb_table_attributes" {
   description = "List of nested attribute definitions. Only required for hash_key and range_key attributes. Each attribute has two properties: name - (Required) The name of the attribute, type - (Required) Attribute type, which must be a scalar type: S, N, or B for (S)tring, (N)umber or (B)inary data"
   type        = list(map(string))
-  default     = []
+  default = [{
+    name = "file"
+    type = "S"
+  }]
 }
 
 variable "dynamodb_stream_enabled" {
@@ -136,41 +145,30 @@ variable "dynamodb_read_capacity" {
   default     = 20
 }
 
-variable "dynamodb_report_table_autoscaling_read_capacity_settings" {
-  description = "Report table autoscaling read capacity"
-  type = object({
-    min = number
-    max = number
-  })
-
+variable "dynamodb_autoscaling_defaults" {
+  description = "A map of default autoscaling settings"
+  type        = map(string)
   default = {
-    min = 50
-    max = 200
+    scale_in_cooldown  = 50
+    scale_out_cooldown = 40
+    target_value       = 45
   }
 }
 
-variable "dynamodb_report_table_autoscaling_write_capacity_settings" {
-  description = "Report table autoscaling write capacity"
-  type = object({
-    min = number
-    max = number
-  })
-
+variable "dynamodb_autoscaling_read" {
+  description = "A map of read autoscaling settings. `max_capacity` is the only required key."
+  type        = map(string)
   default = {
-    min = 2
-    max = 50
+    max_capacity = 200
   }
 }
 
-variable "dynamodb_report_table_read_scale_threshold" {
-  description = "Dynamodb report table read scale up threshold"
-  type        = number
-  default     = 60
-}
-variable "dynamodb_report_table_write_scale_threshold" {
-  description = "Dynamodb report table write scale up threshold"
-  type        = number
-  default     = 70
+variable "dynamodb_autoscaling_write" {
+  description = "A map of write autoscaling settings. `max_capacity` is the only required key."
+  type        = map(string)
+  default = {
+    max_capacity = 10
+  }
 }
 
 #Lambda
