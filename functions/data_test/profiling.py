@@ -108,12 +108,12 @@ class MyExpectationHandler(Handler):
             "Unsupported": [generic_expectations_without_null, expectations_null,
                             ],
             "Categorical": [expectation_algorithms.categorical_expectations,
-                            expectations_null, expectations_mean
+                            expectations_null
                             ],
             "Boolean": [expectations_null,
                         ],
             "Numeric": [generic_expectations_without_null, expectations_null,
-                        expectation_algorithms.numeric_expectations,
+                        expectation_algorithms.numeric_expectations, expectations_mean,
                         expectations_median, expectations_stdev, expectations_quantile
                         ],
             "URL": [expectation_algorithms.url_expectations, expectations_null,
