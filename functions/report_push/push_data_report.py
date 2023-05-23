@@ -125,7 +125,7 @@ def handler(event, context):
         "failed_test_count": failed,
     }
 
-    if token is not 'None' or not token:
+    if token != 'None' and token:
         baseline = 100 * int(total)/int(failed)
         sm = boto3.client('sagemaker')
         response = sm.send_pipeline_execution_step_success(
