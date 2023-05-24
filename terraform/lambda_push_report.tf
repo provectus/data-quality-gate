@@ -1,5 +1,5 @@
 locals {
-  default_push_report_env_vars = {
+  default_push_report_env_vars = merge({
     ENVIRONMENT    = var.environment
     BUCKET         = aws_s3_bucket.settings_bucket.bucket
     REPORTS_WEB    = module.reports_gateway.s3_gateway_address
@@ -7,7 +7,7 @@ locals {
     JIRA_URL       = var.lambda_push_jira_url
     SECRET_NAME    = var.lambda_push_secret_name
     REGION_NAME    = data.aws_region.current.name
-  }
+  }, var.push_report_extra_vars)
 }
 
 module "lambda_push_report" {

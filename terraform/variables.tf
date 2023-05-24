@@ -100,17 +100,6 @@ variable "redshift_secret" {
   default     = null
 }
 
-variable "push_report_extra_vars" {
-  type        = map(string)
-  default     = {}
-  description = "Extra variables for push report lambda"
-}
-
-variable "cloudfront_distribution_enabled" {
-  type        = bool
-  default     = true
-  description = "Enable CloudFront distribution"
-}
 #DynamoDB
 variable "dynamodb_hash_key" {
   description = "The attribute to use as the hash (partition) key. Must also be defined as an attribute"
@@ -172,6 +161,24 @@ variable "dynamodb_autoscaling_write" {
 }
 
 #Lambda
+variable "push_report_extra_vars" {
+  description = "Extra environment variables for push report lambda"
+  type        = map(string)
+  default     = {}
+}
+
+variable "data_test_extra_vars" {
+  description = "Extra environment variables for data test lambda"
+  type        = map(string)
+  default     = {}
+}
+
+variable "allure_report_extra_vars" {
+  description = "Extra environment variables for allure report lambda"
+  type        = map(string)
+  default     = {}
+}
+
 variable "allure_report_image_uri" {
   description = "Allure report image URI(ECR repository)"
   type        = string
