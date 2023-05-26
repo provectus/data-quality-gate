@@ -8,14 +8,14 @@ module "lambda_data_test" {
   attach_policy = true
   policy        = aws_iam_policy.basic_lambda_policy.arn
 
-  environment_variables = {
+  environment_variables = merge({
     ENVIRONMENT     = var.environment
     BUCKET          = module.s3_bucket.bucket_name
     REPORTS_WEB     = module.reports_gateway.s3_gateway_address
     DYNAMODB_TABLE  = aws_dynamodb_table.data_qa_report.name
     REDSHIFT_DB     = var.redshift_db_name
     REDSHIFT_SECRET = var.redshift_secret
-  }
+  }, var.data_test_extra_vars)
 
   image_uri                      = var.data_test_image_uri
   package_type                   = "Image"

@@ -8,12 +8,12 @@ module "lambda_allure_report" {
   attach_policy = true
   policy        = aws_iam_policy.basic_lambda_policy.arn
 
-  environment_variables = {
+  environment_variables = merge({
     ENVIRONMENT    = var.environment
     BUCKET         = module.s3_bucket.bucket_name
     REPORTS_WEB    = module.reports_gateway.s3_gateway_address
     DYNAMODB_TABLE = aws_dynamodb_table.data_qa_report.name
-  }
+  }, var.allure_report_extra_vars)
 
   image_uri                      = var.allure_report_image_uri
   package_type                   = "Image"

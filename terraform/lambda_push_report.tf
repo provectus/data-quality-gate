@@ -1,5 +1,5 @@
 locals {
-  default_push_report_env_vars = {
+  default_push_report_env_vars = merge({
     ENVIRONMENT    = var.environment
     BUCKET         = module.s3_bucket.bucket_name
     REPORTS_WEB    = module.reports_gateway.s3_gateway_address
@@ -7,7 +7,7 @@ locals {
     JIRA_URL       = var.lambda_push_jira_url
     SECRET_NAME    = var.lambda_push_secret_name
     REGION_NAME    = data.aws_region.current.name
-  }
+  }, var.push_report_extra_vars)
 }
 
 module "lambda_push_report" {
@@ -40,7 +40,7 @@ module "data_reports_alerting" {
   slack_channel     = var.data_reports_notification_settings.channel
   slack_webhook_url = var.data_reports_notification_settings.webhook_url
 
-  slack_sns_topic_name = "dqg-data_reports"
+  slack_sns_topic_name = "dqg-data_reports-${var.environment}"
   slack_username       = "DQG-alerting"
 
   resource_name_prefix = local.resource_name_prefix
