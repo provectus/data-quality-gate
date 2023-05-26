@@ -2,6 +2,7 @@ provider "aws" {
   region              = "us-west-2"
   access_key          = "local-access-key"
   secret_key          = "local-secret-key"
+  s3_force_path_style = true
 
   endpoints {
     s3  = "http://localhost:4566"
