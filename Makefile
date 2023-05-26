@@ -45,3 +45,11 @@ run-unit-tests:
 	export REDSHIFT_SECRET='titanic' && \
 	cd ./functions/data_test && \
 	python -m pytest ../../tests/unit_tests/data_test/ -v
+
+build-data-test-unit-tests-img: build-data-test-img
+	cd ./tests/unit_tests/data_test && \
+	docker build -t data_test_unit_tests .
+
+run-unit-tests-in-docker: build-data-test-unit-tests-img
+	cd ./tests/unit_tests/data_test && \
+	docker run --env-file=.env data_test_unit_tests
