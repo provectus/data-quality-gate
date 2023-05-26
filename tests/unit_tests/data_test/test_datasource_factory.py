@@ -1,5 +1,5 @@
 import pytest
-from functions.data_test.data_source_factory import (
+from data_source_factory import (
     DataSourceFactory,
     S3DataSource,
     HudiDataSource,

@@ -1,5 +1,5 @@
 import pytest
-from functions.data_test.profiling import (add_local_s3_to_stores,
+from profiling import (add_local_s3_to_stores,
                                            read_gx_config_file)
 
 ENDPOINT_URL = "http://localhost:4566"
