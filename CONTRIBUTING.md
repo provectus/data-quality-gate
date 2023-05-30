@@ -18,6 +18,11 @@ By participating in this project, you agree to abide by our [Code of Conduct](ht
 - Fork the repository and create a new branch for your changes.
 - Ensure that your branch is up-to-date with the latest version of the main branch.
 - Follow the project's coding style and conventions.
+- Add a meaningful title and description for your pull request (PR)
+  - [BUGFIX] for PRs that address minor bugs without changing behavior.
+  - [FEATURE] for significant PRs that add a new feature likely to require being added to our feature maturity matrix.
+  - [MAINTENANCE] for PRs that focus on updating repository settings or related changes.
+  - [DOCS] for PRs that focus on updating or adding documentation.
 - Write clear and concise commit messages.
 - Include tests to ensure that your changes do not introduce regressions.
 - Provide a description of the changes you made in the pull request description.
