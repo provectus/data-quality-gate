@@ -10,12 +10,7 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3  
-      - name: Set up Python  
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.7'
-          cache: 'pip'
-      - name: install dependieces  
-        run: make prepare-unit-tests
-      - name: run tests
-        run: make run-unit-tests
+      - name: build data test unit tests image  
+        run: make build-data-test-unit-tests-img
+      - name: run data test unit tests
+        run: make run-unit-tests-in-docker
