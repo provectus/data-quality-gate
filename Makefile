@@ -34,4 +34,4 @@ build-data-test-unit-tests-img: build-data-test-img
 
 run-unit-tests-in-docker: build-data-test-unit-tests-img
 	cd $(DATA_TEST_UNIT_TESTS_DIR) && \
-	docker run --env-file=.env $(DATA_TEST_UNIT_TESTS_IMG)
+	docker run $(DATA_TEST_UNIT_TESTS_IMG)
