@@ -132,7 +132,7 @@ def handler(event, context):
             CallbackToken=token,
             OutputParameters=[
                 {
-                    'Name': 'baseline',
+                    'Name': 'data_quality_rate',
                     'Value': str(baseline)
                 },
             ]
