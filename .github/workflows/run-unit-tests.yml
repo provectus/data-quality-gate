@@ -10,7 +10,5 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v3  
-      - name: build data test unit tests image  
-        run: make build-data-test-unit-tests-img
       - name: run data test unit tests
         run: make run-unit-tests-in-docker
