@@ -37,7 +37,9 @@ module "basic_slack_alerting" {
 }
 
 module "reports_gateway" {
-  source      = "./modules/s3-gateway"
+  source     = "./modules/s3-gateway"
+  depends_on = [module.s3_bucket]
+
   env         = var.environment
   bucket_name = module.s3_bucket.bucket_name
 
