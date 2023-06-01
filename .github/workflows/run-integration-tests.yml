@@ -31,13 +31,5 @@ jobs:
       - name: check localstack  
         run: |
          curl http://localhost:4566/_localstack/health -i
-      - name: Build lambda image
-        run: |
-          cd ./functions/data_test
-          docker build -t data-test:latest .
-      - name: Build test image
-        run: |
-          cd ./tests/integration_tests/test_data_tests
-          docker build -t integration-tests:latest .
       - name: Run tests
-        run: docker run --env BUCKET=dqg-settings-local --env S3_HOST=172.17.0.1 --env S3_PORT=4566 integration-tests
+        run: make run-integration-tests BUCKET=dqg-settings-local S3_HOST=172.17.0.1
