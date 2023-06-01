@@ -21,21 +21,8 @@ build-data-test-img:
 	docker build -t data-test:latest .
 
 build-data-test-tests-img: build-data-test-img
-<<<<<<< HEAD
 	cd $(INTEGRATION_TESTS_DIR) && \
 	docker build -t $(DATA_TEST_INTEGRATION_TESTS_IMG) .
-=======
-	cd $(integration_tests_dir) && \
-	docker build -t test_data_tests .
-
-build-unit-tests-img: build-data-test-img
-	cd $(unit_tests_dir) && \
-	docker build -t unit_tests .	
-
-host := host.docker.internal
-port:= 4566
-qa_bucket = dqg-settings-local
->>>>>>> main
 
 run-integration-tests: build-data-test-img build-data-test-tests-img
 	cd $(INTEGRATION_TESTS_DIR)
