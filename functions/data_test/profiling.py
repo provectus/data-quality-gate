@@ -1,12 +1,12 @@
 import json
-from pandas_profiling import ProfileReport
+from ydata_profiling import ProfileReport
 import os
 import boto3
 import awswrangler as wr
-from pandas_profiling.model import expectation_algorithms
-from pandas_profiling.model.handler import Handler
+from ydata_profiling.model import expectation_algorithms
+from ydata_profiling.model.handler import Handler
 from Expectation_report_new import ExpectationsReportNew
-from pandas_profiling.expectations_report import ExpectationsReport
+from ydata_profiling.expectations_report import ExpectationsReport
 from datetime import datetime
 from great_expectations.data_context import BaseDataContext
 from great_expectations.data_context.types.base import (DataContextConfig,
@@ -44,21 +44,25 @@ class MyExpectationHandler(Handler):
                             ],
             "Categorical": [expectation_algorithms.categorical_expectations,
                             expectations_null,
-
                             ],
+            "Text": [expectation_algorithms.categorical_expectations,
+                     expectations_null
+                     ],
             "Boolean": [expectations_null,
                         ],
-            "Numeric": [generic_expectations_without_null, expectations_null,
+            "Numeric": [generic_expectations_without_null,
+                        expectations_null,
                         ],
-            "URL": [expectation_algorithms.url_expectations, expectations_null,
+            "URL": [expectation_algorithms.url_expectations,
+                    expectations_null,
                     ],
-            "File": [expectation_algorithms.file_expectations, 
+            "File": [expectation_algorithms.file_expectations,
                      expectations_null, ],
-            "Path": [expectation_algorithms.path_expectations, 
+            "Path": [expectation_algorithms.path_expectations,
                      expectations_null, ],
-            "DateTime": [expectation_algorithms.datetime_expectations, 
+            "DateTime": [expectation_algorithms.datetime_expectations,
                          expectations_null, ],
-            "Image": [expectation_algorithms.image_expectations, 
+            "Image": [expectation_algorithms.image_expectations,
                       expectations_null, ],
         }
         super().__init__(mapping, typeset, *args, **kwargs)
@@ -196,7 +200,7 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
     now = datetime.now()
     date_time = now.strftime("%y%m%dT%H%M%S")
     folder = f"{folder}{suite_name}/{str(date_time)}/"
-    
+
     qa_bucket.put_object(Key=folder)
     qa_bucket.put_object(Key=f"{folder}{suite_name}_profiling.html",
                          Body=report, ContentType='text/html')

@@ -3,13 +3,13 @@ from typing import Any, Optional
 
 import pandas as pd
 from great_expectations.core import ExpectationConfiguration
-from pandas_profiling.expectations_report import ExpectationHandler
+from ydata_profiling.expectations_report import ExpectationHandler
 from visions import VisionsTypeset
 
-from pandas_profiling.config import Settings
-from pandas_profiling.model import expectation_algorithms
-from pandas_profiling.model.handler import Handler
-from pandas_profiling.utils.dataframe import slugify
+from ydata_profiling.config import Settings
+from ydata_profiling.model import expectation_algorithms
+from ydata_profiling.model.handler import Handler
+from ydata_profiling.utils.dataframe import slugify
 import re
 
 
@@ -139,7 +139,7 @@ class ExpectationsReportNew:
                         suite_old = data_context.get_expectation_suite(f"{suite_name}_{run_name}")
                         batch = ge.dataset.PandasDataset(self.df, expectation_suite=suite_old)
                         summary = self.get_description()
-                        for name, variable_summary in summary["variables"].items():
+                        for name, variable_summary in summary.variables.items():
                             if name in list(new_column_in_mapping.values()):
                                 handler.handle(variable_summary["type"], name, variable_summary, batch)
                         suite = batch.get_expectation_suite(discard_failed_expectations=False)
@@ -211,7 +211,7 @@ class ExpectationsReportNew:
                                                                       overwrite_existing=True)
                     batch = ge.dataset.PandasDataset(self.df, expectation_suite=suite_old)
                     summary = self.get_description()
-                    for name, variable_summary in summary["variables"].items():
+                    for name, variable_summary in summary.variables.items():
                         if name in schema_list and name not in ignored_columns:
                             handler.handle(variable_summary["type"], name, variable_summary, batch)
                     suite = batch.get_expectation_suite(discard_failed_expectations=False)
@@ -237,7 +237,7 @@ class ExpectationsReportNew:
                         expectation_configuration=ExpectationConfiguration(kwargs={"column_set": final_schema},
                                                                            expectation_type="expect_table_columns_to_match_set"))
                     suite.add_expectation(
-                        expectation_configuration=ExpectationConfiguration(kwargs={"value": summary['table']['n']},
+                        expectation_configuration=ExpectationConfiguration(kwargs={"value": summary.table['n']},
                                                                            expectation_type="expect_table_row_count_to_equal"))
                     data_context.save_expectation_suite(expectation_suite=suite,
                                                         expectation_suite_name=f"{suite_name}_{run_name}",
@@ -255,7 +255,7 @@ class ExpectationsReportNew:
 
             # Dispatch to expectations per semantic variable type
             name_list = []
-            for name, variable_summary in summary["variables"].items():
+            for name, variable_summary in summary.variables.items():
                 name_list.append(name)
                 if mapping_schema is not None:
                     if name in list(mapping_schema.keys()) and name not in ignored_columns:
@@ -265,7 +265,7 @@ class ExpectationsReportNew:
                         handler.handle(variable_summary["type"], name, variable_summary, batch)
             batch.expect_table_columns_to_match_set(
                 column_set=name_list)
-            batch.expect_table_row_count_to_equal(value=summary['table']['n'])
+            batch.expect_table_row_count_to_equal(value=summary.table['n'])
             suite = batch.get_expectation_suite(discard_failed_expectations=False)
 
             validation_result_identifier = None
