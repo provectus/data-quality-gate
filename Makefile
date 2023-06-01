@@ -12,17 +12,30 @@ run-localstack:
 	docker run --rm -d -p 4566:4566 -p 4510-4559:4510-4559 localstack/localstack:1.3.1
 
 deploy-qa-infra:
-	cd ./examples/localstack && \
+	cd ./tests/integration_tests/infra && \
 	terraform init && \
-	terraform apply -target=module.integration_tests_data_qa.aws_s3_object.great_expectations_yml -target=module.integration_tests_data_qa.aws_s3_object.test_configs -target=module.integration_tests_data_qa.aws_s3_object.pipeline_config -target=module.integration_tests_data_qa.aws_s3_object.pks_config -target=module.integration_tests_data_qa.aws_s3_object.mapping_config -target=module.integration_tests_data_qa.aws_s3_object.expectations_store -target=module.integration_tests_data_qa.aws_s3_object.test_config_manifest -auto-approve
+	terraform apply -auto-approve
 
 build-data-test-img:
 	cd ./functions/data_test && \
 	docker build -t data-test:latest .
 
 build-data-test-tests-img: build-data-test-img
+<<<<<<< HEAD
 	cd $(INTEGRATION_TESTS_DIR) && \
 	docker build -t $(DATA_TEST_INTEGRATION_TESTS_IMG) .
+=======
+	cd $(integration_tests_dir) && \
+	docker build -t test_data_tests .
+
+build-unit-tests-img: build-data-test-img
+	cd $(unit_tests_dir) && \
+	docker build -t unit_tests .	
+
+host := host.docker.internal
+port:= 4566
+qa_bucket = dqg-settings-local
+>>>>>>> main
 
 run-integration-tests: build-data-test-img build-data-test-tests-img
 	cd $(INTEGRATION_TESTS_DIR)

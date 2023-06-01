@@ -1,0 +1,7 @@
+{
+  "db.table": {
+    "sortKey": [
+      "update_dt"
+    ]
+  }
+}

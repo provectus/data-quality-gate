@@ -1,7 +1,7 @@
 locals {
   default_push_report_env_vars = merge({
     ENVIRONMENT    = var.environment
-    BUCKET         = aws_s3_bucket.settings_bucket.bucket
+    BUCKET         = module.s3_bucket.bucket_name
     REPORTS_WEB    = module.reports_gateway.s3_gateway_address
     DYNAMODB_TABLE = aws_dynamodb_table.data_qa_report.name
     JIRA_URL       = var.lambda_push_jira_url

@@ -1,0 +1,9 @@
+{
+  "db.table": {
+    "primaryKey": [
+      "ACCOUNT_TYPE",
+      "ACCOUNT_NUMBER",
+      "RECORD_NUMBER"
+    ]
+  }
+}

@@ -14,7 +14,6 @@ variable "project" {
 variable "environment" {
   description = "Environment name used to build fully qualified tags and resource's names"
   type        = string
-  default     = "data-qa-dev"
 }
 
 variable "data_test_storage_bucket_name" {
@@ -25,37 +24,49 @@ variable "data_test_storage_bucket_name" {
 variable "test_coverage_path" {
   description = "Path to the tests description path, relative to the root TF"
   type        = string
-  default     = "../configs/test_coverage.json"
+  default     = "../../../configs/test_coverage.json"
 }
 
 variable "pipeline_config_path" {
   description = "Path to the pipeline description path, relative to the root TF"
   type        = string
-  default     = "../configs/pipeline.json"
+  default     = "../../../configs/pipeline.json"
 }
 
 variable "pks_path" {
   description = "Path to the primary keys description path, relative to the root TF"
   type        = string
-  default     = "../configs/pks.json"
+  default     = "../../../configs/pks.json"
 }
 
 variable "sort_keys_path" {
   description = "Path to the sort keys description path, relative to the root TF"
   type        = string
-  default     = "../configs/sort_keys.json"
+  default     = "../../../configs/sort_keys.json"
 }
 
 variable "mapping_path" {
   description = "Path to the mapping description path, relative to the root TF"
   type        = string
-  default     = "../configs/mapping.json"
+  default     = "../../../configs/mapping.json"
 }
 
 variable "expectations_store" {
   description = "Path to the expectations_store directory, relative to the root TF"
   type        = string
-  default     = "../expectations_store"
+  default     = "../../../expectations_store"
+}
+
+variable "manifest_path" {
+  description = "Path to the manifests"
+  type        = string
+  default     = "../../../configs/manifest.json"
+}
+
+variable "great_expectation_path" {
+  description = "Path to the great expectations yaml"
+  type        = string
+  default     = "../../../templates/great_expectations.yml"
 }
 
 variable "lambda_allure_report_memory" {
