@@ -67,5 +67,5 @@ data_docs_sites:
       class_name: DefaultSiteIndexBuilder
 anonymous_usage_statistics:
   data_context_id: f6a15c13-c249-416b-8beb-2e540a245773
-  enabled: true
+  enabled: false
 notebooks:
