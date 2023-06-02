@@ -1,5 +1,5 @@
 import pytest
-from functions.data_test.datasource import (
+from datasource import (
   get_file_extension,
   concat_source_list,
   get_source_name)

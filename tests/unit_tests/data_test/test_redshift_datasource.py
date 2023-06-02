@@ -2,7 +2,7 @@ import pandas as pd
 import moto
 import boto3
 import pytest
-from functions.data_test.data_source_factory import RedshiftDataSource
+from data_source_factory import RedshiftDataSource
 import awswrangler as wr
 from unittest.mock import patch
 

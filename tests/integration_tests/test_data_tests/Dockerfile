@@ -1,5 +1,7 @@
-FROM data-test:latest
-RUN pip3 install pytest==7.3.1
+ARG IMAGE_NAME=data-test
+ARG VERSION=latest
+FROM ${IMAGE_NAME}:${VERSION}
+RUN pip install pytest==7.3.1
 ENV ENVIRONMENT local
 ENV REPORTS_WEB test
 ENV AWS_ACCESS_KEY_ID test
