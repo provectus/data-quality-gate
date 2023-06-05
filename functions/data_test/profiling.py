@@ -180,4 +180,4 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
     qa_bucket.put_object(Key=f"{folder}{suite_name}_profiling.html",
                          Body=report, ContentType='text/html')
     profile_link = f"{cloudfront}/{folder}{suite_name}_profiling.html"
-    return profile_link, date_time, config
+    return profile_link, date_time, config, data_asset

@@ -28,10 +28,10 @@ def handler(event, context):
     source_input = event["source_data"]
     coverage_config = json.loads(
         s3.Object(qa_bucket_name, "test_configs/test_coverage.json")
-        .get()["Body"].read().decode("utf-8"))
+            .get()["Body"].read().decode("utf-8"))
     mapping_config = json.loads(
         s3.Object(qa_bucket_name, "test_configs/mapping.json").get()["Body"]
-        .read().decode("utf-8"))
+            .read().decode("utf-8"))
     if type(source_input) is not list:
         source = [source_input]
     else:
@@ -54,11 +54,11 @@ def handler(event, context):
     final_ds, path = prepare_final_ds(source, engine, source_root, run_name,
                                       source_name, suite_coverage_config)
 
-    profile_link, folder_key, config = profile_data(final_ds, suite_name,
-                                                    cloudfront, source_root,
-                                                    source_covered,
-                                                    mapping_config, run_name)
-    validate_id = validate_data(final_ds, suite_name, config)
+    profile_link, folder_key, config, data_asset = profile_data(final_ds, suite_name,
+                                                                cloudfront, source_root,
+                                                                source_covered,
+                                                                mapping_config, run_name)
+    validate_id = validate_data(final_ds, suite_name, config, data_asset)
     test_suite = f"{cloudfront}/data_docs/validations/{validate_id}.html"
 
     report = {
