@@ -54,11 +54,11 @@ def handler(event, context):
     final_ds, path = prepare_final_ds(source, engine, source_root, run_name,
                                       source_name, suite_coverage_config)
 
-    profile_link, folder_key, config, data_asset = profile_data(final_ds, suite_name,
-                                                                cloudfront, source_root,
-                                                                source_covered,
-                                                                mapping_config, run_name)
-    validate_id = validate_data(final_ds, suite_name, config, data_asset)
+    profile_link, folder_key, saved_context, data_asset = profile_data(final_ds, suite_name,
+                                                                       cloudfront, source_root,
+                                                                       source_covered,
+                                                                       mapping_config, run_name)
+    validate_id = validate_data(final_ds, suite_name, saved_context, data_asset)
     test_suite = f"{cloudfront}/data_docs/validations/{validate_id}.html"
 
     report = {

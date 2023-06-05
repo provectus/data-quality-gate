@@ -4,8 +4,8 @@ from great_expectations.checkpoint import SimpleCheckpoint
 BASE_DIR = Path(__file__).resolve().parent
 
 
-def validate_data(file, suite_name, config, data_asset):
-    context_ge = EphemeralDataContext(project_config=config)
+def validate_data(file, suite_name, saved_context, data_asset):
+    context_ge = saved_context
     expectation_suite_name = suite_name
     batch_request = data_asset.build_batch_request()
     checkpoint_config = {
