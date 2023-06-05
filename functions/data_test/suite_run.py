@@ -1,11 +1,11 @@
 from pathlib import Path
-from great_expectations.data_context import BaseDataContext
+from great_expectations.data_context import EphemeralDataContext
 from great_expectations.checkpoint import SimpleCheckpoint
 BASE_DIR = Path(__file__).resolve().parent
 
 
 def validate_data(file, suite_name, config):
-    context_ge = BaseDataContext(project_config=config)
+    context_ge = EphemeralDataContext(project_config=config)
     expectation_suite_name = suite_name
     data_asset = context_ge.get_datasource("cloud").get_asset(suite_name)
     batch_request = data_asset.build_batch_request()
