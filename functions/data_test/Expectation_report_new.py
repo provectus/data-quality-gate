@@ -201,8 +201,8 @@ class ExpectationsReportNew:
                         dict_suites.append(suite_old)
 
                     # ##run tests generation against new columns
-                    suite_old = data_context.add_expectation_suite(
-                        f"{suite_name}_{run_name}"
+                    suite_old = data_context.add_or_update_expectation_suite(
+                        expectation_suite_name=f"{suite_name}_{run_name}"
                     )
                     validator = data_context.get_validator(
                         batch_request=batch_request,
@@ -240,8 +240,9 @@ class ExpectationsReportNew:
                     data_context.add_or_update_expectation_suite(expectation_suite=suite,
                                                                  expectation_suite_name=f"{suite_name}_{run_name}")
         else:
-            suite = data_context.add_expectation_suite(
-                f"{suite_name}_{run_name}"
+
+            suite = data_context.add_or_update_expectation_suite(
+                expectation_suite_name=f"{suite_name}_{run_name}"
             )
 
             # Instantiate an in-memory pandas dataset
