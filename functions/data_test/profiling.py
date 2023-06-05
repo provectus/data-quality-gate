@@ -8,7 +8,7 @@ from ydata_profiling.model.handler import Handler
 from Expectation_report_new import ExpectationsReportNew
 from ydata_profiling.expectations_report import ExpectationsReport
 from datetime import datetime
-from great_expectations.data_context import BaseDataContext
+from great_expectations.data_context import EphemeralDataContext
 from great_expectations.data_context.types.base import (DataContextConfig,
                                                         S3StoreBackendDefaults)
 import yaml
@@ -138,7 +138,7 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
                  mapping_config, run_name):
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)
-    context_ge = BaseDataContext(project_config=config)
+    context_ge = EphemeralDataContext(project_config=config)
     datasource = context_ge.sources.add_pandas(name="cloud")
     data_asset = datasource.add_dataframe_asset(name=suite_name, dataframe=df)
     try:
