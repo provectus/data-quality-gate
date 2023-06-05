@@ -70,29 +70,6 @@ class MyExpectationHandler(Handler):
 
 def change_ge_config(datasource_root):
     configfile = read_gx_config_file()
-    datasources = {
-        "pandas_s3": {
-            "class_name": "PandasDatasource",
-            "batch_kwargs_generators": {
-                "pandas_s3_generator": {
-                    "class_name": "S3GlobReaderBatchKwargsGenerator",
-                    "bucket": datasource_root,
-                    "assets": {
-                        "your_first_data_asset_name": {
-                            "prefix": "/",
-                            "regex_filter": ".*"
-                        }
-                    }
-                }
-            },
-            "module_name": "great_expectations.datasource",
-            "data_asset_type": {
-                "class_name": "PandasDataset",
-                "module_name": "great_expectations.dataset"
-            }
-        }
-    }
-
     if os.environ['ENVIRONMENT'] == 'local':
         stores = configfile["stores"]
         new_stores = add_local_s3_to_stores(stores, endpoint_url)
@@ -100,7 +77,6 @@ def change_ge_config(datasource_root):
         new_data_docs_sites = add_local_s3_to_data_docs(data_docs_sites,
                                                         endpoint_url)
         config = DataContextConfig(config_version=configfile["config_version"],
-                                   datasources=datasources,
                                    stores=new_stores,
                                    data_docs_sites=new_data_docs_sites,
                                    expectations_store_name=configfile["expectations_store_name"],
@@ -115,7 +91,7 @@ def change_ge_config(datasource_root):
                                        expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
                                        validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
     else:
-        config = DataContextConfig(config_version=configfile["config_version"], datasources=datasources,
+        config = DataContextConfig(config_version=configfile["config_version"],
                                    expectations_store_name=configfile["expectations_store_name"],
                                    validations_store_name=configfile["validations_store_name"],
                                    evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
@@ -163,6 +139,8 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)
     context_ge = BaseDataContext(project_config=config)
+    datasource = context_ge.sources.add_pandas(name="cloud")
+    data_asset = datasource.add_dataframe_asset(name=suite_name, dataframe=df)
     try:
         profile = ProfileReport(df, title=f"{suite_name} Profiling Report",
                                 minimal=True, pool_size=1)
@@ -187,9 +165,6 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
             data_context=context_ge,
             suite_name=remove_suffix(suite_name, f"_{run_name}"),
             run_name=run_name,
-            save_suite=True,
-            run_validation=False,
-            build_data_docs=False,
             reuse_suite=reuse_suite,
             mapping_config=mapping_config,
             use_old_suite=use_old_suite_only,

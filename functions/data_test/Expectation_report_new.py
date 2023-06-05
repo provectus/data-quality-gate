@@ -7,9 +7,7 @@ from ydata_profiling.expectations_report import ExpectationHandler
 from visions import VisionsTypeset
 
 from ydata_profiling.config import Settings
-from ydata_profiling.model import expectation_algorithms
 from ydata_profiling.model.handler import Handler
-from ydata_profiling.utils.dataframe import slugify
 import re
 
 
@@ -22,18 +20,16 @@ class ExpectationsReportNew:
         return None
 
     def to_expectation_suite(
-            self,
-            run_name: Optional[str] = None,
-            suite_name: Optional[str] = None,
-            data_context: Optional[Any] = None,
-            mapping_config: Optional[dict] = None,
-            save_suite: bool = True,
-            reuse_suite: bool = False,
-            run_validation: bool = True,
-            build_data_docs: bool = True,
-            old_suite_name: Optional[str] = None,
-            use_old_suite: Optional[str] = None,
-            handler: Optional[Handler] = None,
+        self,
+        run_name: Optional[str] = None,
+        suite_name: Optional[str] = None,
+        data_context: Optional[Any] = None,
+        mapping_config: Optional[dict] = None,
+        save_suite: bool = True,
+        reuse_suite: bool = False,
+        old_suite_name: Optional[str] = None,
+        use_old_suite: Optional[str] = None,
+        handler: Optional[Handler] = None,
     ) -> Any:
         """
         All parameters default to True to make it easier to access the full functionality of Great Expectations out of
@@ -59,10 +55,6 @@ class ExpectationsReportNew:
                 "Please install great expectations before using the expectation functionality"
             )
 
-        # Use report title if suite is empty
-        if suite_name is None:
-            suite_name = slugify(self.config.title)
-
         # Use the default handler if none
         if handler is None:
             handler = ExpectationHandler(self.typeset)
@@ -77,12 +69,14 @@ class ExpectationsReportNew:
         except KeyError:
             mapping_schema = None
 
+        data_asset = data_context.get_datasource("cloud").get_asset(f"{suite_name}_{run_name}")
+        batch_request = data_asset.build_batch_request()
+
         if reuse_suite:
             if use_old_suite:
                 suite_old = data_context.get_expectation_suite(f"{suite_name}_{old_suite_name}")
-                data_context.save_expectation_suite(expectation_suite=suite_old,
-                                                    expectation_suite_name=f"{suite_name}_{run_name}",
-                                                    overwrite_existing=True)
+                data_context.add_or_update_expectation_suite(expectation_suite=suite_old,
+                                                             expectation_suite_name=f"{suite_name}_{run_name}")
             else:
                 schema_list = list(mapping_schema.keys())
                 dict_keys = [i for i in mapping_schema if isinstance(mapping_schema[i], dict)]
@@ -131,22 +125,22 @@ class ExpectationsReportNew:
                                         value=v,
                                         match_type="runtime",
                                     )
-                    data_context.save_expectation_suite(expectation_suite=suite_old,
-                                                        expectation_suite_name=f"{suite_name}_{run_name}",
-                                                        overwrite_existing=True)
+                    data_context.add_or_update_expectation_suite(expectation_suite=suite_old,
+                                                                 expectation_suite_name=f"{suite_name}_{run_name}")
 
                     if new_column_in_mapping:
                         suite_old = data_context.get_expectation_suite(f"{suite_name}_{run_name}")
-                        batch = ge.dataset.PandasDataset(self.df, expectation_suite=suite_old)
+                        validator = data_context.get_validator(
+                            batch_request=batch_request,
+                            expectation_suite=suite_old,
+                        )
                         summary = self.get_description()
                         for name, variable_summary in summary.variables.items():
                             if name in list(new_column_in_mapping.values()):
-                                handler.handle(variable_summary["type"], name, variable_summary, batch)
-                        suite = batch.get_expectation_suite(discard_failed_expectations=False)
-                        data_context.save_expectation_suite(expectation_suite=suite,
-                                                            expectation_suite_name=f"{suite_name}_{run_name}",
-                                                            overwrite_existing=True)
-
+                                handler.handle(variable_summary["type"], name, variable_summary, validator)
+                        suite = validator.get_expectation_suite(discard_failed_expectations=False)
+                        data_context.add_or_update_expectation_suite(expectation_suite=suite,
+                                                                     expectation_suite_name=f"{suite_name}_{run_name}")
                 else:  # if we have nested tables
                     r = re.compile("new_col_added")
                     new_column_in_mapping_keys = list(filter(r.match, schema_list))
@@ -207,14 +201,18 @@ class ExpectationsReportNew:
                         dict_suites.append(suite_old)
 
                     # ##run tests generation against new columns
-                    suite_old = data_context.create_expectation_suite(f"{suite_name}_{run_name}",
-                                                                      overwrite_existing=True)
-                    batch = ge.dataset.PandasDataset(self.df, expectation_suite=suite_old)
+                    suite_old = data_context.add_expectation_suite(
+                        f"{suite_name}_{run_name}"
+                    )
+                    validator = data_context.get_validator(
+                        batch_request=batch_request,
+                        expectation_suite=suite_old,
+                    )
                     summary = self.get_description()
                     for name, variable_summary in summary.variables.items():
                         if name in schema_list and name not in ignored_columns:
-                            handler.handle(variable_summary["type"], name, variable_summary, batch)
-                    suite = batch.get_expectation_suite(discard_failed_expectations=False)
+                            handler.handle(variable_summary["type"], name, variable_summary, validator)
+                    suite = validator.get_expectation_suite(discard_failed_expectations=False)
 
                     ## join all suites to one
                     ## new version
@@ -239,17 +237,18 @@ class ExpectationsReportNew:
                     suite.add_expectation(
                         expectation_configuration=ExpectationConfiguration(kwargs={"value": summary.table['n']},
                                                                            expectation_type="expect_table_row_count_to_equal"))
-                    data_context.save_expectation_suite(expectation_suite=suite,
-                                                        expectation_suite_name=f"{suite_name}_{run_name}",
-                                                        overwrite_existing=True, discard_failed_expectations=False)
+                    data_context.add_or_update_expectation_suite(expectation_suite=suite,
+                                                                 expectation_suite_name=f"{suite_name}_{run_name}")
         else:
-            suite = data_context.create_expectation_suite(
-                f"{suite_name}_{run_name}", overwrite_existing=True,
+            suite = data_context.add_expectation_suite(
+                f"{suite_name}_{run_name}"
             )
 
             # Instantiate an in-memory pandas dataset
-            batch = ge.dataset.PandasDataset(self.df, expectation_suite=suite)
-
+            validator = data_context.get_validator(
+                batch_request=batch_request,
+                expectation_suite=suite,
+            )
             # Obtain the profiling summary
             summary = self.get_description()  # type: ignore
 
@@ -259,30 +258,16 @@ class ExpectationsReportNew:
                 name_list.append(name)
                 if mapping_schema is not None:
                     if name in list(mapping_schema.keys()) and name not in ignored_columns:
-                        handler.handle(variable_summary["type"], name, variable_summary, batch)
+                        handler.handle(variable_summary["type"], name, variable_summary, validator)
                 else:
                     if name not in ignored_columns:
-                        handler.handle(variable_summary["type"], name, variable_summary, batch)
-            batch.expect_table_columns_to_match_set(
+                        handler.handle(variable_summary["type"], name, variable_summary, validator)
+            validator.expect_table_columns_to_match_set(
                 column_set=name_list)
-            batch.expect_table_row_count_to_equal(value=summary.table['n'])
-            suite = batch.get_expectation_suite(discard_failed_expectations=False)
+            validator.expect_table_row_count_to_equal(value=summary.table['n'])
+            suite = validator.get_expectation_suite(discard_failed_expectations=False)
 
-            validation_result_identifier = None
-            if run_validation:
-                batch = ge.dataset.PandasDataset(self.df, expectation_suite=suite)
+            if save_suite:
+                data_context.update_expectation_suite(suite)
 
-                results = data_context.run_validation_operator(
-                    "action_list_operator", assets_to_validate=[batch]
-                )
-                validation_result_identifier = results.list_validation_result_identifiers()[
-                    0
-                ]
-            if save_suite or build_data_docs:
-                data_context.save_expectation_suite(suite)
-
-            if build_data_docs:
-                data_context.build_data_docs()
-                data_context.open_data_docs(validation_result_identifier)
-
-            return batch.get_expectation_suite()
+            return validator.get_expectation_suite()
