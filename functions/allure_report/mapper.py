@@ -116,7 +116,7 @@ def get_stop_test_time(file):
 
 def get_params(file):
     params = file['expectation_config']['kwargs']
-    del params['result_format']
+    del params['batch_id']
     results = []
     for param in params:
         if isinstance(params[param], list):
