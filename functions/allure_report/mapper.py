@@ -105,7 +105,7 @@ def get_stop_suit_time():
 def parse_datetime(date_str):
     try:
         return datetime.timestamp(datetime.strptime(date_str, '%Y%m%dT%H%M%S.%fZ')) * 1000
-    except TypeError:
+    except (TypeError, ValueError):
         return datetime.timestamp(datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f+00:00')) * 1000
 
 
