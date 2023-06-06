@@ -103,11 +103,15 @@ def get_stop_suit_time():
 
 
 def parse_datetime(date_str):
-    return datetime.timestamp(datetime.strptime(date_str, '%Y%m%dT%H%M%S.%fZ')) * 1000
+    try:
+        return datetime.timestamp(datetime.strptime(date_str, '%Y%m%dT%H%M%S.%fZ')) * 1000
+    except TypeError:
+        return datetime.timestamp(datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f+00:00')) * 1000
+
 
 
 def get_start_test_time(file):
-    return parse_datetime(file['meta']['run_id']['run_name'])
+    return parse_datetime(file['meta']['run_id']['run_time'])
 
 
 def get_stop_test_time(file):
