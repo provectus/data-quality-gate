@@ -73,9 +73,9 @@ def get_test_name(file):
 def get_suit_name(file, i):
     if "column" in i["expectation_config"]["kwargs"]:
         column = i["expectation_config"]["kwargs"]["column"]
-        data_asset_name = file["meta"]["batch_kwargs"]["data_asset_name"]
+        data_asset_name = file["meta"]["active_batch_definition"]["data_asset_name"]
         return f"{data_asset_name}.{column}"
-    return file["meta"]["batch_kwargs"]["data_asset_name"]
+    return file["meta"]["active_batch_definition"]["data_asset_name"]
 
 
 def get_jira_ticket(file):
