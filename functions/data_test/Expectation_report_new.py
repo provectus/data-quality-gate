@@ -150,11 +150,11 @@ class ExpectationsReportNew:
                     dict_keys_schema_list = []
                     dict_values_schema_list = []
                     for key in dict_keys:
-                        if not mapping_schema[key]:
+                        if not mapping_schema[key]:  # if nested tables is empty then use just from mapping
                             dict_keys_schema_list.append(
                                 list(mapping_config[key].keys()))  # create list of lists for nested suites columns
                             dict_values_schema_list.append(list(mapping_config[key].values()))
-                        else:
+                        else:  # in other way use key-values from nested mapping
                             dict_keys_schema_list.append(
                                 list(mapping_schema[key].keys()))  # if nested table has renaming
                             dict_values_schema_list.append(list(mapping_schema[key].values()))
@@ -198,7 +198,7 @@ class ExpectationsReportNew:
                                                 path="/column",
                                                 value=v,
                                                 match_type="runtime",
-                                        )
+                                            )
                         dict_suites.append(suite_old)
 
                     # ##run tests generation against new columns
