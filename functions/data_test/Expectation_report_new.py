@@ -106,25 +106,26 @@ class ExpectationsReportNew:
                     schema_values = list(mapping_schema.values())
                     for key, v in list(itertools.zip_longest(schema_list, schema_values)):
                         exp_conf = []
-                        exp_conf.append(suite_old.get_grouped_and_ordered_expectations_by_column()[0][key])
-                        for exps in exp_conf:
-                            for exp in exps:
-                                if (exp["expectation_type"] == "expect_table_columns_to_match_set"):
-                                    suite_old.patch_expectation(
-                                        exp,
-                                        op="replace",
-                                        path="/column_set",
-                                        value=schema_values,
-                                        match_type="runtime",
-                                    )
-                                elif (exp["expectation_type"] != "expect_table_row_count_to_equal"):
-                                    suite_old.patch_expectation(
-                                        exp,
-                                        op="replace",
-                                        path="/column",
-                                        value=v,
-                                        match_type="runtime",
-                                    )
+                        if key in suite_old.get_grouped_and_ordered_expectations_by_column()[0]:
+                            exp_conf.append(suite_old.get_grouped_and_ordered_expectations_by_column()[0][key])
+                            for exps in exp_conf:
+                                for exp in exps:
+                                    if (exp["expectation_type"] == "expect_table_columns_to_match_set"):
+                                        suite_old.patch_expectation(
+                                            exp,
+                                            op="replace",
+                                            path="/column_set",
+                                            value=schema_values,
+                                            match_type="runtime",
+                                        )
+                                    elif (exp["expectation_type"] != "expect_table_row_count_to_equal"):
+                                        suite_old.patch_expectation(
+                                            exp,
+                                            op="replace",
+                                            path="/column",
+                                            value=v,
+                                            match_type="runtime",
+                                        )
                     data_context.add_or_update_expectation_suite(expectations=suite_old.expectations,
                                                                  expectation_suite_name=f"{suite_name}_{run_name}")
 
