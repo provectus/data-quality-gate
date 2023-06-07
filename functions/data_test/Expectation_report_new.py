@@ -181,22 +181,23 @@ class ExpectationsReportNew:
                         for key, v in zip(dict_keys_schema_list[list(dict_keys).index(d_key)],
                                           schema_values):  # remove table schema test and replace columns name in tests
                             exp_conf = []
-                            exp_conf.append(suite_old.get_grouped_and_ordered_expectations_by_column()[0][key])
-                            for exps in exp_conf:
-                                for exp in exps:
-                                    if (exp["expectation_type"] == "expect_table_columns_to_match_set" or exp[
-                                        "expectation_type"] == "expect_table_row_count_to_equal"):
-                                        suite_old.remove_expectation(
-                                            exp,
-                                            match_type="runtime",
-                                        )
-                                    else:
-                                        suite_old.patch_expectation(
-                                            exp,
-                                            op="replace",
-                                            path="/column",
-                                            value=v,
-                                            match_type="runtime",
+                            if key in suite_old.get_grouped_and_ordered_expectations_by_column()[0]:
+                                exp_conf.append(suite_old.get_grouped_and_ordered_expectations_by_column()[0][key])
+                                for exps in exp_conf:
+                                    for exp in exps:
+                                        if (exp["expectation_type"] == "expect_table_columns_to_match_set" or exp[
+                                            "expectation_type"] == "expect_table_row_count_to_equal"):
+                                            suite_old.remove_expectation(
+                                                exp,
+                                                match_type="runtime",
+                                            )
+                                        else:
+                                            suite_old.patch_expectation(
+                                                exp,
+                                                op="replace",
+                                                path="/column",
+                                                value=v,
+                                                match_type="runtime",
                                         )
                         dict_suites.append(suite_old)
 
