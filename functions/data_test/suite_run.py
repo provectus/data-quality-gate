@@ -9,21 +9,22 @@ def validate_data(file, suite_name, saved_context, data_asset):
     expectation_suite_name = suite_name
     batch_request = data_asset.build_batch_request()
     checkpoint_config = {
-            "class_name": "SimpleCheckpoint",
-            "validations": [
-                {
-                    "batch_request": batch_request,
-                    "expectation_suite_name": expectation_suite_name
-                }
-            ]
-        }
+        "class_name": "SimpleCheckpoint",
+        "validations": [
+            {
+                "batch_request": batch_request,
+                "expectation_suite_name": expectation_suite_name
+            }
+        ]
+    }
     checkpoint = SimpleCheckpoint(
-            f"_tmp_checkpoint_{expectation_suite_name}",
-            context_ge,
-            **checkpoint_config
-        )
+        f"_tmp_checkpoint_{expectation_suite_name}",
+        context_ge,
+        **checkpoint_config
+    )
     results = checkpoint.run(result_format="SUMMARY", run_name=suite_name)
-    validation_result_identifier = results.list_validation_result_identifiers()[0]
+    validation_result_identifier = results.list_validation_result_identifiers()[
+        0]
 
     if not results['success']:
         context_ge.build_data_docs(

@@ -76,33 +76,35 @@ def change_ge_config(datasource_root):
         data_docs_sites = configfile["data_docs_sites"]
         new_data_docs_sites = add_local_s3_to_data_docs(data_docs_sites,
                                                         endpoint_url)
-        config = DataContextConfig(config_version=configfile["config_version"],
-                                   stores=new_stores,
-                                   data_docs_sites=new_data_docs_sites,
-                                   expectations_store_name=configfile["expectations_store_name"],
-                                   validations_store_name=configfile["validations_store_name"],
-                                   evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
-                                   plugins_directory="/great_expectations/plugins",
-                                   validation_operators=configfile["validation_operators"],
-                                   config_variables_file_path=configfile["config_variables_file_path"],
-                                   anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
-                                   store_backend_defaults=S3StoreBackendDefaults(
-                                       default_bucket_name=qa_bucket_name,
-                                       expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
-                                       validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
+        config = DataContextConfig(
+            config_version=configfile["config_version"],
+            stores=new_stores,
+            data_docs_sites=new_data_docs_sites,
+            expectations_store_name=configfile["expectations_store_name"],
+            validations_store_name=configfile["validations_store_name"],
+            evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
+            plugins_directory="/great_expectations/plugins",
+            validation_operators=configfile["validation_operators"],
+            config_variables_file_path=configfile["config_variables_file_path"],
+            anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
+            store_backend_defaults=S3StoreBackendDefaults(
+                default_bucket_name=qa_bucket_name,
+                expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
+                validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
     else:
-        config = DataContextConfig(config_version=configfile["config_version"],
-                                   expectations_store_name=configfile["expectations_store_name"],
-                                   validations_store_name=configfile["validations_store_name"],
-                                   evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
-                                   plugins_directory="/great_expectations/plugins",
-                                   validation_operators=configfile["validation_operators"],
-                                   config_variables_file_path=configfile["config_variables_file_path"],
-                                   anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
-                                   store_backend_defaults=S3StoreBackendDefaults(
-                                       default_bucket_name=qa_bucket_name,
-                                       expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
-                                       validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
+        config = DataContextConfig(
+            config_version=configfile["config_version"],
+            expectations_store_name=configfile["expectations_store_name"],
+            validations_store_name=configfile["validations_store_name"],
+            evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
+            plugins_directory="/great_expectations/plugins",
+            validation_operators=configfile["validation_operators"],
+            config_variables_file_path=configfile["config_variables_file_path"],
+            anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
+            store_backend_defaults=S3StoreBackendDefaults(
+                default_bucket_name=qa_bucket_name,
+                expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
+                validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
     return config
 
 
@@ -151,8 +153,8 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
         report = profile.to_html()
     if not source_covered:
         try:
-            pipeline_config = json.loads(
-                wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/pipeline.json").to_json())
+            pipeline_config = json.loads(wr.s3.read_json(
+                path=f"s3://{qa_bucket_name}/test_configs/pipeline.json").to_json())
             reuse_suite = pipeline_config[run_name]['reuse_suite']
             use_old_suite_only = pipeline_config[run_name]['use_old_suite_only']
             old_suite_name = pipeline_config[run_name]['old_suite_name']
