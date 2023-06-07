@@ -75,7 +75,7 @@ class ExpectationsReportNew:
         if reuse_suite:
             if use_old_suite:
                 suite_old = data_context.get_expectation_suite(f"{suite_name}_{old_suite_name}")
-                data_context.add_or_update_expectation_suite(expectation_suite=suite_old,
+                data_context.add_or_update_expectation_suite(expectations=suite_old.expectations,
                                                              expectation_suite_name=f"{suite_name}_{run_name}")
             else:
                 schema_list = list(mapping_schema.keys())
@@ -125,7 +125,7 @@ class ExpectationsReportNew:
                                         value=v,
                                         match_type="runtime",
                                     )
-                    data_context.add_or_update_expectation_suite(expectation_suite=suite_old,
+                    data_context.add_or_update_expectation_suite(expectations=suite_old.expectations,
                                                                  expectation_suite_name=f"{suite_name}_{run_name}")
 
                     if new_column_in_mapping:
@@ -139,7 +139,7 @@ class ExpectationsReportNew:
                             if name in list(new_column_in_mapping.values()):
                                 handler.handle(variable_summary["type"], name, variable_summary, validator)
                         suite = validator.get_expectation_suite(discard_failed_expectations=False)
-                        data_context.add_or_update_expectation_suite(expectation_suite=suite,
+                        data_context.add_or_update_expectation_suite(expectations=suite.expectations,
                                                                      expectation_suite_name=f"{suite_name}_{run_name}")
                 else:  # if we have nested tables
                     r = re.compile("new_col_added")
@@ -238,7 +238,7 @@ class ExpectationsReportNew:
                     suite.add_expectation(
                         expectation_configuration=ExpectationConfiguration(kwargs={"value": summary.table['n']},
                                                                            expectation_type="expect_table_row_count_to_equal"))
-                    data_context.add_or_update_expectation_suite(expectation_suite=suite,
+                    data_context.add_or_update_expectation_suite(expectations=suite.expectations,
                                                                  expectation_suite_name=f"{suite_name}_{run_name}")
         else:
 
