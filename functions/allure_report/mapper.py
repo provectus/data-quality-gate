@@ -103,11 +103,10 @@ def get_stop_suit_time():
 
 
 def parse_datetime(date_str):
-    try:
-        return datetime.timestamp(datetime.strptime(date_str, '%Y%m%dT%H%M%S.%fZ')) * 1000
-    except (TypeError, ValueError):
+    if '+00:00' in date_str:
         return datetime.timestamp(datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f+00:00')) * 1000
-
+    else:
+        return datetime.timestamp(datetime.strptime(date_str, '%Y%m%dT%H%M%S.%fZ')) * 1000
 
 
 def get_start_test_time(file):
@@ -144,7 +143,7 @@ def get_test_description(file):
     for f in file["result"]:
         if str(f) != "observed_value":
             result = result + "\n" + \
-                f"{str(f)}: {str(file['result'][f])}" + "\n"
+                     f"{str(f)}: {str(file['result'][f])}" + "\n"
     return result
 
 
@@ -202,7 +201,7 @@ def create_categories_json(json_name, key):
     result = json.dumps(data)
     s3.Object(qa_bucket,
               f"allure/{json_name}{key}/result/categories.json").put(
-                Body=bytes(result.encode("UTF-8")))
+        Body=bytes(result.encode("UTF-8")))
 
 
 def get_uuid(i, json_name, key):
@@ -246,7 +245,7 @@ def create_suit_json(json_name, key, validate_id):
                 {
                     "name": "severity",
                     "value": get_severity(i)
-            }
+                }
             ],
             "links": [get_jira_ticket(i)],
             "name": get_test_name(i),
