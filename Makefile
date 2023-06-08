@@ -66,7 +66,7 @@ build-report-push-unit-tests-img: build-report-push-img
 	--build-arg="VERSION=$(REPORT_PUSH_IMAGE_VERSION)" \
 	-t $(REPORT_PUSH_UNIT_TESTS_IMG) .
 
-run-unit-tests-in-docker: build-data-test-unit-tests-img
+run-data-test-unit-tests: build-data-test-unit-tests-img
 	cd $(DATA_TEST_UNIT_TESTS_DIR) && \
 	docker run $(DATA_TEST_UNIT_TESTS_IMG)
 

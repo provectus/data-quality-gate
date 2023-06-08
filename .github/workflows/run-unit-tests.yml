@@ -7,8 +7,18 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-type: [data, allure, report]
     steps:
       - name: checkout
         uses: actions/checkout@v3  
-      - name: run data test unit tests
-        run: make run-unit-tests-in-docker
+      - name: Run unit tests
+        run: |
+          if [[ ${{ matrix.test-type }} == 'data' ]]; then
+            make run-data-test-unit-tests
+          elif [[ ${{ matrix.test-type }} == 'allure' ]]; then
+            make run-allure-report-unit-tests
+          elif [[ ${{ matrix.test-type }} == 'report' ]]; then
+            make run-report-push-unit-tests
+          fi
