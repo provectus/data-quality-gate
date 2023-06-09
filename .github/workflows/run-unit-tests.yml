@@ -7,8 +7,12 @@ on:
 jobs:
   unit-tests:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test-type: [data_test, allure_report, report_push]
     steps:
       - name: checkout
         uses: actions/checkout@v3  
-      - name: run data test unit tests
-        run: make run-unit-tests-in-docker
+      - name: Run unit tests
+        run: |
+          make run-unit-tests test=${{ matrix.test-type }}

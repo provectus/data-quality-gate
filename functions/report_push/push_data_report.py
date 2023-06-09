@@ -6,7 +6,6 @@ import awswrangler as wr
 import random
 from jira_events import auth_in_jira, get_all_issues, open_bug
 
-cloudwatch = boto3.client('cloudwatch')
 s3 = boto3.resource('s3')
 sns = boto3.client('sns')
 
@@ -92,7 +91,12 @@ def handler(event, context):
         created_bug_count, bug_name = create_jira_bugs_from_allure_result(
             bucket, key, replaced_allure_links, suite, jira_project_key)
 
-    push_cloudwatch_metrics(suite, environment, failed, created_bug_count)
+    cloudwatch = boto3.client('cloudwatch')
+    push_cloudwatch_metrics(suite,
+                            environment,
+                            failed,
+                            created_bug_count,
+                            cloudwatch)
     push_sns_message(
         suite,
         run_name,
@@ -187,7 +191,11 @@ def push_sns_message(
                     MessageStructure=message_structure)
 
 
-def push_cloudwatch_metrics(suite, environment, failed, created_bug_count):
+def push_cloudwatch_metrics(suite,
+                            environment,
+                            failed,
+                            created_bug_count,
+                            cloudwatch):
     if created_bug_count > 0:
         metric_data = {
             'MetricName': 'bug_created_count',
@@ -220,7 +228,6 @@ def push_cloudwatch_metrics(suite, environment, failed, created_bug_count):
             'Value': failed,
             'Unit': 'Count'
         }
-
     cloudwatch.put_metric_data(
         Namespace='Data-QA',
         MetricData=[
