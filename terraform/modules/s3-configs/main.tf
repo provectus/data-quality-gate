@@ -1,5 +1,6 @@
 resource "aws_s3_bucket" "settings_bucket" {
-  bucket = var.data_test_storage_bucket_name
+  bucket        = var.data_test_storage_bucket_name
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_public_access_block" "public_access_block_fast_data_qa" {
