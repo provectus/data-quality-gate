@@ -6,7 +6,6 @@ import awswrangler as wr
 import random
 from jira_events import auth_in_jira, get_all_issues, open_bug
 
-cloudwatch = boto3.client('cloudwatch')
 s3 = boto3.resource('s3')
 sns = boto3.client('sns')
 
@@ -92,6 +91,7 @@ def handler(event, context):
         created_bug_count, bug_name = create_jira_bugs_from_allure_result(
             bucket, key, replaced_allure_links, suite, jira_project_key)
 
+    cloudwatch = boto3.client('cloudwatch')
     push_cloudwatch_metrics(suite,
                             environment,
                             failed,

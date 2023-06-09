@@ -11,7 +11,7 @@ environment = 'test_environment'
 @pytest.fixture
 @mock_cloudwatch
 def conn():
-    return boto3.client('cloudwatch', region_name='us-east-1')
+    return boto3.client('cloudwatch')
 
 
 @mock_cloudwatch
