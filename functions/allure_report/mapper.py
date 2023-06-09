@@ -73,9 +73,9 @@ def get_test_name(file):
 def get_suit_name(file, i):
     if "column" in i["expectation_config"]["kwargs"]:
         column = i["expectation_config"]["kwargs"]["column"]
-        data_asset_name = file["meta"]["batch_kwargs"]["data_asset_name"]
+        data_asset_name = file["meta"]["active_batch_definition"]["data_asset_name"]
         return f"{data_asset_name}.{column}"
-    return file["meta"]["batch_kwargs"]["data_asset_name"]
+    return file["meta"]["active_batch_definition"]["data_asset_name"]
 
 
 def get_jira_ticket(file):
@@ -103,11 +103,14 @@ def get_stop_suit_time():
 
 
 def parse_datetime(date_str):
-    return datetime.timestamp(datetime.strptime(date_str, '%Y%m%dT%H%M%S.%fZ')) * 1000
+    if '+00:00' in date_str:
+        return datetime.timestamp(datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f+00:00')) * 1000
+    else:
+        return datetime.timestamp(datetime.strptime(date_str, '%Y%m%dT%H%M%S.%fZ')) * 1000
 
 
 def get_start_test_time(file):
-    return parse_datetime(file['meta']['run_id']['run_name'])
+    return parse_datetime(file['meta']['run_id']['run_time'])
 
 
 def get_stop_test_time(file):
@@ -116,7 +119,7 @@ def get_stop_test_time(file):
 
 def get_params(file):
     params = file['expectation_config']['kwargs']
-    del params['result_format']
+    del params['batch_id']
     results = []
     for param in params:
         if isinstance(params[param], list):
@@ -140,7 +143,7 @@ def get_test_description(file):
     for f in file["result"]:
         if str(f) != "observed_value":
             result = result + "\n" + \
-                f"{str(f)}: {str(file['result'][f])}" + "\n"
+                     f"{str(f)}: {str(file['result'][f])}" + "\n"
     return result
 
 
@@ -198,7 +201,7 @@ def create_categories_json(json_name, key):
     result = json.dumps(data)
     s3.Object(qa_bucket,
               f"allure/{json_name}{key}/result/categories.json").put(
-                Body=bytes(result.encode("UTF-8")))
+        Body=bytes(result.encode("UTF-8")))
 
 
 def get_uuid(i, json_name, key):
@@ -242,7 +245,7 @@ def create_suit_json(json_name, key, validate_id):
                 {
                     "name": "severity",
                     "value": get_severity(i)
-            }
+                }
             ],
             "links": [get_jira_ticket(i)],
             "name": get_test_name(i),

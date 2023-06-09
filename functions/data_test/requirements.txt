@@ -1,10 +1,10 @@
 boto3==1.26.66
 botocore==1.29.66
 importlib-metadata==6.0.0
-great-expectations==0.14.13
+great-expectations==0.16.14
 s3fs==0.4.2
 python-dateutil==2.8.2
 fastparquet==0.8.1
 awswrangler==2.19.0
-pandas-profiling==3.6.3
+ydata-profiling==4.2.0
 jinja2==3.0.3

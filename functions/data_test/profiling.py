@@ -1,14 +1,14 @@
 import json
-from pandas_profiling import ProfileReport
+from ydata_profiling import ProfileReport
 import os
 import boto3
 import awswrangler as wr
-from pandas_profiling.model import expectation_algorithms
-from pandas_profiling.model.handler import Handler
+from ydata_profiling.model import expectation_algorithms
+from ydata_profiling.model.handler import Handler
 from Expectation_report_new import ExpectationsReportNew
-from pandas_profiling.expectations_report import ExpectationsReport
+from ydata_profiling.expectations_report import ExpectationsReport
 from datetime import datetime
-from great_expectations.data_context import BaseDataContext
+from great_expectations.data_context import EphemeralDataContext
 from great_expectations.data_context.types.base import (DataContextConfig,
                                                         S3StoreBackendDefaults)
 import yaml
@@ -44,21 +44,25 @@ class MyExpectationHandler(Handler):
                             ],
             "Categorical": [expectation_algorithms.categorical_expectations,
                             expectations_null,
-
                             ],
+            "Text": [expectation_algorithms.categorical_expectations,
+                     expectations_null
+                     ],
             "Boolean": [expectations_null,
                         ],
-            "Numeric": [generic_expectations_without_null, expectations_null,
+            "Numeric": [generic_expectations_without_null,
+                        expectations_null,
                         ],
-            "URL": [expectation_algorithms.url_expectations, expectations_null,
+            "URL": [expectation_algorithms.url_expectations,
+                    expectations_null,
                     ],
-            "File": [expectation_algorithms.file_expectations, 
+            "File": [expectation_algorithms.file_expectations,
                      expectations_null, ],
-            "Path": [expectation_algorithms.path_expectations, 
+            "Path": [expectation_algorithms.path_expectations,
                      expectations_null, ],
-            "DateTime": [expectation_algorithms.datetime_expectations, 
+            "DateTime": [expectation_algorithms.datetime_expectations,
                          expectations_null, ],
-            "Image": [expectation_algorithms.image_expectations, 
+            "Image": [expectation_algorithms.image_expectations,
                       expectations_null, ],
         }
         super().__init__(mapping, typeset, *args, **kwargs)
@@ -66,63 +70,41 @@ class MyExpectationHandler(Handler):
 
 def change_ge_config(datasource_root):
     configfile = read_gx_config_file()
-    datasources = {
-        "pandas_s3": {
-            "class_name": "PandasDatasource",
-            "batch_kwargs_generators": {
-                "pandas_s3_generator": {
-                    "class_name": "S3GlobReaderBatchKwargsGenerator",
-                    "bucket": datasource_root,
-                    "assets": {
-                        "your_first_data_asset_name": {
-                            "prefix": "/",
-                            "regex_filter": ".*"
-                        }
-                    }
-                }
-            },
-            "module_name": "great_expectations.datasource",
-            "data_asset_type": {
-                "class_name": "PandasDataset",
-                "module_name": "great_expectations.dataset"
-            }
-        }
-    }
-
     if os.environ['ENVIRONMENT'] == 'local':
         stores = configfile["stores"]
         new_stores = add_local_s3_to_stores(stores, endpoint_url)
         data_docs_sites = configfile["data_docs_sites"]
         new_data_docs_sites = add_local_s3_to_data_docs(data_docs_sites,
                                                         endpoint_url)
-        config = DataContextConfig(config_version=configfile["config_version"],
-                                   datasources=datasources,
-                                   stores=new_stores,
-                                   data_docs_sites=new_data_docs_sites,
-                                   expectations_store_name=configfile["expectations_store_name"],
-                                   validations_store_name=configfile["validations_store_name"],
-                                   evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
-                                   plugins_directory="/great_expectations/plugins",
-                                   validation_operators=configfile["validation_operators"],
-                                   config_variables_file_path=configfile["config_variables_file_path"],
-                                   anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
-                                   store_backend_defaults=S3StoreBackendDefaults(
-                                       default_bucket_name=qa_bucket_name,
-                                       expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
-                                       validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
+        config = DataContextConfig(
+            config_version=configfile["config_version"],
+            stores=new_stores,
+            data_docs_sites=new_data_docs_sites,
+            expectations_store_name=configfile["expectations_store_name"],
+            validations_store_name=configfile["validations_store_name"],
+            evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
+            plugins_directory="/great_expectations/plugins",
+            validation_operators=configfile["validation_operators"],
+            config_variables_file_path=configfile["config_variables_file_path"],
+            anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
+            store_backend_defaults=S3StoreBackendDefaults(
+                default_bucket_name=qa_bucket_name,
+                expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
+                validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
     else:
-        config = DataContextConfig(config_version=configfile["config_version"], datasources=datasources,
-                                   expectations_store_name=configfile["expectations_store_name"],
-                                   validations_store_name=configfile["validations_store_name"],
-                                   evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
-                                   plugins_directory="/great_expectations/plugins",
-                                   validation_operators=configfile["validation_operators"],
-                                   config_variables_file_path=configfile["config_variables_file_path"],
-                                   anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
-                                   store_backend_defaults=S3StoreBackendDefaults(
-                                       default_bucket_name=qa_bucket_name,
-                                       expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
-                                       validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
+        config = DataContextConfig(
+            config_version=configfile["config_version"],
+            expectations_store_name=configfile["expectations_store_name"],
+            validations_store_name=configfile["validations_store_name"],
+            evaluation_parameter_store_name=configfile["evaluation_parameter_store_name"],
+            plugins_directory="/great_expectations/plugins",
+            validation_operators=configfile["validation_operators"],
+            config_variables_file_path=configfile["config_variables_file_path"],
+            anonymous_usage_statistics=configfile["anonymous_usage_statistics"],
+            store_backend_defaults=S3StoreBackendDefaults(
+                default_bucket_name=qa_bucket_name,
+                expectations_store_prefix=f"{qa_bucket_name}/great_expectations/expectations/",
+                validations_store_prefix=f"{qa_bucket_name}/great_expectations/uncommitted/validations/"))
     return config
 
 
@@ -158,7 +140,9 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
                  mapping_config, run_name):
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)
-    context_ge = BaseDataContext(project_config=config)
+    context_ge = EphemeralDataContext(project_config=config)
+    datasource = context_ge.sources.add_pandas(name="cloud")
+    data_asset = datasource.add_dataframe_asset(name=suite_name, dataframe=df)
     try:
         profile = ProfileReport(df, title=f"{suite_name} Profiling Report",
                                 minimal=True, pool_size=1)
@@ -169,8 +153,8 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
         report = profile.to_html()
     if not source_covered:
         try:
-            pipeline_config = json.loads(
-                wr.s3.read_json(path=f"s3://{qa_bucket_name}/test_configs/pipeline.json").to_json())
+            pipeline_config = json.loads(wr.s3.read_json(
+                path=f"s3://{qa_bucket_name}/test_configs/pipeline.json").to_json())
             reuse_suite = pipeline_config[run_name]['reuse_suite']
             use_old_suite_only = pipeline_config[run_name]['use_old_suite_only']
             old_suite_name = pipeline_config[run_name]['old_suite_name']
@@ -183,9 +167,6 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
             data_context=context_ge,
             suite_name=remove_suffix(suite_name, f"_{run_name}"),
             run_name=run_name,
-            save_suite=True,
-            run_validation=False,
-            build_data_docs=False,
             reuse_suite=reuse_suite,
             mapping_config=mapping_config,
             use_old_suite=use_old_suite_only,
@@ -196,9 +177,9 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
     now = datetime.now()
     date_time = now.strftime("%y%m%dT%H%M%S")
     folder = f"{folder}{suite_name}/{str(date_time)}/"
-    
+
     qa_bucket.put_object(Key=folder)
     qa_bucket.put_object(Key=f"{folder}{suite_name}_profiling.html",
                          Body=report, ContentType='text/html')
     profile_link = f"{cloudfront}/{folder}{suite_name}_profiling.html"
-    return profile_link, date_time, config
+    return profile_link, date_time, context_ge, data_asset
