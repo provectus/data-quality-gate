@@ -28,3 +28,28 @@ module "lambda_function_push_report" {
   vpc_subnet_ids         = var.vpc_subnet_ids
   vpc_security_group_ids = var.vpc_security_group_ids
 }
+
+resource "aws_iam_policy" "data_test_sm" {
+  name = "${local.resource_name_prefix}-data-test-sm"
+  path = "/service-role/"
+  policy = jsonencode(
+    {
+      "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sagemaker:SendPipelineExecutionStepSuccess",
+                "sagemaker:SendPipelineExecutionStepFailure"
+            ],
+            "Resource": "*"
+        }
+    ]
+      Version = "2012-10-17"
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "data_test_sm" {
+  role       = module.lambda_function_push_report.lambda_role_name
+  policy_arn = aws_iam_policy.data_test_sm.arn
+}
