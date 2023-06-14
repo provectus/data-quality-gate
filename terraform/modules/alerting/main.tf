@@ -9,7 +9,7 @@ resource "aws_kms_ciphertext" "slack_url" {
 
 module "slack_notification" {
   source  = "terraform-aws-modules/notify-slack/aws"
-  version = "5.6.0"
+  version = "6.0.0"
 
   sns_topic_name = var.slack_sns_topic_name
 
