@@ -88,7 +88,8 @@ def expectations_quantile(name, summary, batch, *args):
         summary["50%"],
         summary["75%"],
         summary["95%"]]
-    q_array[:] = [x / 100 for x in q_array]
+    degree = len(str(q_array[0]).split('.')[0])
+    q_array[:] = [x / math.pow(10, degree+2) for x in q_array]
     q_ranges = {
         "quantiles": q_array,
         "value_ranges": [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]]
