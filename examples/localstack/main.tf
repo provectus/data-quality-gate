@@ -15,6 +15,7 @@ module "integration_tests_data_qa" {
   cloudfront_allowed_subnets = ["255.255.255.255/32"]
 
   data_test_storage_bucket_name = "integration-test-bucket"
+  s3_source_data_bucket         = "integration-test-bucket"
   environment                   = "local"
 
   allure_report_image_uri = ""
