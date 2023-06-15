@@ -16,11 +16,12 @@ schema = {
         "suite_name": {"type": "string"},
         "folder_key": {"type": "string"},
         "run_name": {"type": "string"},
-        "validate_id": {"type": "string"}
+        "validate_id": {"type": "string"},
+        "token": {"type": "string"},
     },
     "required": [
         "path", "file", "profiling", "test_suite", "suite_name",
-        "folder_key", "run_name", "validate_id"
+        "folder_key", "run_name", "validate_id", "token"
     ]
 }
 
@@ -38,7 +39,8 @@ def s3_test_data(request):
         "source_root": b_name,
         "source_data": file_path,
         "engine": "s3",
-        "project_name": "integration_test"
+        "project_name": "integration_test",
+        "token": "test_token"
     }
     s3 = boto3.resource("s3", endpoint_url=url)
     qa_bucket_name = os.environ['QA_BUCKET']
