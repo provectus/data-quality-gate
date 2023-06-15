@@ -56,9 +56,9 @@ def expectations_median(name, summary, batch, *args):
     for key, v in raw_values.items():
         key = [key] * v
         values.extend(key)
-    q = summary['25%']
-    j = int(len(values) * q - 0.99 * math.sqrt(len(values) * q * (1 - q)))
-    k = int(len(values) * q + 0.99 * math.sqrt(len(values) * q * (1 - q)))
+    q = 0.5
+    j = int(len(values) * q - 2.58 * math.sqrt(len(values) * q * (1 - q)))
+    k = int(len(values) * q + 2.58 * math.sqrt(len(values) * q * (1 - q)))
     min_median = values[j]
     max_median = values[k]
     batch.expect_column_median_to_be_between(
