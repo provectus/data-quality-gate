@@ -37,7 +37,8 @@ def s3_test_data(request):
         "run_name": "local_test",
         "source_root": b_name,
         "source_data": file_path,
-        "engine": "s3"
+        "engine": "s3",
+        "project_name": "integration_test"
     }
     s3 = boto3.resource("s3", endpoint_url=url)
     qa_bucket_name = os.environ['QA_BUCKET']
