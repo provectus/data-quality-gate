@@ -59,13 +59,14 @@ def expectations_median(name, summary, batch, *args):
     for key, v in raw_values.items():
         key = [key] * v
         values.extend(key)
-    q = 0.5
-    j = int(len(values) * q - 2.58 * math.sqrt(len(values) * q * (1 - q)))
-    k = int(len(values) * q + 2.58 * math.sqrt(len(values) * q * (1 - q)))
-    min_median = values[j]
-    max_median = values[k]
-    batch.expect_column_median_to_be_between(
-        column=name, min_value=min_median, max_value=max_median)
+    if len(values) >= 3:
+        q = 0.5
+        j = int(len(values) * q - 2.58 * math.sqrt(len(values) * q * (1 - q)))
+        k = int(len(values) * q + 2.58 * math.sqrt(len(values) * q * (1 - q)))
+        min_median = values[j]
+        max_median = values[k]
+        batch.expect_column_median_to_be_between(
+            column=name, min_value=min_median, max_value=max_median)
     return name, summary, batch
 
 
@@ -92,7 +93,7 @@ def expectations_quantile(name, summary, batch, *args):
         summary["75%"],
         summary["95%"]]
     degree = len(str(q_array[0]).split('.')[0])
-    q_array[:] = [x / math.pow(10, degree+2) for x in q_array]
+    q_array[:] = [x / math.pow(10, degree + 2) for x in q_array]
     q_ranges = {
         "quantiles": q_array,
         "value_ranges": [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]]
@@ -110,7 +111,6 @@ def expectations_z_score(name, summary, batch, *args):
     batch.expect_column_value_z_scores_to_be_less_than(
         column=name, threshold=threshold, double_sided=True)
     return name, summary, batch
-
 
 
 class MyExpectationHandler(Handler):
