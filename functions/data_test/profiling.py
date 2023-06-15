@@ -59,10 +59,10 @@ def expectations_median(name, summary, batch, *args):
     for key, v in raw_values.items():
         key = [key] * v
         values.extend(key)
-    if len(values) >= 3:
-        q = 0.5
-        j = int(len(values) * q - 2.58 * math.sqrt(len(values) * q * (1 - q)))
-        k = int(len(values) * q + 2.58 * math.sqrt(len(values) * q * (1 - q)))
+    q = 0.5
+    j = int(len(values) * q - 2.58 * math.sqrt(len(values) * q * (1 - q)))
+    k = int(len(values) * q + 2.58 * math.sqrt(len(values) * q * (1 - q)))
+    if j < len(values) and k < len(values):
         min_median = values[j]
         max_median = values[k]
         batch.expect_column_median_to_be_between(
@@ -97,14 +97,14 @@ def expectations_quantile(name, summary, batch, *args):
     return name, summary, batch
 
 
-
 def expectations_z_score(name, summary, batch, *args):
     mean = summary["mean"]
     std = summary["std"]
     maximum = summary["max"]
     threshold = (maximum - mean) / std
-    batch.expect_column_value_z_scores_to_be_less_than(
-        column=name, threshold=threshold, double_sided=True)
+    if std != 0:
+        batch.expect_column_value_z_scores_to_be_less_than(
+            column=name, threshold=threshold, double_sided=True)
     return name, summary, batch
 
 
