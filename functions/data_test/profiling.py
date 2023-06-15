@@ -100,7 +100,7 @@ def expectations_z_score(name, summary, batch, *args):
     std = summary["std"]
     maximum = summary["max"]
     threshold = (maximum - mean) / std
-    if isinstance(threshold, float):
+    if std != 0:
         batch.expect_column_value_z_scores_to_be_less_than(
             column=name, threshold=threshold, double_sided=True)
     return name, summary, batch
