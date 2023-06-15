@@ -15,6 +15,7 @@ from great_expectations.data_context.types.base import (DataContextConfig,
                                                         S3StoreBackendDefaults)
 import yaml
 from scipy.stats import t
+
 DEFAULT_CONFIG_FILE_PATH = "great_expectations/great_expectations.yml"
 
 if os.environ['ENVIRONMENT'] == 'local':
@@ -56,10 +57,10 @@ def expectations_median(name, summary, batch, *args):
     for key, v in raw_values.items():
         key = [key] * v
         values.extend(key)
-    if len(values) >= 3:
-        q = 0.5
-        j = int(len(values) * q - 2.58 * math.sqrt(len(values) * q * (1 - q)))
-        k = int(len(values) * q + 2.58 * math.sqrt(len(values) * q * (1 - q)))
+    q = 0.5
+    j = int(len(values) * q - 2.58 * math.sqrt(len(values) * q * (1 - q)))
+    k = int(len(values) * q + 2.58 * math.sqrt(len(values) * q * (1 - q)))
+    if j < len(values) and k < len(values):
         min_median = values[j]
         max_median = values[k]
         batch.expect_column_median_to_be_between(
@@ -90,7 +91,7 @@ def expectations_quantile(name, summary, batch, *args):
         summary["75%"],
         summary["95%"]]
     degree = len(str(q_array[0]).split('.')[0])
-    q_array[:] = [x / math.pow(10, degree+2) for x in q_array]
+    q_array[:] = [x / math.pow(10, degree + 2) for x in q_array]
     q_ranges = {
         "quantiles": q_array,
         "value_ranges": [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]]
