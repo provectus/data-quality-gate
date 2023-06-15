@@ -66,7 +66,7 @@ class ExpectationsReportNew:
         new_column_in_mapping = {}
         try:
             mapping_schema = mapping_config[suite_name]
-        except KeyError:
+        except (KeyError, TypeError):
             mapping_schema = None
 
         data_asset = data_context.get_datasource(

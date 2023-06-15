@@ -1,4 +1,6 @@
 import json
+import math
+
 from ydata_profiling import ProfileReport
 import os
 import boto3
@@ -12,6 +14,7 @@ from great_expectations.data_context import EphemeralDataContext
 from great_expectations.data_context.types.base import (DataContextConfig,
                                                         S3StoreBackendDefaults)
 import yaml
+from scipy.stats import t
 DEFAULT_CONFIG_FILE_PATH = "great_expectations/great_expectations.yml"
 
 if os.environ['ENVIRONMENT'] == 'local':
@@ -37,33 +40,119 @@ def expectations_null(name, summary, batch, *args):
     return name, summary, batch
 
 
+def expectations_mean(name, summary, batch, *args):
+    n = summary["n"]
+    k = 0.99 * (summary["std"] / math.sqrt(n))
+    min_mean = summary["mean"] - k
+    max_mean = summary["mean"] + k
+    batch.expect_column_mean_to_be_between(
+        column=name, min_value=min_mean, max_value=max_mean)
+    return name, summary, batch
+
+
+def expectations_median(name, summary, batch, *args):
+    raw_values = summary["value_counts_index_sorted"]
+    values = []
+    for key, v in raw_values.items():
+        key = [key] * v
+        values.extend(key)
+    q = summary['25%']
+    j = int(len(values) * q - 0.99 * math.sqrt(len(values) * q * (1 - q)))
+    k = int(len(values) * q + 0.99 * math.sqrt(len(values) * q * (1 - q)))
+    min_median = values[j]
+    max_median = values[k]
+    batch.expect_column_median_to_be_between(
+        column=name, min_value=min_median, max_value=max_median)
+    return name, summary, batch
+
+
+def expectations_stdev(name, summary, batch, *args):
+    n = summary["n"]
+    std = summary["std"]
+    confidence_level = 0.99
+    degrees_of_freedom = n - 1
+    alpha = 1 - confidence_level
+    t_critical = t.ppf(1 - alpha / 2, degrees_of_freedom)
+    margin_of_error = t_critical * (std / math.sqrt(n))
+    min_std = std - margin_of_error
+    max_std = std + margin_of_error
+    batch.expect_column_stdev_to_be_between(
+        column=name, min_value=min_std, max_value=max_std)
+    return name, summary, batch
+
+
+def expectations_quantile(name, summary, batch, *args):
+    q_array = [
+        summary["5%"],
+        summary["25%"],
+        summary["50%"],
+        summary["75%"],
+        summary["95%"]]
+    q_array[:] = [x / 100 for x in q_array]
+    q_ranges = {
+        "quantiles": q_array,
+        "value_ranges": [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]]
+    }
+    batch.expect_column_quantile_values_to_be_between(
+        column=name, quantile_ranges=q_ranges)
+    return name, summary, batch
+
+
+def expectations_z_score(name, summary, batch, *args):
+    mean = summary["mean"]
+    std = summary["std"]
+    maximum = summary["max"]
+    threshold = (maximum - mean) / std
+    batch.expect_column_value_z_scores_to_be_less_than(
+        column=name, threshold=threshold, double_sided=True)
+    return name, summary, batch
+
+
 class MyExpectationHandler(Handler):
     def __init__(self, typeset, *args, **kwargs):
         mapping = {
-            "Unsupported": [expectations_null,
-                            ],
-            "Categorical": [expectation_algorithms.categorical_expectations,
-                            expectations_null,
-                            ],
-            "Text": [expectation_algorithms.categorical_expectations,
-                     expectations_null
-                     ],
-            "Boolean": [expectations_null,
-                        ],
-            "Numeric": [generic_expectations_without_null,
-                        expectations_null,
-                        ],
-            "URL": [expectation_algorithms.url_expectations,
-                    expectations_null,
-                    ],
-            "File": [expectation_algorithms.file_expectations,
-                     expectations_null, ],
-            "Path": [expectation_algorithms.path_expectations,
-                     expectations_null, ],
-            "DateTime": [expectation_algorithms.datetime_expectations,
-                         expectations_null, ],
-            "Image": [expectation_algorithms.image_expectations,
-                      expectations_null, ],
+            "Unsupported": [
+                expectations_null,
+            ],
+            "Categorical": [
+                expectation_algorithms.categorical_expectations,
+                expectations_null,
+            ],
+            "Text": [
+                expectation_algorithms.categorical_expectations,
+                expectations_null],
+            "Boolean": [
+                expectations_null,
+            ],
+            "Numeric": [
+                generic_expectations_without_null,
+                expectations_null,
+                expectation_algorithms.numeric_expectations,
+                expectations_mean,
+                expectations_median,
+                expectations_stdev,
+                expectations_quantile,
+                expectations_z_score],
+            "URL": [
+                expectation_algorithms.url_expectations,
+                expectations_null,
+            ],
+            "File": [
+                expectation_algorithms.file_expectations,
+                expectations_null,
+            ],
+            "Path": [
+                expectation_algorithms.path_expectations,
+                expectations_null,
+            ],
+            "DateTime": [
+                expectation_algorithms.datetime_expectations,
+                expectations_null,
+            ],
+            "Image": [
+                expectation_algorithms.image_expectations,
+                expectations_null,
+            ],
         }
         super().__init__(mapping, typeset, *args, **kwargs)
 
