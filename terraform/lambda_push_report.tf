@@ -34,16 +34,16 @@ resource "aws_iam_policy" "data_test_sm" {
   path = "/service-role/"
   policy = jsonencode(
     {
-      "Statement": [
+      "Statement" : [
         {
-            "Effect": "Allow",
-            "Action": [
-                "sagemaker:SendPipelineExecutionStepSuccess",
-                "sagemaker:SendPipelineExecutionStepFailure"
-            ],
-            "Resource": "*"
+          "Effect" : "Allow",
+          "Action" : [
+            "sagemaker:SendPipelineExecutionStepSuccess",
+            "sagemaker:SendPipelineExecutionStepFailure"
+          ],
+          "Resource" : "*"
         }
-    ]
+      ]
       Version = "2012-10-17"
     }
   )
