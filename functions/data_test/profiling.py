@@ -84,17 +84,11 @@ def expectations_stdev(name, summary, batch, *args):
 
 
 def expectations_quantile(name, summary, batch, *args):
-    q_array = [
-        summary["5%"],
-        summary["25%"],
-        summary["50%"],
-        summary["75%"],
-        summary["95%"]]
-    degree = len(str(q_array[0]).split('.')[0])
-    q_array[:] = [x / math.pow(10, degree + 2) for x in q_array]
     q_ranges = {
-        "quantiles": q_array,
-        "value_ranges": [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5]]
+        "quantiles": [0.05, 0.25, 0.5, 0.75, 0.95],
+        "value_ranges": [[summary["5%"], summary["25%"]], [summary["25%"], summary["50%"]],
+                         [summary["50%"], summary["75%"]], [summary["75%"], summary["95%"]],
+                         [summary["95%"], summary["max"]]]
     }
     batch.expect_column_quantile_values_to_be_between(
         column=name, quantile_ranges=q_ranges)
@@ -106,8 +100,9 @@ def expectations_z_score(name, summary, batch, *args):
     std = summary["std"]
     maximum = summary["max"]
     threshold = (maximum - mean) / std
-    batch.expect_column_value_z_scores_to_be_less_than(
-        column=name, threshold=threshold, double_sided=True)
+    if isinstance(threshold, float):
+        batch.expect_column_value_z_scores_to_be_less_than(
+            column=name, threshold=threshold, double_sided=True)
     return name, summary, batch
 
 
