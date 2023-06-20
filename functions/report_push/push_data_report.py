@@ -85,7 +85,7 @@ def handler(event, context):
         only_failed = True
         print(f"Can't find only_failed param for {run_name}")
 
-    if autobug and failed > 0:
+    if autobug and failed:
         jira_project_key = os.environ['JIRA_PROJECT_KEY']
         auth_in_jira()
         created_bug_count, bug_name = create_jira_bugs_from_allure_result(
