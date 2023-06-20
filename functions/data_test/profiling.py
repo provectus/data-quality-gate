@@ -233,11 +233,15 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
     try:
         profile = ProfileReport(df, title=f"{suite_name} Profiling Report",
                                 minimal=True, pool_size=1)
-        report = profile.to_html()
     except TypeError:
         profile = ProfileReport(df, title=f"{suite_name} Profiling Report",
                                 pool_size=1)
+    try:
         report = profile.to_html()
+    except ValueError:
+        profile.config.vars.text.words = False
+        report = profile.to_html()
+
     if not source_covered:
         try:
             pipeline_config = json.loads(wr.s3.read_json(
