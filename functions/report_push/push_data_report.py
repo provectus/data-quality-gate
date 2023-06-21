@@ -126,7 +126,7 @@ def handler(event, context):
     }
 
     if token != 'None' and token:
-        baseline = 100 * int(total)/int(failed)
+        baseline = 100 * int(passed)/int(total)
         sm = boto3.client('sagemaker')
         response = sm.send_pipeline_execution_step_success(
             CallbackToken=token,
