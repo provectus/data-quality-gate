@@ -122,7 +122,7 @@ def get_params(file):
     del params['batch_id']
     results = []
     for param in params:
-        if isinstance(params[param], list):
+        if isinstance(params[param], (list, dict)):
             value = str(params[param])
         else:
             value = params[param]
