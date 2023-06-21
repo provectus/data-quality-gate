@@ -120,7 +120,7 @@ def get_params(file):
     del params['result_format']
     result = []
     for param in params:
-        result.append({"name": param, "value": str(params[param])}) if isinstance(params[param], list) else result.append({"name": param, "value": params[param]})
+        result.append({"name": param, "value": str(params[param])}) if isinstance(params[param], (list, dict)) else result.append({"name": param, "value": params[param]})
     return result
 
 def get_params1(file):
