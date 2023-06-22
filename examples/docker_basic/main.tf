@@ -46,8 +46,8 @@ module "data_qa" {
   push_report_image_uri   = module.docker_image_push_report.image_uri
 
   data_reports_notification_settings = {
-    channel     = var.slack_channel
-    webhook_url = var.slack_webhook_url
+    channel     = "DataQASlackChannel"
+    webhook_url = "https://hooks.slack.com/services/........"
   }
 
   lambda_private_subnet_ids = module.vpc.private_subnet_ids
@@ -55,29 +55,14 @@ module "data_qa" {
 
   reports_vpc_id        = module.vpc.vpc_id
   reports_subnet_id     = module.vpc.public_subnet_ids[0]
-  reports_whitelist_ips = ["195.155.100.203/32"]
-}
+  reports_whitelist_ips = ["0.0.0.0/0"] # Available from everywhere
 
-module "data_qa_intg" {
-  source = "../../terraform"
-
-  data_test_storage_bucket_name = "dqg-settings-intg"
-  environment                   = "intg"
-  project                       = "provectus"
-
-  allure_report_image_uri = module.docker_image_allure_report.image_uri
-  data_test_image_uri     = module.docker_image_data_test.image_uri
-  push_report_image_uri   = module.docker_image_push_report.image_uri
-
-  data_reports_notification_settings = {
-    channel     = var.slack_channel
-    webhook_url = var.slack_webhook_url
-  }
-
-  lambda_private_subnet_ids = module.vpc.private_subnet_ids
-  lambda_security_group_ids = module.vpc.security_group_ids
-
-  reports_vpc_id        = module.vpc.vpc_id
-  reports_subnet_id     = module.vpc.public_subnet_ids[0]
-  reports_whitelist_ips = ["195.155.100.203/32"]
+  test_coverage_path     = "../../configs/test_coverage.json"
+  pipeline_config_path   = "../../configs/pipeline.json"
+  pks_path               = "../../configs/pks.json"
+  sort_keys_path         = "../../configs/sort_keys.json"
+  mapping_path           = "../../configs/mapping.json"
+  manifest_path          = "../../configs/manifest.json"
+  great_expectation_path = "../../templates/great_expectations.yml"
+  expectations_store     = "../../expectations_store"
 }

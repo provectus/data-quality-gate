@@ -31,7 +31,7 @@ module "basic_slack_alerting" {
   slack_sns_topic_name = "dqg-alerting-${var.environment}"
   slack_username       = "DQG-alerting"
 
-  step_functions_to_monitor = ["${local.resource_name_prefix}-fast-data-qa"]
+  step_functions_to_monitor = [aws_sfn_state_machine.fast_data_qa.name]
 
   resource_name_prefix = local.resource_name_prefix
 }
