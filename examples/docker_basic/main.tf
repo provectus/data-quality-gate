@@ -38,6 +38,7 @@ module "data_qa" {
   source = "../../terraform"
 
   data_test_storage_bucket_name = "dqg-settings-dev"
+  s3_source_data_bucket         = "data-bucket-name"
   environment                   = "demo"
   project                       = "provectus"
 

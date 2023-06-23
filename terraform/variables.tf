@@ -21,6 +21,11 @@ variable "data_test_storage_bucket_name" {
   type        = string
 }
 
+variable "s3_source_data_bucket" {
+  type        = string
+  description = "Bucket name, with the data on which test will be executed"
+}
+
 variable "test_coverage_path" {
   description = "Path to the tests description path, relative to the root TF"
   type        = string
