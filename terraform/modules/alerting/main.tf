@@ -51,4 +51,3 @@ data "aws_sfn_state_machine" "step_functions" {
   for_each = var.step_functions_to_monitor
   name     = each.key
 }
-
