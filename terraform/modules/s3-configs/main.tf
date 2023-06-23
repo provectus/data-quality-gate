@@ -22,11 +22,11 @@ resource "aws_s3_bucket_versioning" "fast-data-qa-bucket" {
 resource "aws_s3_object" "great_expectations_yml" {
   bucket       = aws_s3_bucket.settings_bucket.bucket
   content_type = "application/x-yaml"
-  content = templatefile("${var.great_expectation_path}", {
+  content = templatefile(var.great_expectation_path, {
     bucket = aws_s3_bucket.settings_bucket.bucket
   })
   key = "${aws_s3_bucket.settings_bucket.bucket}/great_expectations/great_expectations.yml"
-  etag = md5(templatefile("${var.great_expectation_path}", {
+  etag = md5(templatefile(var.great_expectation_path, {
     bucket = aws_s3_bucket.settings_bucket.bucket
   }))
 }
@@ -35,40 +35,40 @@ resource "aws_s3_object" "test_configs" {
   bucket = aws_s3_bucket.settings_bucket.bucket
   source = var.test_coverage_path
   key    = "test_configs/test_coverage.json"
-  etag   = filemd5("${var.test_coverage_path}")
+  etag   = filemd5(var.test_coverage_path)
 }
 
 resource "aws_s3_object" "pipeline_config" {
   bucket = aws_s3_bucket.settings_bucket.bucket
   source = var.pipeline_config_path
   key    = "test_configs/pipeline.json"
-  etag   = filemd5("${var.pipeline_config_path}")
+  etag   = filemd5(var.pipeline_config_path)
 }
 
 resource "aws_s3_object" "pks_config" {
   bucket = aws_s3_bucket.settings_bucket.bucket
   source = var.pks_path
   key    = "test_configs/pks.json"
-  etag   = filemd5("${var.pks_path}")
+  etag   = filemd5(var.pks_path)
 }
 
 resource "aws_s3_object" "sort_keys_config" {
   bucket = aws_s3_bucket.settings_bucket.bucket
   source = var.sort_keys_path
   key    = "test_configs/sort_keys.json"
-  etag   = filemd5("${var.sort_keys_path}")
+  etag   = filemd5(var.sort_keys_path)
 }
 
 resource "aws_s3_object" "mapping_config" {
   bucket = aws_s3_bucket.settings_bucket.bucket
   source = var.mapping_path
   key    = "test_configs/mapping.json"
-  etag   = filemd5("${var.mapping_path}")
+  etag   = filemd5(var.mapping_path)
 }
 
 
 resource "aws_s3_object" "expectations_store" {
-  for_each = fileset("${var.expectations_store}", "**")
+  for_each = fileset(var.expectations_store, "**")
   bucket   = aws_s3_bucket.settings_bucket.bucket
   source   = "${var.expectations_store}/${each.value}"
   key      = "${aws_s3_bucket.settings_bucket.bucket}/great_expectations/expectations/${each.value}"
@@ -77,12 +77,12 @@ resource "aws_s3_object" "expectations_store" {
 
 resource "aws_s3_object" "test_config_manifest" {
   bucket = aws_s3_bucket.settings_bucket.bucket
-  etag = md5(templatefile("${var.manifest_path}", {
+  etag = md5(templatefile(var.manifest_path, {
     env_name    = var.environment,
     bucket_name = aws_s3_bucket.settings_bucket.bucket
   }))
   content_type = "application/json"
-  content = templatefile("${var.manifest_path}",
+  content = templatefile(var.manifest_path,
     {
       env_name    = var.environment,
       bucket_name = aws_s3_bucket.settings_bucket.bucket

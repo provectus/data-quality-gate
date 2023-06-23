@@ -1,7 +1,19 @@
-variable "slack_sns_topic_name" { type = string }
-variable "slack_webhook_url" { type = string }
-variable "slack_channel" { type = string }
-variable "slack_username" { type = string }
+variable "slack_sns_topic_name" {
+  description = "Sns topic name to forward notifications to"
+  type        = string
+}
+variable "slack_webhook_url" {
+  description = "Slack webhook url in form https://hooks.slack.com/services/........"
+  type        = string
+}
+variable "slack_channel" {
+  description = "Slack channel to send notifications"
+  type        = string
+}
+variable "slack_username" {
+  description = "Slack username which will be used as author of notifications"
+  type        = string
+}
 
 variable "resource_name_prefix" {
   description = "Resource name prefix used to generate resources"
@@ -9,23 +21,27 @@ variable "resource_name_prefix" {
 }
 
 variable "step_functions_to_monitor" {
-  type    = set(string)
-  default = []
+  description = "List of step functions for which to create cloudwatch metrics alarm"
+  type        = set(string)
+  default     = []
 }
 
 variable "period" {
-  default     = 60
   description = "The period in seconds over which the specified statistic is applied."
+  type        = number
+  default     = 60
 }
 
 variable "evaluation_periods" {
-  default     = 1
   description = "The number of periods over which data is compared to the specified threshold."
+  type        = number
+  default     = 1
 }
 
 variable "datapoints_to_alarm" {
-  default     = 1
   description = "The number of datapoints that must be breaching to trigger the alarm."
+  type        = number
+  default     = 1
 }
 
 variable "lambda_function_vpc_security_group_ids" {

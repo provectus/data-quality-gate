@@ -1,3 +1,4 @@
 output "bucket_name" {
-  value = aws_s3_bucket.settings_bucket.bucket
+  description = "Name of s3 configs bucket"
+  value       = aws_s3_bucket.settings_bucket.bucket
 }
