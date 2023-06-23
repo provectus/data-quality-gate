@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "settings_bucket" {
   force_destroy = true
 }
 
-resource "aws_s3_bucket_public_access_block" "public_access_block_fast_data_qa" {
+resource "aws_s3_bucket_public_access_block" "settings_bucket_public_access_block" {
   bucket                  = aws_s3_bucket.settings_bucket.id
   block_public_acls       = true
   block_public_policy     = true
@@ -11,7 +11,7 @@ resource "aws_s3_bucket_public_access_block" "public_access_block_fast_data_qa" 
   restrict_public_buckets = true
 }
 
-resource "aws_s3_bucket_versioning" "fast-data-qa-bucket" {
+resource "aws_s3_bucket_versioning" "settings_bucket_versioning" {
   bucket = aws_s3_bucket.settings_bucket.id
 
   versioning_configuration {
