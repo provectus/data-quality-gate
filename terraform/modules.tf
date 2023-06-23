@@ -1,4 +1,4 @@
-module "athena-connector" {
+module "athena_connector" {
   source = "./modules/athena-connector"
 
   primary_aws_region = data.aws_region.current.name

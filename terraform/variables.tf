@@ -1,10 +1,3 @@
-variable "tags" {
-  description = "Default tags"
-  type        = map(string)
-
-  default = {}
-}
-
 variable "project" {
   description = "Project name used to build fully qualified tags and resource's names"
   type        = string
@@ -206,12 +199,6 @@ variable "data_test_image_uri" {
 variable "push_report_image_uri" {
   description = "Push report image URI(ECR repository)"
   type        = string
-}
-
-variable "lambda_alerts_sns_topic_arn" {
-  description = "SNS topic used to to publish cloudwatch alerts"
-  type        = string
-  default     = null
 }
 
 variable "lambda_private_subnet_ids" {
