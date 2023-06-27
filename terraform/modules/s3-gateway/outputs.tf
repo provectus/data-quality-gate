@@ -1,3 +1,4 @@
 output "s3_gateway_address" {
-  value = replace(aws_instance.s3_gateway.public_dns, "https", "http")
+  description = "DNS http address of s3 gateway"
+  value       = replace(aws_instance.s3_gateway.public_dns, "https", "http")
 }

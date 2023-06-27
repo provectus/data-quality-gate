@@ -1,4 +1,4 @@
-resource "aws_cloudwatch_log_group" "state-machine-log-group" {
+resource "aws_cloudwatch_log_group" "state_machine_log_group" {
   name              = "/aws/${local.resource_name_prefix}/states/fast-data-qa-logs"
   retention_in_days = 0
 }
@@ -130,7 +130,7 @@ DEFINITION
   logging_configuration {
     include_execution_data = true
     level                  = "ALL"
-    log_destination        = "${aws_cloudwatch_log_group.state-machine-log-group.arn}:*"
+    log_destination        = "${aws_cloudwatch_log_group.state_machine_log_group.arn}:*"
   }
 
   tracing_configuration {
@@ -156,15 +156,15 @@ resource "aws_iam_role" "step_functions_fast_data_qa" {
   )
   force_detach_policies = false
   managed_policy_arns = [
-    aws_iam_policy.CloudWatchLogsDeliveryFullAccessPolicy.arn,
-    aws_iam_policy.LambdaInvokeScopedAccessPolicy.arn,
-    aws_iam_policy.XRayAccessPolicy.arn
+    aws_iam_policy.cloud_watch_logs_delivery_full_access_policy.arn,
+    aws_iam_policy.lambda_invoke_scoped_access_policy.arn,
+    aws_iam_policy.xray_access_policy.arn
   ]
   max_session_duration = 3600
   path                 = "/${var.environment}/"
 }
 
-resource "aws_iam_policy" "CloudWatchLogsDeliveryFullAccessPolicy" {
+resource "aws_iam_policy" "cloud_watch_logs_delivery_full_access_policy" {
   description = "Allows AWS Step Functions to write execution logs to CloudWatch Logs on your behalf"
   path        = "/${var.environment}/"
   policy = jsonencode(
@@ -190,7 +190,7 @@ resource "aws_iam_policy" "CloudWatchLogsDeliveryFullAccessPolicy" {
   )
 }
 
-resource "aws_iam_policy" "LambdaInvokeScopedAccessPolicy" {
+resource "aws_iam_policy" "lambda_invoke_scoped_access_policy" {
   description = "Allow AWS Step Functions to invoke Lambda functions on your behalf"
   path        = "/${var.environment}/"
   policy = jsonencode(
@@ -213,7 +213,7 @@ resource "aws_iam_policy" "LambdaInvokeScopedAccessPolicy" {
   )
 }
 
-resource "aws_iam_policy" "XRayAccessPolicy" {
+resource "aws_iam_policy" "xray_access_policy" {
   description = "Allow AWS Step Functions to call X-Ray daemon on your behalf"
   path        = "/${var.environment}/"
   policy = jsonencode(
