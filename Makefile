@@ -22,16 +22,13 @@ build-integration-tests-img: build-lambda-img
 	-t "$(test)_integration_tests" .
 
 run-integration-tests: build-integration-tests-img
-	cd ./tests/integration_tests/$(test) && \
 	docker run --env BUCKET=$(QA_BUCKET) \
 	--env S3_HOST=$(HOST) --env S3_PORT=$(PORT) $(test)_integration_tests
 
-build-unit-tests-img: build-lambda-img
-	cd ./tests/unit_tests/$(test) && \
-	docker build --build-arg="IMAGE_NAME=$(test)" \
-	--build-arg="VERSION=$(IMAGE_VERSION)" \
+build-unit-tests-img:
+	cd ./functions/$(test) && \
+	docker build --target=unit-tests \
 	-t $(test)_unit_tests .
 
 run-unit-tests: build-unit-tests-img
-	cd ./tests/unit_tests/$(test) && \
 	docker run $(test)_unit_tests
