@@ -58,12 +58,12 @@ module "data_qa" {
 
 Could be used as standard Terraform module, the examples of deployments under `examples` directory.
 
-- [data-qa-basic](https://github.com/provectus/data-quality-gate/tree/master/examples/basic) - Creates DataQA module which builds AWS infrastructure.
+- [data-qa-basic](https://github.com/provectus/data-quality-gate/tree/main/examples/basic) - Creates DataQA module which builds AWS infrastructure.
 
 ## Local Development and Testing
 
-See the [functions](https://github.com/data-quality-gate/tree/master/functions) for further details.
+See the [functions](https://github.com/provectus/data-quality-gate/tree/main/functions) for further details.
 
 ## License
 
-Apache 2 Licensed. See [LICENSE](https://github.com/provectus/data-quality-gate/tree/master/LICENSE) for full details.
+Apache 2 Licensed. See [LICENSE](https://github.com/provectus/data-quality-gate/tree/main/LICENSE) for full details.

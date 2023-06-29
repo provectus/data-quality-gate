@@ -1,3 +1,29 @@
+## DataQA terraform module
+
+![Preview Image](https://raw.githubusercontent.com/provectus/data-quality-gate/main/terraform/inframap.png)
+
+### Pre-requirements
+
+As part of this solution, it is expected to have the necessary existing infrastructure
+- At least 1 Vpc
+- At least 1 private subnet in vpc
+- At least 1 public subnet in vpc(if you want to see DataQA reports in the Web)
+- At least 5 vpc endpoints
+  - `com.amazonaws.AWS-REGION.dynamodb`
+  - `com.amazonaws.AWS-REGION.s3`
+  - `com.amazonaws.AWS-REGION.sns`
+  - `com.amazonaws.AWS-REGION.monitoring`
+  - `com.amazonaws.AWS-REGION.secretsmanager`
+- At least 1 AWS S3 bucket with data that you want to test
+- At least 1 AWS ECR repository
+
+### List of submodules
+
+- [Alerting](https://github.com/provectus/data-quality-gate/tree/main/terraform/modules/alerting) - provides basic functionality for AWS CloudWatch metrics alerts and forwards them to the Slack messenger. Also used as message bus for `data_report` lambda
+- [Athena connector](https://github.com/provectus/data-quality-gate/tree/main/terraform/modules/athena-connector) - builds AWS Athena data catalog and AWS Lambda to allow query internal DynamoDB data table
+- [AWS S3 configs](https://github.com/provectus/data-quality-gate/tree/main/terraform/modules/s3-configs) - creates internal AWS S3 bucket for data quality processing. Additionally pushing Allure and GreatExpectations configs to this bucket
+- [AWS S3 Gateway](https://github.com/provectus/data-quality-gate/tree/main/terraform/modules/s3-gateway) - creates AWS EC2 instance that serves HTTP requests to see static reports in the web.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

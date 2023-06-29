@@ -3,7 +3,7 @@ Basic Data QA example
 
 Configuration in this directory shows how to instantiate a Data QA module that consists from various AWS services.
 
-Note, this example does not contain required high-level aws global infrastructure such as vpc and networking. To see module details go to [README](../../terraform/README.md) 
+Note, this example does not contain required high-level aws global infrastructure such as vpc and networking. To see module requirements go to [README](https://github.com/provectus/data-quality-gate/tree/main/terraform/README.md) 
 
 Usage
 =====
