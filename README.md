@@ -1,7 +1,7 @@
 # Data Quality Gate 
 
 ## Description
-Terrafrom module which setup Data-QA solution(bucket,Stepfunctions Pipeline with AWS Lambda, Metadata Storage. Data-QA Reports) in your infrastructure in 'one-click'. AWS Based. Built on top of Great_expectations, Pandas_profiling, Allure
+Terrafrom module which setup DataQA solution in your infrastructure in 'one-click'. AWS Based. Built on top of Great_expectations, Pandas_profiling, Allure
 
 ### Data Test
 Main engine based on GX to profile, generate suites and run tests
@@ -15,64 +15,55 @@ Metadata and metrics aggregation
 ## Solution Architecture
 ![Preview Image](https://raw.githubusercontent.com/provectus/data-quality-gate/main/architecture.PNG)
 
+## Supported Features
+
+- AWS Lambda runtime Python 3.8
+- AWS StepFunction pipeline, combining whole DataQA cycle(profiling, test generation, reporting)
+- Supports Slack and Jira notifications and reporting
+- AWS SNS output message bus, allowing to embed to existing data pipelines
+- Web reports delivery through Nginx for companies VPN/IP set
+- AWS DynamoDB and Athena integration, allowing to build AWS QuickSide or Graphana dashboards
+- Flexible way of config management for underlying technologies such as Allure and GreatExpectation
+
 ## Usage
-Could be used as standard Terraform module, the examples of deployments under `examples` directory.
 
-1. Add to terraform DataQA module as in examples
-2. Add to terraform state machine `DataTests` step
-```terraform
-resource "aws_sfn_state_machine" "data_state_machine" {
-  definition = jsonencode(
-    {
-      StartAt = "GetData"
-      States  = {
-        GetData = {
-          Next       = "DataTests"
-          Resource   = aws_lambda_function.some_get_data.function_name
-          ResultPath = "$.file"
-          Type       = "Task"
-        }
-        DataTests = {
-          Type       = "Task"
-          Resource   = "arn:aws:states:::states:startExecution.sync:2",
-          End        = true
-          Parameters = {
-            StateMachineArn = module.data-qa.qa_step_functions_arn
-            Input = {
-              files = [
-                {
-                  engine          = "s3"
-                  source_root     = var.data_lake_bucket
-                  run_name        = "raw_data"
-                  "source_data.$" = "$.file"
-                }
-              ]
-            }
-          }
-        }
-      }
-    }
-  )
-  name     = "Data-state-machine"
-  role_arn = aws_iam_role.state_machine.arn // role with perms on lambda:InvokeFunction
-  type     = "STANDARD"
+```hcl
+module "data_qa" {
+  source = "github.com/provectus/data-quality-gate"
 
-  logging_configuration {
-    include_execution_data = false
-    level                  = "OFF"
+  data_test_storage_bucket_name = "my-data-settings-dev"
+  s3_source_data_bucket         = "my-data-bucket"
+  environment                   = "example"
+  project                       = "my-project"
+
+  allure_report_image_uri = "xxxxxxxxxxxx.dkr.ecr.xx-xxxx-x.amazonaws.com/dqg-allure_report:latest"
+  data_test_image_uri     = "xxxxxxxxxxxx.dkr.ecr.xx-xxxx-x.amazonaws.com/dqg-data_test:latest"
+  push_report_image_uri   = "xxxxxxxxxxxx.dkr.ecr.xx-xxxx-x.amazonaws.com/dqg-push_reportt:latest"
+
+  data_reports_notification_settings = {
+    channel     = "DataReportSlackChannelName"
+    webhook_url = "https://hooks.slack.com/services/xxxxxxxxxxxxxxx"
   }
 
-  tracing_configuration {
-    enabled = false
-  }
+  lambda_private_subnet_ids = ["private_subnet_id"]
+  lambda_security_group_ids = ["security_group_id"]
+
+  reports_vpc_id        = "some_vpc_id"
+  reports_subnet_id     = "subnet_id"
+  reports_whitelist_ips = ["0.0.0.0/0"]
 }
 ```
-3. Create AWS Serverless application* - [AthenaDynamoDBConnector](https://us-west-2.console.aws.amazon.com/lambda/home?region=us-west-2#/create/app?applicationId=arn:aws:serverlessrepo:us-east-1:292517598671:applications/AthenaDynamoDBConnector) with parameters:
-  - SpillBucket - name of bucket created by terraform module 
-  - AthenaCatalogName - The name you will give to this catalog in Athena. It will also be used as the function name.
 
-*Cannot be created automatically by terraform because [terraform-provider-aws/issues/16485](https://github.com/hashicorp/terraform-provider-aws/issues/16485)
+## Examples
 
-4. Create AWS Athena Data Source:
-- Data source type -> Amazon DynamoDB
-- Connection details -> lambda function -> name of `AthenaCatalogName` from pt.3 
+Could be used as standard Terraform module, the examples of deployments under `examples` directory.
+
+- [data-qa-basic](https://github.com/provectus/data-quality-gate/tree/master/examples/basic) - Creates DataQA module which builds AWS infrastructure.
+
+## Local Development and Testing
+
+See the [functions](https://github.com/data-quality-gate/tree/master/functions) for further details.
+
+## License
+
+Apache 2 Licensed. See [LICENSE](https://github.com/provectus/data-quality-gate/tree/master/LICENSE) for full details.

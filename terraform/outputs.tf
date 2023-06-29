@@ -19,6 +19,6 @@ output "lambda_report_push_arn" {
 }
 
 output "bucket" {
-  description = "Data quality gate bucket with settings and generated tests"
+  description = "DataQA bucket with settings and generated tests"
   value       = module.s3_bucket.bucket_name
 }
