@@ -1,7 +1,7 @@
 # Data Quality Gate 
 
 ## Description
-Terrafrom module which setup DataQA solution in your infrastructure in 'one-click'. AWS Based. Built on top of Great_expectations, Pandas_profiling, Allure
+Terraform module which setups DataQA solution in your infrastructure in 'one-click'. AWS Based. Built on top of Great_expectations, Pandas_profiling, Allure
 
 ### Data Test
 Main engine based on GX to profile, generate suites and run tests
@@ -17,7 +17,7 @@ Metadata and metrics aggregation
 
 ## Supported Features
 
-- AWS Lambda runtime Python 3.8
+- AWS Lambda runtime Python 3.9
 - AWS StepFunction pipeline, combining whole DataQA cycle(profiling, test generation, reporting)
 - Supports Slack and Jira notifications and reporting
 - AWS SNS output message bus, allowing to embed to existing data pipelines
