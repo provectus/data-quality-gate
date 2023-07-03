@@ -1,6 +1,6 @@
 ## DataQA terraform module
 
-![Preview Image](https://raw.githubusercontent.com/provectus/data-quality-gate/main/terraform/inframap.png)
+![Preview Image](https://raw.githubusercontent.com/provectus/data-quality-gate/main/docs/inframap.png)
 
 ### Pre-requirements
 

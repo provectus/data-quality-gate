@@ -22,7 +22,7 @@ Metadata and metrics aggregation
 - Supports Slack and Jira notifications and reporting
 - AWS SNS output message bus, allowing to embed to existing data pipelines
 - Web reports delivery through Nginx for companies VPN/IP set
-- AWS DynamoDB and Athena integration, allowing to build AWS QuickSide or Graphana dashboards
+- AWS DynamoDB and Athena integration, allowing to build AWS QuickSight or Grafana dashboards
 - Flexible way of config management for underlying technologies such as Allure and GreatExpectation
 
 ## Usage

@@ -1,7 +1,7 @@
 AWS Athena connector
 =======================
 
-The module in this folder create AWS Athena DataCatalog and AWS Lambda function that serves requests from AWS Athena to AWS DynamoDB.
+The module in this folder creates AWS Athena DataCatalog and AWS Lambda function that serves requests from AWS Athena to AWS DynamoDB.
 It uses official AWS DynamoDB [connector](https://docs.aws.amazon.com/athena/latest/ug/connectors-dynamodb.html). 
 
 
