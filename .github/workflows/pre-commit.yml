@@ -2,9 +2,12 @@ name: Pre-Commit
 
 on:
   pull_request:
-    branches:
-      - main
-      - master
+    types:
+      - opened
+      - synchronize
+      - closed
+    paths:
+      - '**.tf'
 
 env:
   TERRAFORM_DOCS_VERSION: v0.16.0
