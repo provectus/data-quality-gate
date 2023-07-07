@@ -1,11 +1,13 @@
 name: Pre-Commit
 
 on:
+  push:
+    braches:
+      - main
   pull_request:
     types:
       - opened
       - synchronize
-      - closed
     paths:
       - '**.tf'
 
