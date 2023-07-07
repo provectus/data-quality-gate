@@ -56,9 +56,9 @@ module "data_qa" {
 
 ## Examples
 
-The tool can be used as a standard Terraform module, with deployment examples provided in the 'examples' directory.
+The tool can be used as a standard Terraform module, with deployment examples provided in the `examples` directory.
 
-- [data-qa-basic](https://github.com/provectus/data-quality-gate/tree/main/examples/basic) - Creates DataQA module which builds AWS infrastructure.
+- [Data-QA-Basic](https://github.com/provectus/data-quality-gate/tree/main/examples/basic) - Creates a DataQA module that builds AWS infrastructure.
 
 ## Local Development and Testing
 
