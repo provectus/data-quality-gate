@@ -1,29 +1,29 @@
 # Data Quality Gate 
 
 ## Description
-Terraform module which setups DataQA solution in your infrastructure in 'one-click'. AWS Based. Built on top of Great_expectations, Pandas_profiling, Allure
+Data Quality Gate is a Terraform module that enables data engineers and data QA professionals to effortlessly set up the Provectus DataQA solution within their infrastructure in a single click. It is AWS-based and built on the solid foundation of Great Expectations, YData Profiling (ex. Pandas Profiling), and Allure.
 
 ### Data Test
-Main engine based on GX to profile, generate suites and run tests
+The main engine, based on Great Expectations (GX), is used to profile, generate suites, and run tests.
 
 ### Allure Report
-Mapping from GX format to Allure Test Report tool
+The mapping from the GX format into the Allure Test Report tool is executed,
 
 ### Report Push
-Metadata and metrics aggregation
+The existing metadata and metrics are aggregated and pushed down the pipeline.
 
 ## Solution Architecture
 ![Preview Image](https://raw.githubusercontent.com/provectus/data-quality-gate/main/architecture.PNG)
 
 ## Supported Features
 
-- AWS Lambda runtime Python 3.9
-- AWS StepFunction pipeline, combining whole DataQA cycle(profiling, test generation, reporting)
-- Supports Slack and Jira notifications and reporting
-- AWS SNS output message bus, allowing to embed to existing data pipelines
-- Web reports delivery through Nginx for companies VPN/IP set
-- AWS DynamoDB and Athena integration, allowing to build AWS QuickSight or Grafana dashboards
-- Flexible way of config management for underlying technologies such as Allure and GreatExpectation
+1. AWS Lambda Runtime: Utilizes Python 3.9.
+2. AWS Step Functions Pipeline: Incorporates the entire DataQA cycle, including profiling, test generation, and reporting.
+3. Notifications and Reporting: Offers support for Slack and Jira notifications and reporting.
+4. AWS SNS: Outputs message bus, allowing for seamless integration with existing data pipelines.
+5. Web Reports Delivery: Provides report delivery via Nginx for company-specific VPN/IP settings.
+6. AWS DynamoDB and Athena Integration: Enables the construction of AWS QuickSight or Grafana dashboards.
+7. Configuration Management: Provides a flexible method for managing configurations of underlying technologies like Allure and Great Expectations.
 
 ## Usage
 
@@ -56,7 +56,7 @@ module "data_qa" {
 
 ## Examples
 
-Could be used as standard Terraform module, the examples of deployments under `examples` directory.
+The tool can be used as a standard Terraform module, with deployment examples provided in the 'examples' directory.
 
 - [data-qa-basic](https://github.com/provectus/data-quality-gate/tree/main/examples/basic) - Creates DataQA module which builds AWS infrastructure.
 
