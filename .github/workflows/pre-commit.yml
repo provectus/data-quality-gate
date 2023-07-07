@@ -1,10 +1,15 @@
 name: Pre-Commit
 
 on:
-  pull_request:
+  push:
     branches:
       - main
-      - master
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    paths:
+      - '**.tf'
 
 env:
   TERRAFORM_DOCS_VERSION: v0.16.0
