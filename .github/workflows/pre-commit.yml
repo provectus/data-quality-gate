@@ -2,7 +2,7 @@ name: Pre-Commit
 
 on:
   push:
-    braches:
+    branches:
       - main
   pull_request:
     types:

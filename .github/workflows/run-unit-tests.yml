@@ -1,7 +1,7 @@
 name: Run unit tests
 on:
   push:
-    braches:
+    branches:
       - main
   pull_request:
     types:
