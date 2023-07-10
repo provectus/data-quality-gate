@@ -6,7 +6,7 @@ datasources:
     batch_kwargs_generators:
       pandas_s3_generator:
         class_name: S3GlobReaderBatchKwargsGenerator
-        bucket: dataplatform-data-qa-env-fast-data-qa
+        bucket: dqg-settings-local
         assets:
           your_first_data_asset_name:
             prefix: data/ # trailing slash is important
@@ -27,27 +27,27 @@ validation_operators:
     - name: store_validation_result
       action:
         class_name: StoreValidationResultAction
-#    - name: store_evaluation_params
-#      action:
-#        class_name: StoreEvaluationParametersAction
-#    - name: update_data_docs
-#      action:
-#        class_name: UpdateDataDocsAction
+    - name: store_evaluation_params
+      action:
+        class_name: StoreEvaluationParametersAction
+    - name: update_data_docs
+      action:
+        class_name: UpdateDataDocsAction
 
 stores:
   expectations_S3_store:
     class_name: ExpectationsStore
     store_backend:
       class_name: TupleS3StoreBackend
-      bucket: 'dataplatform-data-qa-env-fast-data-qa'
-      prefix: 'dataplatform-data-qa-env-fast-data-qa/great_expectations/expectations/'
+      bucket: 'dqg-settings-local'
+      prefix: 'dqg-settings-local/great_expectations/expectations/'
 
   validations_S3_store:
     class_name: ValidationsStore
     store_backend:
       class_name: TupleS3StoreBackend
-      bucket: 'dataplatform-data-qa-env-fast-data-qa'
-      prefix: 'dataplatform-data-qa-env-fast-data-qa/great_expectations/uncommitted/validations/'
+      bucket: 'dqg-settings-local'
+      prefix: 'dqg-settings-local/great_expectations/uncommitted/validations/'
 
   evaluation_parameter_store:
     class_name: EvaluationParameterStore
@@ -62,9 +62,11 @@ data_docs_sites:
     show_how_to_buttons: false
     store_backend:
       class_name: TupleS3StoreBackend
-      bucket: dataplatform-data-qa-env-fast-data-qa
+      bucket: dqg-settings-local
+      prefix: "data_docs/"
     site_index_builder:
       class_name: DefaultSiteIndexBuilder
+
 anonymous_usage_statistics:
   data_context_id: f6a15c13-c249-416b-8beb-2e540a245773
   enabled: false

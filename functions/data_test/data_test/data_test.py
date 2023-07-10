@@ -12,6 +12,7 @@ def handler(event, context):
         endpoint_url = (f"http://{os.environ['S3_HOST']}:"
                         f"{os.environ['S3_PORT']}")
         s3 = boto3.resource("s3", endpoint_url=endpoint_url)
+        wr.config.s3_endpoint_url = endpoint_url
     else:
         s3 = boto3.resource("s3")
     cloudfront = os.environ['REPORTS_WEB']

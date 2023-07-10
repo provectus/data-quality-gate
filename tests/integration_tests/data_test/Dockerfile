@@ -9,4 +9,5 @@ ENV AWS_SECRET_ACCESS_KEY test
 ENV AWS_DEFAULT_REGION us-east-1
 COPY test_data ./test_data
 COPY ./*.py ./
-ENTRYPOINT ["pytest", "-qvs", "test_data_test.py"]
+# ENTRYPOINT ["pytest", "-qvs", "test_data_test.py"]"
+CMD ["data_test.handler"]
