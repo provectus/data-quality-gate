@@ -209,6 +209,8 @@ def calculate_mean(summary):
 
 
 def calculate_median(summary):
+    min_median = None
+    max_median = None
     raw_values = summary["value_counts_index_sorted"]
     values = []
     for key, v in raw_values.items():
@@ -220,7 +222,7 @@ def calculate_median(summary):
     if j < len(values) and k < len(values):
         min_median = values[j]
         max_median = values[k]
-        return min_median, max_median
+    return min_median, max_median
 
 
 def calculate_stdev(summary):
