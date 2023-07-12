@@ -42,42 +42,22 @@ def expectations_null(name, summary, batch, *args):
 
 
 def expectations_mean(name, summary, batch, *args):
-    n = summary["n"]
-    k = 0.99 * (summary["std"] / math.sqrt(n))
-    min_mean = summary["mean"] - k
-    max_mean = summary["mean"] + k
+    min_mean, max_mean = calculate_mean(summary)
     batch.expect_column_mean_to_be_between(
         column=name, min_value=min_mean, max_value=max_mean)
     return name, summary, batch
 
 
 def expectations_median(name, summary, batch, *args):
-    raw_values = summary["value_counts_index_sorted"]
-    values = []
-    for key, v in raw_values.items():
-        key = [key] * v
-        values.extend(key)
-    q = 0.5
-    j = int(len(values) * q - 2.58 * math.sqrt(len(values) * q * (1 - q)))
-    k = int(len(values) * q + 2.58 * math.sqrt(len(values) * q * (1 - q)))
-    if j < len(values) and k < len(values):
-        min_median = values[j]
-        max_median = values[k]
+    min_median, max_median = calculate_median(summary)
+    if min_median and max_median:
         batch.expect_column_median_to_be_between(
             column=name, min_value=min_median, max_value=max_median)
     return name, summary, batch
 
 
 def expectations_stdev(name, summary, batch, *args):
-    n = summary["n"]
-    std = summary["std"]
-    confidence_level = 0.99
-    degrees_of_freedom = n - 1
-    alpha = 1 - confidence_level
-    t_critical = t.ppf(1 - alpha / 2, degrees_of_freedom)
-    margin_of_error = t_critical * (std / math.sqrt(n))
-    min_std = std - margin_of_error
-    max_std = std + margin_of_error
+    min_std, max_std = calculate_stdev(summary)
     batch.expect_column_stdev_to_be_between(
         column=name, min_value=min_std, max_value=max_std)
     return name, summary, batch
@@ -96,14 +76,10 @@ def expectations_quantile(name, summary, batch, *args):
 
 
 def expectations_z_score(name, summary, batch, *args):
-    mean = summary["mean"]
-    std = summary["std"]
-    maximum = summary["max"]
-    significance_level = 0.005
-    threshold = (maximum - mean) / std
-    if std:
+    threshold = calculate_z_score(summary)
+    if threshold:
         batch.expect_column_value_z_scores_to_be_less_than(
-            column=name, threshold=threshold+significance_level, double_sided=False)
+            column=name, threshold=threshold, double_sided=False)
     return name, summary, batch
 
 
@@ -222,6 +198,52 @@ def read_gx_config_file(path=None) -> dict:
     with open(path, "r") as config_file:
         configfile = yaml.safe_load(config_file)
     return configfile
+
+
+def calculate_mean(summary):
+    n = summary["n"]
+    k = 0.99 * (summary["std"] / math.sqrt(n))
+    min_mean = summary["mean"] - k
+    max_mean = summary["mean"] + k
+    return min_mean, max_mean
+
+
+def calculate_median(summary):
+    raw_values = summary["value_counts_index_sorted"]
+    values = []
+    for key, v in raw_values.items():
+        key = [key] * v
+        values.extend(key)
+    q = 0.5
+    j = int(len(values) * q - 2.58 * math.sqrt(len(values) * q * (1 - q)))
+    k = int(len(values) * q + 2.58 * math.sqrt(len(values) * q * (1 - q)))
+    if j < len(values) and k < len(values):
+        min_median = values[j]
+        max_median = values[k]
+        return min_median, max_median
+
+
+def calculate_stdev(summary):
+    n = summary["n"]
+    std = summary["std"]
+    confidence_level = 0.99
+    degrees_of_freedom = n - 1
+    alpha = 1 - confidence_level
+    t_critical = t.ppf(1 - alpha / 2, degrees_of_freedom)
+    margin_of_error = t_critical * (std / math.sqrt(n))
+    min_std = std - margin_of_error
+    max_std = std + margin_of_error
+    return min_std, max_std
+
+
+def calculate_z_score(summary):
+    mean = summary["mean"]
+    std = summary["std"]
+    maximum = summary["max"]
+    significance_level = 0.005
+    threshold = (maximum - mean) / std
+    if std:
+        return threshold + significance_level
 
 
 def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
