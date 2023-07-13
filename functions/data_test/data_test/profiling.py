@@ -77,7 +77,7 @@ def expectations_quantile(name, summary, batch, *args):
 
 def expectations_z_score(name, summary, batch, *args):
     threshold = calculate_z_score(summary)
-    if threshold:
+    if threshold and threshold == threshold:
         batch.expect_column_value_z_scores_to_be_less_than(
             column=name, threshold=threshold, double_sided=False)
     return name, summary, batch
