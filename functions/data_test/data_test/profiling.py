@@ -28,7 +28,7 @@ else:
 qa_bucket_name = os.environ['BUCKET']
 
 
-def generic_expectations_without_null(name, summary, batch, *args):
+def expectations_unique(name, summary, batch, *args):
     batch.expect_column_to_exist(column=name)
     if summary["p_unique"] >= 0.9:
         batch.expect_column_values_to_be_unique(column=name)
@@ -100,7 +100,7 @@ class MyExpectationHandler(Handler):
                 expectations_null,
             ],
             "Numeric": [
-                generic_expectations_without_null,
+                expectations_unique,
                 expectations_null,
                 expectation_algorithms.numeric_expectations,
                 expectations_mean,
