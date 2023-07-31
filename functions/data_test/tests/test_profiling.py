@@ -1,10 +1,15 @@
 import pytest
+import numpy as np
 from profiling import (add_local_s3_to_stores,
                        read_gx_config_file,
                        expectations_unique,
                        expectations_null,
                        expectations_mean,
-                       calculate_mean)
+                       calculate_mean,
+                       calculate_stdev,
+                       expectations_stdev,
+                       calculate_z_score,
+                       expectations_z_score)
 import great_expectations as gx
 import pandas as pd
 
@@ -154,3 +159,41 @@ def test_expectations_mean(n, std, mean, max_mean, min_mean, before_and_after_te
     assert (min_mean == min_mean_expected and max_mean == max_mean_expected)
     assert name == name_expected
     assert expectation_type in str(batch.expectation_suite)
+
+@pytest.mark.parametrize("n,std,max_std,min_std",
+                         [(418, 120.81045760473994, 136.10108739120102, 105.51982781827887)])
+def test_expectations_stdev(n, std, max_std, min_std, before_and_after_test):
+    n = eval("n")
+    std = eval("std")
+    max_std_expected = eval("max_std")
+    min_std_expected = eval("min_std")
+    name_expected, summary_expected = change_template([n, std], ["n", "std"])
+    expectation_type = "expect_column_stdev_to_be_between"
+    batch_empty = before_and_after_test
+
+    min_std, max_std = calculate_stdev(summary_expected)
+    name, summary, batch = expectations_stdev(name_expected, summary_expected, batch_empty)
+
+    assert (min_std == min_std_expected and max_std == max_std_expected)
+    assert name == name_expected
+    assert expectation_type in str(batch.expectation_suite)
+
+@pytest.mark.parametrize("mean,std,max,threshold,applied",
+                         [(418, 120.81045760473994, 1309, 7.380189347557294, True),
+                          (418, np.nan, 1309, None, False)])
+def test_expectations_z_score(mean, std, max, threshold, applied, before_and_after_test):
+    mean = eval("mean")
+    std = eval("std")
+    max = eval("max")
+    threshold_expected = eval("threshold")
+    applied = eval("applied")
+    name_expected, summary_expected = change_template([mean, std, max], ["mean", "std", "max"])
+    expectation_type = "expect_column_value_z_scores_to_be_less_than"
+    batch_empty = before_and_after_test
+
+    threshold = calculate_z_score(summary_expected)
+    name, summary, batch = expectations_z_score(name_expected, summary_expected, batch_empty)
+
+    assert threshold == threshold_expected
+    assert name == name_expected
+    assert (expectation_type in str(batch.expectation_suite)) == applied

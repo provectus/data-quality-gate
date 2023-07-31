@@ -1,6 +1,6 @@
 import json
 import math
-
+import numpy as np
 from ydata_profiling import ProfileReport
 import os
 import boto3
@@ -244,7 +244,7 @@ def calculate_z_score(summary):
     maximum = summary["max"]
     significance_level = 0.005
     threshold = (maximum - mean) / std
-    if std:
+    if std and not np.isnan(std):
         return threshold + significance_level
 
 
