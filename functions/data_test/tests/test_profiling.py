@@ -102,8 +102,8 @@ def before_and_after_test():
     df = pd.DataFrame(columns=['PassengerId'])
     context_gx = gx.get_context()
     datasource = context_gx.sources.add_pandas(name="test")
-    data_asset = datasource.add_dataframe_asset(name="test")
-    batch_request = data_asset.build_batch_request(dataframe=df)
+    data_asset = datasource.add_dataframe_asset(name="test", dataframe=df)
+    batch_request = data_asset.build_batch_request()
     context_gx.add_or_update_expectation_suite("test_suite")
     batch_empty = context_gx.get_validator(
         batch_request=batch_request,
