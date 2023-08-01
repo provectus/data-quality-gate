@@ -16,6 +16,7 @@ from profiling import (add_local_s3_to_stores,
                        expectations_median)
 import great_expectations as gx
 import pandas as pd
+from datetime import datetime
 
 ENDPOINT_URL = "http://localhost:4566"
 summary_template = {
@@ -99,21 +100,23 @@ def change_template(params, params_name):
 
 @pytest.fixture(autouse=True)
 def before_and_after_test():
+
     df = pd.DataFrame(columns=['PassengerId'])
     context_gx = gx.get_context()
-    datasource = context_gx.sources.add_pandas(name="test")
-    data_asset = datasource.add_dataframe_asset(name="test", dataframe=df)
+    suite_name = f"test_{datetime.now()}"
+    datasource = context_gx.sources.add_pandas(name=suite_name)
+    data_asset = datasource.add_dataframe_asset(name=suite_name, dataframe=df)
     batch_request = data_asset.build_batch_request()
-    context_gx.add_or_update_expectation_suite("test_suite")
+    context_gx.add_or_update_expectation_suite(f"{suite_name}_suite")
     batch_empty = context_gx.get_validator(
         batch_request=batch_request,
-        expectation_suite_name="test_suite",
+        expectation_suite_name=f"{suite_name}_suite",
     )
 
     yield batch_empty
 
-    context_gx.delete_expectation_suite("test_suite")
-    context_gx.delete_datasource("test")
+    context_gx.delete_expectation_suite(f"{suite_name}_suite")
+    context_gx.delete_datasource(suite_name)
 
 
 @pytest.mark.parametrize("p_unique, applied", [(0.95, True), (0.9, True), (0.1, False)])
