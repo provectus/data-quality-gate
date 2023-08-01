@@ -50,9 +50,8 @@ def expectations_mean(name, summary, batch, *args):
 
 def expectations_median(name, summary, batch, *args):
     min_median, max_median = calculate_median(summary)
-    if min_median and max_median:
-        batch.expect_column_median_to_be_between(
-            column=name, min_value=min_median, max_value=max_median)
+    batch.expect_column_median_to_be_between(
+        column=name, min_value=min_median, max_value=max_median)
     return name, summary, batch
 
 
@@ -64,11 +63,10 @@ def expectations_stdev(name, summary, batch, *args):
 
 
 def expectations_quantile(name, summary, batch, *args):
+    value_ranges = calculate_q_ranges(summary)
     q_ranges = {
         "quantiles": [0.05, 0.25, 0.5, 0.75, 0.95],
-        "value_ranges": [[summary["5%"], summary["25%"]], [summary["25%"], summary["50%"]],
-                         [summary["50%"], summary["75%"]], [summary["75%"], summary["95%"]],
-                         [summary["95%"], summary["max"]]]
+        "value_ranges": value_ranges
     }
     batch.expect_column_quantile_values_to_be_between(
         column=name, quantile_ranges=q_ranges)
@@ -209,8 +207,6 @@ def calculate_mean(summary):
 
 
 def calculate_median(summary):
-    min_median = None
-    max_median = None
     raw_values = summary["value_counts_index_sorted"]
     values = []
     for key, v in raw_values.items():
@@ -218,10 +214,11 @@ def calculate_median(summary):
         values.extend(key)
     q = 0.5
     j = int(len(values) * q - 2.58 * math.sqrt(len(values) * q * (1 - q)))
-    k = int(len(values) * q + 2.58 * math.sqrt(len(values) * q * (1 - q)))
-    if j < len(values) and k < len(values):
-        min_median = values[j]
-        max_median = values[k]
+    k = int(len(values) * q + 2.58 * math.sqrt(len(values) * q * (1 - q))) - 1
+    if j >= 1:
+        j -= 1
+    min_median = values[j]
+    max_median = values[k]
     return min_median, max_median
 
 
@@ -246,6 +243,12 @@ def calculate_z_score(summary):
     threshold = (maximum - mean) / std
     if std and not np.isnan(std):
         return threshold + significance_level
+
+
+def calculate_q_ranges(summary):
+    return [[summary["5%"], summary["25%"]], [summary["25%"], summary["50%"]],
+            [summary["50%"], summary["75%"]], [summary["75%"], summary["95%"]],
+            [summary["95%"], summary["max"]]]
 
 
 def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,

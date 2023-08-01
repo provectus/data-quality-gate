@@ -9,7 +9,11 @@ from profiling import (add_local_s3_to_stores,
                        calculate_stdev,
                        expectations_stdev,
                        calculate_z_score,
-                       expectations_z_score)
+                       expectations_z_score,
+                       expectations_quantile,
+                       calculate_q_ranges,
+                       calculate_median,
+                       expectations_median)
 import great_expectations as gx
 import pandas as pd
 
@@ -23,7 +27,7 @@ summary_template = {
     "type": "Numeric",
     "hashable": True,
     "value_counts_without_nan": "892",
-    "value_counts_index_sorted": "892     1 \nName: PassengerId, Length: 418, dtype: int64",
+    "value_counts_index_sorted": pd.Series({892: 1, 893: 1, 894: 1, 1004: 2, 1500: 1}),
     "ordering": True,
     "n_missing": 0,
     "n": 418,
@@ -160,6 +164,7 @@ def test_expectations_mean(n, std, mean, max_mean, min_mean, before_and_after_te
     assert name == name_expected
     assert expectation_type in str(batch.expectation_suite)
 
+
 @pytest.mark.parametrize("n,std,max_std,min_std",
                          [(418, 120.81045760473994, 136.10108739120102, 105.51982781827887)])
 def test_expectations_stdev(n, std, max_std, min_std, before_and_after_test):
@@ -178,6 +183,7 @@ def test_expectations_stdev(n, std, max_std, min_std, before_and_after_test):
     assert name == name_expected
     assert expectation_type in str(batch.expectation_suite)
 
+
 @pytest.mark.parametrize("mean,std,max,threshold,applied",
                          [(418, 120.81045760473994, 1309, 7.380189347557294, True),
                           (418, np.nan, 1309, None, False)])
@@ -195,5 +201,48 @@ def test_expectations_z_score(mean, std, max, threshold, applied, before_and_aft
     name, summary, batch = expectations_z_score(name_expected, summary_expected, batch_empty)
 
     assert threshold == threshold_expected
+    assert name == name_expected
+    assert (expectation_type in str(batch.expectation_suite)) == applied
+
+
+@pytest.mark.parametrize("q1,q2,q3,q4,q5,q6",
+                         [(912.85, 996.25, 1100.5, 1204.75, 1288.15, 1309)])
+def test_expectations_quantile(q1, q2, q3, q4, q5, q6, before_and_after_test):
+    q1 = eval("q1")
+    q2 = eval("q2")
+    q3 = eval("q3")
+    q4 = eval("q4")
+    q5 = eval("q5")
+    q6 = eval("q6")
+    expected_ranges = [[q1, q2], [q2, q3],
+                       [q3, q4], [q4, q5],
+                       [q5, q6]]
+    name_expected, summary_expected = change_template([q1, q2, q3, q4, q5, q6],
+                                                      ["5%", "25%", "50%", "75%", "95%", "max"])
+    expectation_type = "expect_column_quantile_values_to_be_between"
+    batch_empty = before_and_after_test
+
+    q_ranges = calculate_q_ranges(summary_expected)
+    name, summary, batch = expectations_quantile(name_expected, summary_expected, batch_empty)
+
+    assert expected_ranges == q_ranges
+    assert name == name_expected
+    assert expectation_type in str(batch.expectation_suite)
+
+@pytest.mark.parametrize("min_median,max_median,value_counts_index_sorted,applied",
+                         [(892, 1500, pd.Series({892: 1, 893: 1, 894: 1, 1004: 2, 1500: 1}), True)])
+def test_expectations_median(min_median, max_median, value_counts_index_sorted, applied, before_and_after_test):
+    min_median_expected = eval("min_median")
+    max_median_expected = eval("max_median")
+    value_counts_index_sorted = eval("value_counts_index_sorted")
+    applied = eval("applied")
+    name_expected, summary_expected = change_template([value_counts_index_sorted], ["value_counts_index_sorted"])
+    expectation_type = "expect_column_median_to_be_between"
+    batch_empty = before_and_after_test
+
+    min_median, max_median = calculate_median(summary_expected)
+    name, summary, batch = expectations_median(name_expected, summary_expected, batch_empty)
+
+    assert (min_median == min_median_expected and max_median == max_median_expected)
     assert name == name_expected
     assert (expectation_type in str(batch.expectation_suite)) == applied
