@@ -16,7 +16,6 @@ from profiling import (add_local_s3_to_stores,
                        expectations_median,
                        change_ge_config)
 import great_expectations as gx
-from great_expectations.data_context import EphemeralDataContext
 import pandas as pd
 from datetime import datetime
 
@@ -104,21 +103,17 @@ def change_template(params, params_name):
 def before_and_after_test():
 
     df = pd.DataFrame(columns=['PassengerId'])
-    config = change_ge_config("test")
-    context_gx = EphemeralDataContext(project_config=config)
+    context_gx = gx.get_context()
     suite_name = f"test_{datetime.now()}"
     datasource = context_gx.sources.add_pandas(name=suite_name)
     data_asset = datasource.add_dataframe_asset(name=suite_name, dataframe=df)
     batch_request = data_asset.build_batch_request()
-    context_gx.add_or_update_expectation_suite(f"{suite_name}_suite")
     batch_empty = context_gx.get_validator(
         batch_request=batch_request,
-        expectation_suite_name=f"{suite_name}_suite",
     )
 
     yield batch_empty
 
-    context_gx.delete_expectation_suite(f"{suite_name}_suite")
     context_gx.delete_datasource(suite_name)
 
 
