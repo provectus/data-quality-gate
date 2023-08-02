@@ -13,8 +13,10 @@ from profiling import (add_local_s3_to_stores,
                        expectations_quantile,
                        calculate_q_ranges,
                        calculate_median,
-                       expectations_median)
+                       expectations_median,
+                       change_ge_config)
 import great_expectations as gx
+from great_expectations.data_context import EphemeralDataContext
 import pandas as pd
 from datetime import datetime
 
@@ -102,7 +104,8 @@ def change_template(params, params_name):
 def before_and_after_test():
 
     df = pd.DataFrame(columns=['PassengerId'])
-    context_gx = gx.get_context()
+    config = change_ge_config("test")
+    context_gx = EphemeralDataContext(project_config=config)
     suite_name = f"test_{datetime.now()}"
     datasource = context_gx.sources.add_pandas(name=suite_name)
     data_asset = datasource.add_dataframe_asset(name=suite_name, dataframe=df)
