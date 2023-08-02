@@ -15,6 +15,7 @@ from great_expectations.data_context.types.base import (DataContextConfig,
                                                         S3StoreBackendDefaults)
 import yaml
 from scipy.stats import t
+from loguru import logger
 
 DEFAULT_CONFIG_FILE_PATH = "great_expectations/great_expectations.yml"
 
@@ -51,6 +52,7 @@ def expectations_mean(name, summary, batch, *args):
 def expectations_median(name, summary, batch, *args):
     min_median, max_median = calculate_median(summary)
     if min_median and max_median:
+        logger.debug("min_median and max_median is not None")
         batch.expect_column_median_to_be_between(
             column=name, min_value=min_median, max_value=max_median)
     return name, summary, batch
@@ -78,6 +80,7 @@ def expectations_quantile(name, summary, batch, *args):
 def expectations_z_score(name, summary, batch, *args):
     threshold = calculate_z_score(summary)
     if threshold and threshold == threshold:
+        logger.debug("threshold is not None")
         batch.expect_column_value_z_scores_to_be_less_than(
             column=name, threshold=threshold, double_sided=False)
     return name, summary, batch
@@ -250,6 +253,7 @@ def calculate_z_score(summary):
 
 def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
                  mapping_config, run_name):
+    logger.info("starting profiling")
     qa_bucket = s3.Bucket(qa_bucket_name)
     config = change_ge_config(datasource_root)
     context_ge = EphemeralDataContext(project_config=config)
@@ -258,26 +262,33 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
     try:
         profile = ProfileReport(df, title=f"{suite_name} Profiling Report",
                                 minimal=True, pool_size=1)
+        logger.info("profiling in minimal mode")
     except TypeError:
         profile = ProfileReport(df, title=f"{suite_name} Profiling Report",
                                 pool_size=1)
+        logger.warning("profiling in default mode")
     try:
         report = profile.to_html()
+        logger.debug("profiling converted to html successfully")
     except ValueError:
         profile.config.vars.text.words = False
         report = profile.to_html()
+        logger.warning("profiling had problems with text.words during process")
 
     if not source_covered:
+        logger.debug("suite is not covered")
         try:
             pipeline_config = json.loads(wr.s3.read_json(
                 path=f"s3://{qa_bucket_name}/test_configs/pipeline.json").to_json())
             reuse_suite = pipeline_config[run_name]['reuse_suite']
             use_old_suite_only = pipeline_config[run_name]['use_old_suite_only']
             old_suite_name = pipeline_config[run_name]['old_suite_name']
+            logger.debug("all params were found at configs for pipeline")
         except KeyError:
             reuse_suite = False
             use_old_suite_only = False
             old_suite_name = None
+            logger.warning("some params were not found at configs for pipeline")
         ExpectationsReport.to_expectation_suite = ExpectationsReportNew.to_expectation_suite
         suite = profile.to_expectation_suite(
             data_context=context_ge,
@@ -298,4 +309,5 @@ def profile_data(df, suite_name, cloudfront, datasource_root, source_covered,
     qa_bucket.put_object(Key=f"{folder}{suite_name}_profiling.html",
                          Body=report, ContentType='text/html')
     profile_link = f"{cloudfront}/{folder}{suite_name}_profiling.html"
+    logger.info("profiling is finished")
     return profile_link, date_time, context_ge, data_asset
