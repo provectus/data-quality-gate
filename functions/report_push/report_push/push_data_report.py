@@ -5,6 +5,7 @@ import json
 import awswrangler as wr
 import random
 from jira_events import auth_in_jira, get_all_issues, open_bug
+from loguru import logger
 
 s3 = boto3.resource('s3')
 sns = boto3.client('sns')
@@ -19,6 +20,7 @@ autobug = False
 
 
 def handler(event, context):
+    logger.info("Starting pushing notifications and metadata")
     replaced_allure_links = event['links'].get('Payload')
     report = event['report'].get('Payload')
     profiling_link = (report.get('profiling'))
@@ -76,16 +78,19 @@ def handler(event, context):
         path=f"s3://{qa_bucket}/test_configs/pipeline.json").to_json())
     try:
         autobug = pipeline_config[run_name]['autobug']
+        logger.debug("autobug param was found at pipeline.json")
     except KeyError:
         autobug = False
-        print(f"Can't find autobug param for {run_name}")
+        logger.warning(f"Can't find autobug param for {run_name}")
     try:
         only_failed = pipeline_config[run_name]["only_failed"]
+        logger.debug("only_failed param was found at pipeline.json")
     except KeyError:
         only_failed = True
-        print(f"Can't find only_failed param for {run_name}")
+        logger.warning(f"Can't find only_failed param for {run_name}")
 
     if autobug and failed:
+        logger.debug("autobug and failed params branch")
         jira_project_key = os.environ['JIRA_PROJECT_KEY']
         auth_in_jira()
         created_bug_count, bug_name = create_jira_bugs_from_allure_result(
@@ -110,6 +115,8 @@ def handler(event, context):
         sns_bugs_topic,
         only_failed)
 
+    logger.info("Finished pushing notifications and metadata")
+
     return report
 
 
@@ -119,6 +126,7 @@ def create_jira_bugs_from_allure_result(
         replaced_allure_links,
         suite,
         jira_project_key):
+    logger.info("Starting creating bugs at Jira")
     created_bug_count = 0
     bug_name = []
     all_result_files = bucket.objects.filter(
@@ -142,6 +150,7 @@ def create_jira_bugs_from_allure_result(
                     issues,
                     jira_project_key,
                 ))
+    logger.info("Finished creating bugs at Jira")
     return created_bug_count, bug_name
 
 
@@ -157,6 +166,7 @@ def push_sns_message(
         passed,
         sns_bugs_topic,
         only_failed):
+    logger.info("Starting pushing sns messages")
     message_structure = 'json'
     allure_link = f"http://{replaced_allure_links}"
     if created_bug_count > 0:
@@ -189,6 +199,7 @@ def push_sns_message(
         sns.publish(TopicArn=sns_bugs_topic,
                     Message=sns_message,
                     MessageStructure=message_structure)
+    logger.info("Finished pushing sns messages")
 
 
 def push_cloudwatch_metrics(suite,
@@ -196,6 +207,7 @@ def push_cloudwatch_metrics(suite,
                             failed,
                             created_bug_count,
                             cloudwatch):
+    logger.info("Starting pushing cloudwatch")
     if created_bug_count > 0:
         metric_data = {
             'MetricName': 'bug_created_count',
@@ -234,3 +246,4 @@ def push_cloudwatch_metrics(suite,
             metric_data,
         ]
     )
+    logger.info("Finished pushing cloudwatch")
