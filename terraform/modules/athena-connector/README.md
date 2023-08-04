@@ -37,14 +37,12 @@ No modules.
 | [aws_s3_bucket_public_access_block.public_access_block](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_public_access_block) | resource |
 | [aws_s3_bucket_versioning.athena_spill_bucket](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket_versioning) | resource |
 | [null_resource.athena_dynamodb_connector](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
-| [null_resource.delete_athena_dynamodb_connector](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_data_catalog_name"></a> [data\_catalog\_name](#input\_data\_catalog\_name) | Name of athena data catalog | `string` | n/a | yes |
-| <a name="input_delete_athena_dynamodb_connector"></a> [delete\_athena\_dynamodb\_connector](#input\_delete\_athena\_dynamodb\_connector) | Set to True to delete athena dynamodb connector | `bool` | `false` | no |
 | <a name="input_primary_aws_region"></a> [primary\_aws\_region](#input\_primary\_aws\_region) | AWS region | `string` | n/a | yes |
 | <a name="input_vpc_security_group_ids"></a> [vpc\_security\_group\_ids](#input\_vpc\_security\_group\_ids) | List of security group assigned to lambda. If null value, default subnet and vpc will be used | `list(string)` | `null` | no |
 | <a name="input_vpc_subnet_ids"></a> [vpc\_subnet\_ids](#input\_vpc\_subnet\_ids) | List of subnet ids to place lambda in. If null value, default subnet and vpc will be used | `list(string)` | `null` | no |
