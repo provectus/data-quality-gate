@@ -2,7 +2,7 @@ import os
 import re
 import pathlib
 from data_source_factory import DataSourceFactory
-
+from loguru import logger
 qa_bucket_name = os.environ['BUCKET']
 
 
@@ -14,7 +14,9 @@ def concat_source_list(source, source_engine):
 
 
 def get_file_extension(source):
-    return pathlib.Path(source).suffix[1:]
+    extension = pathlib.Path(source).suffix[1:]
+    logger.debug(f"file extension is {extension}")
+    return extension
 
 
 def read_source(source, engine, extension, run_name, table_name=None,
@@ -33,18 +35,22 @@ def get_source_name(source, extension):
 
 def prepare_final_ds(source, engine, source_engine, run_name, source_name=None,
                      coverage_config=None):
+    logger.info(f"Engine is {engine}")
     path = source
     if engine == 's3':
         source = concat_source_list(source, source_engine)
         source_extension = get_file_extension(source[0])
         df, path = read_source(source, engine, source_extension, run_name)
+        logger.debug("going through s3 branch")
     elif engine == 'hudi':
         source = concat_source_list(source, source_engine)
         source_extension = get_file_extension(source[0])
         df, path = read_source(
             source, engine, source_extension, run_name, source_name)
+        logger.debug("going through hudi branch")
     else:
         source = concat_source_list(source, source_engine)
         df, path = read_source(source, engine, None,
                                run_name, source_name, coverage_config)
+        logger.debug("going through default branch")
     return df, path

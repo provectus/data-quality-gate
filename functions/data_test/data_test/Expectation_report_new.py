@@ -9,7 +9,7 @@ from visions import VisionsTypeset
 from ydata_profiling.config import Settings
 from ydata_profiling.model.handler import Handler
 import re
-
+from loguru import logger
 
 class ExpectationsReportNew:
     config: Settings
@@ -51,6 +51,7 @@ class ExpectationsReportNew:
         try:
             import great_expectations as ge
         except ImportError:
+            logger.error("Please install great expectations before using the expectation functionality")
             raise ImportError(
                 "Please install great expectations before using the expectation functionality"
             )
@@ -66,7 +67,9 @@ class ExpectationsReportNew:
         new_column_in_mapping = {}
         try:
             mapping_schema = mapping_config[suite_name]
+            logger.debug(f"mapping schema was found for {suite_name}")
         except (KeyError, TypeError):
+            logger.debug(f"mapping schema was not found for {suite_name}")
             mapping_schema = None
 
         data_asset = data_context.get_datasource(
@@ -74,19 +77,23 @@ class ExpectationsReportNew:
         batch_request = data_asset.build_batch_request()
 
         if reuse_suite:
+            logger.debug(f"reuse suite branch")
             if use_old_suite:
+                logger.debug(f"use old suite branch")
                 suite_old = data_context.get_expectation_suite(
                     f"{suite_name}_{old_suite_name}")
                 data_context.add_or_update_expectation_suite(
                     expectations=suite_old.expectations,
                     expectation_suite_name=f"{suite_name}_{run_name}")
             else:
+                logger.debug(f"not use old suite branch")
                 schema_list = list(mapping_schema.keys())
                 dict_keys = [
                     i for i in mapping_schema if isinstance(
                         mapping_schema[i], dict)]
 
                 if not dict_keys:
+                    logger.debug(f"dict keys were not found")
                     suite_old = data_context.get_expectation_suite(
                         f"{suite_name}_{old_suite_name}")
                     schema_list.append("_nocolumn")
@@ -98,6 +105,7 @@ class ExpectationsReportNew:
                         new_column_in_mapping.update(
                             {key: mapping_schema[key]})
                     if new_column_in_mapping_keys:
+                        logger.debug(f"new_column_in_mapping_keys were found")
                         schema_list = [
                             x for x in schema_list if x not in new_column_in_mapping_keys and x not in ignored_columns]
                     old_schema_list = list(
@@ -164,6 +172,7 @@ class ExpectationsReportNew:
                             expectations=suite.expectations,
                             expectation_suite_name=f"{suite_name}_{run_name}")
                 else:  # if we have nested tables
+                    logger.debug(f"dict keys were found")
                     r = re.compile("new_col_added")
                     new_column_in_mapping_keys = list(
                         filter(r.match, schema_list))
@@ -288,7 +297,7 @@ class ExpectationsReportNew:
                         expectations=suite.expectations,
                         expectation_suite_name=f"{suite_name}_{run_name}")
         else:
-
+            logger.debug(f"new suite branch")
             suite = data_context.add_or_update_expectation_suite(
                 expectation_suite_name=f"{suite_name}_{run_name}"
             )

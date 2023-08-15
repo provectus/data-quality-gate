@@ -10,7 +10,7 @@ import shutil
 import awswrangler as wr
 import boto3
 import re
-
+from loguru import logger
 qa_bucket = os.environ['BUCKET']
 s3 = boto3.resource('s3')
 bucket = s3.Bucket(qa_bucket)
@@ -30,13 +30,16 @@ def get_test_human_name(file):
     for key, value in params.items():
         if type(value) == list:
             if key == 'value_set':
+                logger.debug("key in param is value_set")
                 for i in value:
                     new_params[f"v__{str(value.index(i))}"] = i
             elif key == 'column_set':
+                logger.debug("key in param is column_set")
                 for i in value:
                     new_params[f"column_list_{str(value.index(i))}"] = i
             else:
                 for i in value:
+                    logger.debug("key in param is other")
                     new_params[f"{str(key)}_{str(value.index(i))}"] = i
 
     if new_params:

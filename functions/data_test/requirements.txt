@@ -8,3 +8,4 @@ fastparquet==0.8.1
 awswrangler==2.19.0
 ydata-profiling==4.2.0
 jinja2==3.0.3
+loguru==0.7.0
