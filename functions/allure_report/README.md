@@ -4,22 +4,22 @@
 Allure Report Lambda convert GX validations format to Best open-source Test report tool format and generate report
 
 ### Libraries and Tools
-great-expectations
-Allure
-awswrangler
+- great-expectations
+- Allure 
+- awswrangler
 
 ### Convert results
-Convert GX validations json results to Allure json result through custom mapper
-Input: Path to json validation result on S3
-Output: allure results in json format
+Convert GX validations json results to Allure json result through custom mapper\
+Input: Path to json validation result on S3\
+Output: allure results in json format\
 
 ### Generate Report
-Generate from Allure json results html page
-Input: Allure results(json)
+Generate from Allure json results html page\
+Input: Allure results(json)\
 Output: Allure report(html+JS)
 
 ## Flow
-![Preview Image](https://raw.githubusercontent.com/provectus/data-quality-gate/main/functions/allure_report/allure_report_flow.png)
+![Tux, the Linux mascot](/functions/allure_report/allure_report_flow.png)
 
 ## Process
 
