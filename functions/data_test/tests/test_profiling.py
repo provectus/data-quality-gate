@@ -101,7 +101,6 @@ def change_template(params, params_name):
 
 @pytest.fixture(autouse=True)
 def before_and_after_test():
-
     df = pd.DataFrame(columns=['PassengerId'])
     context_gx = gx.get_context()
     suite_name = f"test_{datetime.now()}"
