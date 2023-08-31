@@ -11,3 +11,4 @@ boto==2.49.0
 pyarrow==3.0.0
 fastparquet==0.8.1
 awswrangler==2.12.1
+cloudpathlib[s3]==0.15.1

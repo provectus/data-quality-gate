@@ -165,7 +165,7 @@ fabric.properties
 node_modules
 tmp
 
-examples/*/plan
+plan
 *.auto.tfvars
 
 .envrc

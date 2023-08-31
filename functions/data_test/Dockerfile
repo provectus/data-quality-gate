@@ -1,6 +1,6 @@
-FROM public.ecr.aws/lambda/python:3.9 as base
+FROM --platform=linux/amd64 public.ecr.aws/lambda/python:3.9 as base
 COPY requirements.txt ./
-RUN pip3 install -r requirements.txt --no-cache-dir
+RUN pip3 install -r requirements.txt --no-cache-dir && pip3 cache purge
 COPY ./data_test/*.py ./
 COPY ./data_test/great_expectations ./great_expectations
 RUN rm -f  /etc/timezone
@@ -23,3 +23,7 @@ ENTRYPOINT ["pytest","-qvs"]
 
 FROM base as production
 CMD ["data_test.handler"]
+
+FROM base as k8s
+ENTRYPOINT "/bin/sh"
+WORKDIR .

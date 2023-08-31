@@ -73,4 +73,9 @@ def handler(event, context):
         "run_name": run_name,
         "validate_id": validate_id
     }
+
+    if os.getenv("EXEC_ENGINE") == "argo_workflow":
+        with open("/tmp/data_test.json", "w") as outfile:
+            json.dump({'report': report}, outfile)
+
     return report

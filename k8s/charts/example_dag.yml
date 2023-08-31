@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: dag-dqg-
+spec:
+  entrypoint: dag
+  templates:
+    - name: dag
+      steps:
+      - - name: s3
+          template: s3
+      - - name: modify
+          template: modify
+          arguments:
+            parameters:
+            - name: report
+              value: "{{steps.s3.outputs.parameters.report}}"
+      - - name: finish
+          template: finish
+          arguments:
+            parameters:
+              - name: modify
+                value: "{{steps.modify.outputs.parameters.modify}}"
+
+    - name: s3
+      serviceAccountName: "dqg-s3-read"
+      container:
+        image: 024975173233.dkr.ecr.eu-west-2.amazonaws.com/k8s-images:df4491da-9084-3f1a-0ee0-3bd32a9a1faa
+        env:
+        - name: STEP_NAME
+          value: "s3"
+      outputs:
+        parameters:
+        - name: report
+          valueFrom:
+            path: /tmp/s3.json
+    - name: modify
+      serviceAccountName: "dqg-s3-read"
+      inputs:
+        parameters:
+        - name: report
+      outputs:
+        parameters:
+          - name: modify
+            valueFrom:
+              path: /tmp/modify.json
+      container:
+        image: 024975173233.dkr.ecr.eu-west-2.amazonaws.com/k8s-images:df4491da-9084-3f1a-0ee0-3bd32a9a1faa
+        command: ["python3"]
+        args: [ "-c", "import s3_access; s3_access.handler({{inputs.parameters.report}}, 'example_context')"]
+        env:
+          - name: STEP_NAME
+            value: "modify"
+    - name: finish
+      serviceAccountName: "dqg-s3-read"
+      inputs:
+        parameters:
+          - name: modify
+      container:
+        image: 024975173233.dkr.ecr.eu-west-2.amazonaws.com/k8s-images:df4491da-9084-3f1a-0ee0-3bd32a9a1faa
+        command: ["python3"]
+        args: [ "-c", "import s3_access; s3_access.handler({{inputs.parameters.modify}}, 'example_context')"]
+        env:
+          - name: STEP_NAME
+            value: "finish"

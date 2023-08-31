@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: argo-server
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "aa0e37d71394641748c5c86444da90e7-1791585494.eu-west-2.elb.amazonaws.com"
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: argo-workflow-argo-workflows-server
+              port:
+                number: 2746

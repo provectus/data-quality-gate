@@ -17,6 +17,20 @@ environment = os.environ['ENVIRONMENT']
 sns_bugs_topic = os.environ.get('SNS_BUGS_TOPIC_ARN', None)
 autobug = False
 
+engine_name = os.getenv("EXEC_ENGINE_NAME")
+
+def generate_artifact(output):
+    if engine_name == "k8s":
+        with open("/tmp/data_test.json", "w") as outfile:
+            json.dump(output, outfile)
+
+    return 0
+
+def prepare_event(event):
+    if engine_name == "k8s":
+        return json.loads(event)
+    else:
+        return event
 
 def handler(event, context):
     replaced_allure_links = event['links'].get('Payload')

@@ -1,0 +1,72 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: dqg-
+spec:
+  entrypoint: dag
+  templates:
+    - name: dag
+      steps:
+        - - name: data_test
+            template: data_test
+            arguments:
+              parameters:
+                - name: request
+                  value: |
+                    {
+                      "files": [
+                        {
+                          "engine": "s3",
+                          "run_name": "raw_s3",
+                          "source_root": "dqg-data-storage",
+                          "source_data": [
+                            "titanic.parquet"
+                          ]
+                        }
+                      ]
+                    }
+        - - name: allure_report
+            template: allure_report
+            arguments:
+              parameters:
+                - name: report
+                  value: "{{steps.data_test.outputs.parameters.report}}"
+
+    - name: data_test
+      serviceAccountName: "dqg-s3-read"
+      container:
+        image: 024975173233.dkr.ecr.eu-west-2.amazonaws.com/k8s-images:df4491da-9084-3f1a-0ee0-3bd32a9a1faa
+        command: ["python3"]
+        args: [ "-c", "import data_test; data_test.handler({{inputs.parameters.request}}, '')"]
+        env:
+          - name: EXEC_ENGINE
+            value: "argo_workflow"
+          - name: ENVIRONMENT
+            value: "k8s"
+          - name: BUCKET
+            value: "dqg-settings-dev"
+          - name: REPORTS_WEB
+            value: "http://ec2-52-56-212-61.eu-west-2.compute.amazonaws.com"
+      outputs:
+        parameters:
+          - name: report
+            valueFrom:
+              path: /tmp/data_test.json
+    - name: allure_report
+      serviceAccountName: "dqg-s3-read"
+      inputs:
+        parameters:
+          - name: report
+      container:
+        image: 024975173233.dkr.ecr.eu-west-2.amazonaws.com/k8s-images:df4491da-9084-3f1a-0ee0-3bd32a9a1faa
+        command: ["python3"]
+        args: [ "-c", "import allure_report; allure_report.handler({{inputs.parameters.report}}, '')"]
+        env:
+          - name: EXEC_ENGINE
+            value: "argo_workflow"
+          - name: ENVIRONMENT
+            value: "k8s"
+          - name: BUCKET
+            value: "dqg-settings-dev"
+          - name: REPORTS_WEB
+            value: "http://ec2-52-56-212-61.eu-west-2.compute.amazonaws.com"
