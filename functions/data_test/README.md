@@ -33,4 +33,3 @@ Output: validation results(GX json and GX html)
 3. Profile data and save reports to s3 with json and html
 4. if necessary generate test suite based on profiling report and save to s3 with json
 5. Run generated test suite and save validation results to s3 with json and html
-

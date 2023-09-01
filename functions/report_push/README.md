@@ -31,5 +31,3 @@ Output: Bug at Jira
 2. Send necessary info to DynamoDB
 3. If necessary and failed>0 send metrics to Cloudwatch and sns topic
 4. If necessary create bug at Jira
-
-
