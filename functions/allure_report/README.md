@@ -27,4 +27,3 @@ Output: Allure report(html+JS)
 2. Run it through custom mapper and get Allure results in json format
 3. Generate by Allure report from results
 4. Save Report to S3
-
