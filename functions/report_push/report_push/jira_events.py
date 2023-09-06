@@ -6,7 +6,7 @@ API_USERNAME = os.getenv("DATAQA_JIRA_USERNAME")
 API_PASSWORD = os.getenv("DATAQA_JIRA_PASSWORD")
 
 options = {'server': API_URL}
-
+from loguru import logger
 
 def auth_in_jira():
     global jira
@@ -25,7 +25,7 @@ def open_bug(table_name: str, fail_step: str, description: str,
         elif summary == str(single_issue.fields.summary) and str(
                 single_issue.fields.status) != 'Open':
             ticket_exist = True
-            print(f'Will be reopen bug with name[{summary}]')
+            logger.debug(f"Will be reopen bug with name[{summary}]")
             jira.transition_issue(single_issue.key, transition='Re-Open')
             break
     if not ticket_exist:
@@ -41,7 +41,7 @@ def get_all_issues(jira_project_key):
 
 def create_new_bug(description, replaced_allure_links, summary,
                    jira_project_key):
-    print(f'Will be created bug with name[{summary}]')
+    logger.debug(f"Will be created bug with name[{summary}]")
     jira.create_issue(
         fields={
             "project": {"key": jira_project_key},
