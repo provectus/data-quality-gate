@@ -7,6 +7,7 @@ import json
 from datasource import prepare_final_ds, get_source_name, get_file_extension
 from loguru import logger
 
+
 def handler(event, context):
     logger.info("Starting data test")
     if os.environ['ENVIRONMENT'] == 'local':
