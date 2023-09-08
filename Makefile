@@ -17,14 +17,16 @@ build-lambda-img:
 
 build-integration-tests-img: build-lambda-img
 	cd ./tests/integration_tests/$(test) && \
-	docker build --build-arg="IMAGE_NAME=$(test)" \
-	--build-arg="VERSION=$(IMAGE_VERSION)" \
-	-t "$(test)_integration_tests" .
+	docker build -t "$(test)_integration_tests" .
 
 run-data-test-local: build-lambda-img
-	docker run -p 9000:8080 --env BUCKET=$(QA_BUCKET) \
+	docker_id=$$(docker run -d -p 9000:8080 --env BUCKET=$(QA_BUCKET) \
 	--env S3_HOST=$(HOST) --env S3_PORT=$(PORT) --env ENVIRONMENT=local --env REPORTS_WEB=test \
-	--env AWS_ACCESS_KEY_ID=test --env AWS_SECRET_ACCESS_KEY=test --env AWS_DEFAULT_REGION=us-east-1 $(test)
+	--env AWS_ACCESS_KEY_ID=test --env AWS_SECRET_ACCESS_KEY=test --env AWS_DEFAULT_REGION=us-east-1 $(test))
+
+run-integration-tests:
+	S3_HOST=$(HOST) docker-compose up --abort-on-container-exit --build
+
 
 build-unit-tests-img:
 	cd ./functions/$(test) && \

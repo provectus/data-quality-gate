@@ -35,4 +35,4 @@ jobs:
         run: |
          curl http://localhost:4566/_localstack/health -i
       - name: Run tests
-        run: make run-integration-tests QA_BUCKET=dqg-settings-local HOST=172.17.0.1 test=data_test
+        run: make run-integration-tests HOST=172.17.0.1

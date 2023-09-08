@@ -1,13 +1,5 @@
-ARG IMAGE_NAME=data-test
-ARG VERSION=latest
-FROM ${IMAGE_NAME}:${VERSION}
-RUN pip install pytest==7.3.1
-ENV ENVIRONMENT local
-ENV REPORTS_WEB test
-ENV AWS_ACCESS_KEY_ID test
-ENV AWS_SECRET_ACCESS_KEY test
-ENV AWS_DEFAULT_REGION us-east-1
+FROM python:3.9
+RUN pip install pytest==7.3.1 jsonschema==4.0.1 boto3==1.26.66 requests==2.31.0  
 COPY test_data ./test_data
 COPY ./*.py ./
-# ENTRYPOINT ["pytest", "-qvs", "test_data_test.py"]"
-CMD ["data_test.handler"]
+CMD ["pytest", "-qvs", "test_data_test.py"]"

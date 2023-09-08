@@ -1,0 +1,23 @@
+version: '3'
+services:
+  data-test:
+    build:
+      context: ./functions/data_test
+    environment:
+      - BUCKET=dqg-settings-local
+      - S3_HOST=$S3_HOST 
+      - S3_PORT=4566
+      - ENVIRONMENT=local
+      - REPORTS_WEB=test
+      - AWS_ACCESS_KEY_ID=test
+      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_DEFAULT_REGION=us-east-1
+  data-integration-test:
+    build:
+      context: ./tests/integration_tests/data_test
+    environment:
+      - S3_HOST=$S3_HOST
+      - LAMBDA_HOST=data-test
+      - LAMBDA_PORT=8080
+    depends_on:
+      - data-test
