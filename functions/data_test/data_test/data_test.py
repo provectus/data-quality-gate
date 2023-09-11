@@ -11,8 +11,8 @@ import warnings
 
 def handler(event, context):
     logger.info("Starting data test")
+    _ignore_warnings()
     if os.environ['ENVIRONMENT'] == 'local':
-        _ignore_warnings()
         endpoint_url = (f"http://{os.environ['S3_HOST']}:"
                         f"{os.environ['S3_PORT']}")
         s3 = boto3.resource("s3", endpoint_url=endpoint_url)
