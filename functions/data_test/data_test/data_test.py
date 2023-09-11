@@ -6,11 +6,13 @@ import awswrangler as wr
 import json
 from datasource import prepare_final_ds, get_source_name, get_file_extension
 from loguru import logger
+import warnings
 
 
 def handler(event, context):
     logger.info("Starting data test")
     if os.environ['ENVIRONMENT'] == 'local':
+        _ignore_warnings()
         endpoint_url = (f"http://{os.environ['S3_HOST']}:"
                         f"{os.environ['S3_PORT']}")
         s3 = boto3.resource("s3", endpoint_url=endpoint_url)
@@ -90,3 +92,12 @@ def handler(event, context):
     }
     logger.info("Data test is finished successfully")
     return report
+
+
+def _ignore_warnings():
+    warnings.filterwarnings("ignore", category=FutureWarning)
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    # issue for this warning
+    # https://github.com/great-expectations/great_expectations/issues/7338
+    warnings.filterwarnings("ignore", category=UserWarning,
+                            message="`result_format` configured at the Validator-level")
