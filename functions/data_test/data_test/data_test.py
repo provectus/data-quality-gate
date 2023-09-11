@@ -7,12 +7,14 @@ import json
 from datasource import prepare_final_ds, get_source_name, get_file_extension
 from loguru import logger
 
+
 def handler(event, context):
     logger.info("Starting data test")
     if os.environ['ENVIRONMENT'] == 'local':
         endpoint_url = (f"http://{os.environ['S3_HOST']}:"
                         f"{os.environ['S3_PORT']}")
         s3 = boto3.resource("s3", endpoint_url=endpoint_url)
+        wr.config.s3_endpoint_url = endpoint_url
         logger.debug("ENVIRONMENT is local")
     else:
         s3 = boto3.resource("s3")
