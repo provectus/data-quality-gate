@@ -205,6 +205,15 @@ def test_expectations_z_score(mean, std, max, threshold, applied, before_and_aft
     assert (expectation_type in str(batch.expectation_suite)) == applied
 
 
+@pytest.mark.parametrize("summary, expected_result", [
+    ({"mean": 5.0, "std": 2.0, "max": 10.0}, 2.505),
+    ({"mean": 5.0, "std": 0.0, "max": 10.0}, None),
+    ({"mean": 5.0, "std": np.nan, "max": 10.0}, None),
+    ({"mean": 5.0, "std": 2.0, "max": 5.0}, 0.005), ])
+def test_calculate_z_score(summary, expected_result):
+    assert calculate_z_score(summary) == expected_result
+
+
 @pytest.mark.parametrize("q1,q2,q3,q4,q5,q6",
                          [(912.85, 996.25, 1100.5, 1204.75, 1288.15, 1309)])
 def test_expectations_quantile(q1, q2, q3, q4, q5, q6, before_and_after_test):

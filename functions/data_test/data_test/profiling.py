@@ -242,9 +242,11 @@ def calculate_z_score(summary):
     std = summary["std"]
     maximum = summary["max"]
     significance_level = 0.005
-    threshold = (maximum - mean) / std
     if std and not np.isnan(std):
+        threshold = (maximum - mean) / std
         return threshold + significance_level
+    else:
+        return None
 
 
 def calculate_q_ranges(summary):
