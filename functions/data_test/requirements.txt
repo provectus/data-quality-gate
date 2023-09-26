@@ -6,6 +6,8 @@ s3fs==0.4.2
 python-dateutil==2.8.2
 fastparquet==0.8.1
 awswrangler==2.19.0
+#issue https://github.com/ydataai/ydata-profiling/issues/1455
+matplotlib==3.7.0
 ydata-profiling==4.5.1
 jinja2==3.0.3
 loguru==0.7.0
