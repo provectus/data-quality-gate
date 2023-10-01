@@ -19,5 +19,6 @@ services:
       - S3_HOST=$S3_HOST
       - LAMBDA_HOST=data-test
       - LAMBDA_PORT=8080
+      - BUCKET=dqg-settings-local
     depends_on:
       - data-test
