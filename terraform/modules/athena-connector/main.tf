@@ -31,17 +31,14 @@ resource "aws_lambda_function" "athena_dynamodb_connector" {
 
 resource "null_resource" "athena_dynamodb_connector" {
   provisioner "local-exec" {
+    when    = create
     command = "aws athena create-data-catalog --name ${var.data_catalog_name} --type LAMBDA --region ${var.primary_aws_region} --parameters function=${aws_lambda_function.athena_dynamodb_connector.arn}"
   }
 
-  depends_on = [aws_lambda_function.athena_dynamodb_connector]
-}
-
-resource "null_resource" "delete_athena_dynamodb_connector" {
-  count = var.delete_athena_dynamodb_connector ? 1 : 0
   provisioner "local-exec" {
+    when    = destroy
     command = "aws athena delete-data-catalog --name ${var.data_catalog_name} --region ${var.primary_aws_region}"
   }
 
-  depends_on = [null_resource.athena_dynamodb_connector]
+  depends_on = [aws_lambda_function.athena_dynamodb_connector]
 }
