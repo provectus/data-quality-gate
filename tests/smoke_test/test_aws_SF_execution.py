@@ -1,3 +1,5 @@
+import time
+
 import boto3
 import botocore
 import json
@@ -48,16 +50,17 @@ def run_step_function():
 
 
 def get_sf_execution_status(execution_arn):
-    while True:
-        response = sfn_client.describe_execution(
-            executionArn=execution_arn
-        )
-
+    max_iterations = 100
+    for _ in range(max_iterations):
+        response = sfn_client.describe_execution(executionArn=execution_arn)
         status = response['status']
         logger.info(f"Execution status: {status}")
 
         if status in ["SUCCEEDED", "FAILED"]:
             break
+        time.sleep(10)
+    else:
+        logger.warning("Maximum iterations reached. Exiting loop.")
 
 
 def get_sf_events_status(execution_arn):
