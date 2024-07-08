@@ -8,12 +8,6 @@ variable "primary_aws_region" {
   type        = string
 }
 
-variable "delete_athena_dynamodb_connector" {
-  description = "Set to True to delete athena dynamodb connector"
-  type        = bool
-  default     = false
-}
-
 variable "vpc_subnet_ids" {
   description = "List of subnet ids to place lambda in. If null value, default subnet and vpc will be used"
   type        = list(string)
