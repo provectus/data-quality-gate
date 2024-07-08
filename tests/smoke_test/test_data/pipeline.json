@@ -1,0 +1,9 @@
+{
+  "raw_s3":
+  {
+    "engine": "s3",
+    "reuse_suite": false,
+    "use_old_suite_only": false,
+    "autobug": false
+  }
+}
